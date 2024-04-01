@@ -27,13 +27,16 @@
 
 #include <iostream>
 #include "modules/skparagraph/include/ParagraphStyle.h"
+#include "modules/skparagraph/src/ParagraphBuilderImpl.h"
 
 using namespace skia::textlayout;
 
 
 
 int main() {
-    sk_sp<SkFontMgr> fontCollection = SkFontMgr::RefDefault();
+    auto fontCollection = sk_make_sp<FontCollection>();
+    fontCollection->setDefaultFontManager(SkFontMgr::RefDefault());
+
 
     TextStyle text_style;
     text_style.setColor(SK_ColorBLACK);
@@ -42,9 +45,12 @@ int main() {
     ParagraphStyle paragraph_style;
     paragraph_style.setTextStyle(text_style);
 
-//    ParagraphBuilderImpl builder(paragraph_style, fontCollection);
+    ParagraphBuilderImpl builder(paragraph_style, fontCollection);
+    builder.pushStyle(text_style);
+    builder.addText("Hello, World!");
 
-    std::cout << text_style.getFontFamilies()[0].c_str() << std::endl;
-    std::cout << fontCollection->countFamilies() << std::endl;
+    auto paragraph = builder.Build();
+    paragraph->layout(SK_ScalarInfinity);
+
     return 0;
 }
