@@ -34,36 +34,38 @@
 
 using namespace skia::textlayout;
 
-
 int main() {
     auto fontCollection = sk_make_sp<FontCollection>();
     fontCollection->setDefaultFontManager(SkFontMgr::RefDefault());
     
 
-    int width = 800;
-    int height = 600;
+    int width = 595;
+    int height = 842;
 
     SkBitmap bitmap;
     bitmap.allocN32Pixels(width, height);
 
     SkCanvas canvas(bitmap);
+    canvas.clear(SK_ColorWHITE);
 
 
     TextStyle text_style;
     text_style.setColor(SK_ColorBLACK);
     text_style.setFontFamilies({SkString("Maven Pro")});
-    text_style.setFontSize(100.0f);
+    text_style.setFontSize(12.0f);
     ParagraphStyle paragraph_style;
     paragraph_style.setTextStyle(text_style);
 
     ParagraphBuilderImpl builder(paragraph_style, fontCollection);
     builder.pushStyle(text_style);
-    builder.addText("Hello, World!");
+    builder.addText(
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis urna tortor, placerat nec orci suscipit, accumsan hendrerit purus. Maecenas auctor nisi non nibh tristique maximus. Fusce cursus imperdiet justo ut porttitor. Aliquam euismod placerat mi sit amet bibendum. Quisque at libero ac lacus rutrum viverra sed sit amet justo. Pellentesque sit amet massa ac enim luctus vehicula. Suspendisse fringilla, augue sit amet aliquam vehicula, justo odio cursus dolor, nec finibus nibh nibh id purus. Phasellus suscipit urna dolor, at convallis tortor euismod ac. Sed volutpat aliquam consectetur. Phasellus eu erat auctor, tempor enim vitae, tempus ligula. Aenean malesuada tincidunt purus, vitae molestie ante euismod ac. Nulla cursus arcu a dictum elementum. Maecenas pulvinar semper augue vel tempus. Duis velit augue, imperdiet ut euismod vel, rutrum in urna. Donec laoreet fringilla neque sit amet cursus. Sed sollicitudin nunc vel elementum vulputate."
+    );
 
     auto paragraph = builder.Build();
-    paragraph->layout(SK_ScalarInfinity);
+    paragraph->layout(495);
 
-    paragraph->paint(&canvas, 0, 0);
+    paragraph->paint(&canvas, 50, 50);
     
 
     sk_sp<SkImage> image = bitmap.asImage();
@@ -71,7 +73,6 @@ int main() {
 
     SkFILEWStream out("text.png");
     out.write(png->data(), png->size());
-
 
     return 0;
 }
