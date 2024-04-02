@@ -61,6 +61,8 @@
         "vector": "cpp",
         "algorithm": "cpp",
         "future": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "span": "cpp",
+        "*.inc": "cpp"
     }
 }

@@ -31,48 +31,57 @@
 
 #include "include/core/SkImage.h"
 #include "include/core/SkStream.h"
+#include "include/core/SkDocument.h"
+#include "include/docs/SkPDFDocument.h"
+#include <string>
 
 using namespace skia::textlayout;
+
 
 int main() {
     auto fontCollection = sk_make_sp<FontCollection>();
     fontCollection->setDefaultFontManager(SkFontMgr::RefDefault());
     
+    SkFILEWStream stream("output.pdf");
 
-    int width = 595;
-    int height = 842;
+    SkPDF::Metadata metadata;
+    metadata.fTitle = "Wordly";
+    metadata.fCreator = "Example WritePDF() Function";
+    metadata.fCreation = {0, 2019, 1, 4, 31, 12, 34, 56};
+    metadata.fModified = {0, 2019, 1, 4, 31, 12, 34, 56};
+    auto doc = SkPDF::MakeDocument(&stream, metadata);
+    SkCanvas* canvas = doc->beginPage(595, 842);
 
-    SkBitmap bitmap;
-    bitmap.allocN32Pixels(width, height);
-
-    SkCanvas canvas(bitmap);
-    canvas.clear(SK_ColorWHITE);
+    canvas->clear(SK_ColorWHITE);
 
 
     TextStyle text_style;
     text_style.setColor(SK_ColorBLACK);
-    text_style.setFontFamilies({SkString("Maven Pro")});
+    text_style.setFontFamilies({SkString("Damascus")});
     text_style.setFontSize(12.0f);
     ParagraphStyle paragraph_style;
     paragraph_style.setTextStyle(text_style);
 
     ParagraphBuilderImpl builder(paragraph_style, fontCollection);
     builder.pushStyle(text_style);
-    builder.addText(
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis urna tortor, placerat nec orci suscipit, accumsan hendrerit purus. Maecenas auctor nisi non nibh tristique maximus. Fusce cursus imperdiet justo ut porttitor. Aliquam euismod placerat mi sit amet bibendum. Quisque at libero ac lacus rutrum viverra sed sit amet justo. Pellentesque sit amet massa ac enim luctus vehicula. Suspendisse fringilla, augue sit amet aliquam vehicula, justo odio cursus dolor, nec finibus nibh nibh id purus. Phasellus suscipit urna dolor, at convallis tortor euismod ac. Sed volutpat aliquam consectetur. Phasellus eu erat auctor, tempor enim vitae, tempus ligula. Aenean malesuada tincidunt purus, vitae molestie ante euismod ac. Nulla cursus arcu a dictum elementum. Maecenas pulvinar semper augue vel tempus. Duis velit augue, imperdiet ut euismod vel, rutrum in urna. Donec laoreet fringilla neque sit amet cursus. Sed sollicitudin nunc vel elementum vulputate."
-    );
+    std::basic_string<char16_t> text = u"كما قالت المنظمة إن عمالها الذين قتلو كانوا بريطانيين وبولنديين وأستراليين و كذلك فلسطينيين، من بينهم مواطن مزدوج الجنسية، يحمل الجنسيتين الأمريكية والكندية.";
+    builder.addText(text);
+
+    ParagraphBuilderImpl builder2(paragraph_style, fontCollection);
+    builder2.pushStyle(text_style);
+    builder2.addText("The American pop star entered the Forbes World's Billionaires List for the first time with $1.1bn (£877m), along with Sam Altman, creator of the AI chatbot ChatGPT on $1bn (£800m).");
 
     auto paragraph = builder.Build();
-    paragraph->layout(495);
-
-    paragraph->paint(&canvas, 50, 50);
+    paragraph->layout(200);
+    paragraph->paint(canvas, 50, 50);
     
+    auto paragraph2 = builder2.Build();
+    paragraph2->layout(200);
+    paragraph2->paint(canvas, 300, 50);
 
-    sk_sp<SkImage> image = bitmap.asImage();
-    sk_sp<SkData> png = SkPngEncoder::Encode(nullptr, image.get(), {});
-
-    SkFILEWStream out("text.png");
-    out.write(png->data(), png->size());
+    doc->endPage();
+    doc->close();
+    
 
     return 0;
 }
