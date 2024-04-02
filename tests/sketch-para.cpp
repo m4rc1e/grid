@@ -29,19 +29,30 @@
 #include "modules/skparagraph/include/ParagraphStyle.h"
 #include "modules/skparagraph/src/ParagraphBuilderImpl.h"
 
-using namespace skia::textlayout;
+#include "include/core/SkImage.h"
+#include "include/core/SkStream.h"
 
+using namespace skia::textlayout;
 
 
 int main() {
     auto fontCollection = sk_make_sp<FontCollection>();
     fontCollection->setDefaultFontManager(SkFontMgr::RefDefault());
+    
+
+    int width = 800;
+    int height = 600;
+
+    SkBitmap bitmap;
+    bitmap.allocN32Pixels(width, height);
+
+    SkCanvas canvas(bitmap);
 
 
     TextStyle text_style;
     text_style.setColor(SK_ColorBLACK);
     text_style.setFontFamilies({SkString("Maven Pro")});
-    text_style.setFontSize(10.0f);
+    text_style.setFontSize(100.0f);
     ParagraphStyle paragraph_style;
     paragraph_style.setTextStyle(text_style);
 
@@ -51,6 +62,16 @@ int main() {
 
     auto paragraph = builder.Build();
     paragraph->layout(SK_ScalarInfinity);
+
+    paragraph->paint(&canvas, 0, 0);
+    
+
+    sk_sp<SkImage> image = bitmap.asImage();
+    sk_sp<SkData> png = SkPngEncoder::Encode(nullptr, image.get(), {});
+
+    SkFILEWStream out("text.png");
+    out.write(png->data(), png->size());
+
 
     return 0;
 }
