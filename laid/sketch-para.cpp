@@ -35,33 +35,10 @@
 #include "include/docs/SkPDFDocument.h"
 #include <string>
 
-
-
-doc = Document()
-
-style = Style;
-style.fontFamily = "Arial"
-doc.addParagraphStyle("p1", style)
-
-masterPage = MasterPage;
-masterPage.dimensions(595, 842)
-masterPage.cols = 5
-masterPage.rows = 4
-doc.addMasterPage("dflt", page)
-
-page = doc.addPage("dflt")
-
-box = page.addBox(10, 10, 100, 100)
-box.addText("Hello World", "p1")
-box.addImage("image.png")
-
-
-
-
 using namespace skia::textlayout;
 
 
-int main() 
+int main() {
     auto fontCollection = sk_make_sp<FontCollection>();
     fontCollection->setDefaultFontManager(SkFontMgr::RefDefault());
     
@@ -87,15 +64,14 @@ int main()
 
     ParagraphBuilderImpl builder(paragraph_style, fontCollection);
     builder.pushStyle(text_style);
-    std::basic_string<char16_t> text = u"كما قالت المنظمة إن عمالها الذين قتلو كانوا بريطانيين وبولنديين وأستراليين و كذلك فلسطينيين، من بينهم مواطن مزدوج الجنسية، يحمل الجنسيتين الأمريكيةالكندية.";
+    std::basic_string<char16_t> text = u"كما قالت المنظمة إن عمالها الذين قتلو كانوا بريطانيين وبولنديين وأستراليين و كذلك فلسطينيين، من بينهم مواطن مزدوج الجنسية، يحمل الجنسيتين الأمريكية والكندية.";
     builder.addText(text);
 
     ParagraphBuilderImpl builder2(paragraph_style, fontCollection);
     builder2.pushStyle(text_style);
-    builder2.addText("The American pop star entered the Forbes World's Billionaires List for the first time with $1.1bn (£877m), along with Sam Altman, creator of the AI chatbot ChatGPT on $1bn (£800m). This is the only way back home if you want to live. This is never going to work");
+    builder2.addText("The American pop star entered the Forbes World's Billionaires List for the first time with $1.1bn (£877m), along with Sam Altman, creator of the AI chatbot ChatGPT on $1bn (£800m).");
 
     auto paragraph = builder.Build();
-    paragraph->updateTextAlign(TextAlign::kRight);
     paragraph->layout(200);
     paragraph->paint(canvas, 50, 50);
     
