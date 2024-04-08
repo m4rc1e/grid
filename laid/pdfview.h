@@ -45,6 +45,40 @@ using namespace skia::textlayout;
 
 
 void renderGuides(SkCanvas* canvas, laid::MasterPage& masterPage) {
+    // grids
+    SkPaint paintGrids;
+    paintGrids.setStrokeWidth(1.0f);
+    paintGrids.setColor(SK_ColorCYAN);
+    int workingWidth = masterPage.width - masterPage.marginLeft - masterPage.marginRight;
+    // grid cols
+    for (int i=0; i< masterPage.cols; i++) {
+        auto gridbox = masterPage.getRect(i, 0);
+        std::cout << masterPage.marginTop << std::endl;
+        canvas->drawLine(
+            SkPoint::Make(gridbox.startX, masterPage.marginTop),
+            SkPoint::Make(gridbox.startX, masterPage.height - masterPage.marginBottom),
+            paintGrids
+        );
+        canvas->drawLine(
+            SkPoint::Make(gridbox.endX, masterPage.marginTop),
+            SkPoint::Make(gridbox.endX, masterPage.height - masterPage.marginBottom),
+            paintGrids
+        );
+    }
+
+    for (int i=0; i< masterPage.rows; i++) {
+        auto gridbox = masterPage.getRect(0, i);
+        canvas->drawLine(
+            SkPoint::Make(masterPage.marginLeft, gridbox.startY),
+            SkPoint::Make(masterPage.width - masterPage.marginRight, gridbox.startY),
+            paintGrids
+        );
+        canvas->drawLine(
+            SkPoint::Make(masterPage.marginLeft, gridbox.endY),
+            SkPoint::Make(masterPage.width - masterPage.marginRight, gridbox.endY),
+            paintGrids
+        );
+    }
     //margins
     SkPaint paintMargins;
     paintMargins.setColor(SK_ColorMAGENTA);
@@ -54,11 +88,7 @@ void renderGuides(SkCanvas* canvas, laid::MasterPage& masterPage) {
     canvas->drawLine(SkPoint::Make(masterPage.width - masterPage.marginRight, masterPage.marginTop), SkPoint::Make(masterPage.width - masterPage.marginRight, masterPage.height - masterPage.marginBottom), paintMargins);
     canvas->drawLine(SkPoint::Make(masterPage.marginLeft, masterPage.height - masterPage.marginBottom), SkPoint::Make(masterPage.width - masterPage.marginRight, masterPage.height - masterPage.marginBottom), paintMargins);
     
-    // grids
-//    SkPaint paint;
-//    paint.setColor(SK_ColorCYAN);
-//    paint.setStrokeWidth(1.0f);
-//    canvas->drawLine(SkPoint::Make(0, 400), SkPoint::Make(width, 400), paint);
+
 }
 
 

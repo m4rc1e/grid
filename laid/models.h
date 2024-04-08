@@ -5,6 +5,8 @@
 #include <map>
 #include <vector>
 #include <iostream>
+#include <tuple>
+
 
 namespace laid {
 
@@ -14,18 +16,38 @@ class ParagraphStyle {
         std::string name;
 };
 
+class Rect {
+    public:
+        float startX;
+        float startY;
+        float endX;
+        float endY;
+};
+
 class MasterPage {
     public:
         std::string name;
-        int width;
-        int height;
+        float width;
+        float height;
         int cols;
         int rows;
-        int columnGap;
-        int marginTop;
-        int marginBottom;
-        int marginLeft;
-        int marginRight;
+        float gap;
+        float marginTop;
+        float marginBottom;
+        float marginLeft;
+        float marginRight;
+    
+        Rect getRect(int col, int row) {
+            auto colWidth = (width - marginLeft - marginRight - gap) / cols;
+            auto rowHeight = (height - marginTop - marginBottom - gap) / rows;
+
+            auto startX = marginLeft + (colWidth * col) + ((gap/2) * col);
+            auto endX = startX + colWidth - (gap/2);
+            auto startY = marginTop + (rowHeight * row) + ((gap/2) * row);
+            auto endY = startY + rowHeight - (gap/2);
+            return Rect{startX, startY, endX, endY};
+        }
+
 };
 
 
@@ -38,10 +60,10 @@ class TextRun {
 
 class Box {
     public:
-        int x;
-        int y;
-        int width;
-        int height;
+        float x;
+        float y;
+        float width;
+        float height;
         std::vector<TextRun> text_runs;
 
         Box(int x, int y, int width, int height) : x(x), y(y), width(width), height(height) {}
