@@ -61,6 +61,25 @@ int RenderPDF(laid::Document& laidDoc) {
         int width = page->masterPage.width;
         int height = page->masterPage.height;
         SkCanvas* canvas = doc->beginPage(width, height);
+        for(auto& box : page->boxes) {
+            ParagraphStyle paragraph_style;
+            ParagraphBuilderImpl builder(paragraph_style, fontCollection);
+            for(auto& text_run : box.text_runs) {
+                std::cout << text_run.text << std::endl;
+                TextStyle text_style;
+                text_style.setColor(SK_ColorBLACK);
+                text_style.setFontFamilies({SkString("Damascus")});
+                text_style.setFontSize(12.0f);
+                paragraph_style.setTextStyle(text_style);
+
+                builder.pushStyle(text_style);
+                builder.addText(text_run.text.data());
+
+                auto paragraph = builder.Build();
+                paragraph->layout(box.width);
+                paragraph->paint(canvas, box.x, box.y);
+            }
+        }
         doc->endPage();
 
     }

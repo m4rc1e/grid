@@ -24,18 +24,25 @@ class MasterPage {
 };
 
 
-class Box {
-    int x;
-    int y;
-    int width;
-    int height;
-    std::string text;
-    ParagraphStyle style;
+class TextRun {
+    public:
+        std::string text;
+        ParagraphStyle style;
+};
 
-    void addText(std::string text, ParagraphStyle& style) {
-        this->text = text;
-        this->style = style;
-    }
+
+class Box {
+    public:
+        int x;
+        int y;
+        int width;
+        int height;
+        std::vector<TextRun> text_runs;
+
+        Box(int x, int y, int width, int height) : x(x), y(y), width(width), height(height) {}
+        void addText(std::string text, ParagraphStyle& style) {
+            text_runs.push_back(TextRun{text, style});
+        }
 };
 
 
