@@ -44,6 +44,24 @@
 using namespace skia::textlayout;
 
 
+void renderGuides(SkCanvas* canvas, laid::MasterPage& masterPage) {
+    //margins
+    SkPaint paintMargins;
+    paintMargins.setColor(SK_ColorMAGENTA);
+    paintMargins.setStrokeWidth(1.0f);
+    canvas->drawLine(SkPoint::Make(masterPage.marginLeft, masterPage.marginTop), SkPoint::Make(masterPage.width - masterPage.marginRight, masterPage.marginTop), paintMargins);
+    canvas->drawLine(SkPoint::Make(masterPage.marginLeft, masterPage.marginTop), SkPoint::Make(masterPage.marginLeft, masterPage.height - masterPage.marginBottom), paintMargins);
+    canvas->drawLine(SkPoint::Make(masterPage.width - masterPage.marginRight, masterPage.marginTop), SkPoint::Make(masterPage.width - masterPage.marginRight, masterPage.height - masterPage.marginBottom), paintMargins);
+    canvas->drawLine(SkPoint::Make(masterPage.marginLeft, masterPage.height - masterPage.marginBottom), SkPoint::Make(masterPage.width - masterPage.marginRight, masterPage.height - masterPage.marginBottom), paintMargins);
+    
+    // grids
+//    SkPaint paint;
+//    paint.setColor(SK_ColorCYAN);
+//    paint.setStrokeWidth(1.0f);
+//    canvas->drawLine(SkPoint::Make(0, 400), SkPoint::Make(width, 400), paint);
+}
+
+
 int RenderPDF(laid::Document& laidDoc) {
     auto fontCollection = sk_make_sp<FontCollection>();
     fontCollection->setDefaultFontManager(SkFontMgr::RefDefault());
@@ -61,6 +79,8 @@ int RenderPDF(laid::Document& laidDoc) {
         int width = page->masterPage.width;
         int height = page->masterPage.height;
         SkCanvas* canvas = doc->beginPage(width, height);
+        auto paint = SkPaint();
+        renderGuides(canvas, page->masterPage);
         for(auto& box : page->boxes) {
             ParagraphStyle paragraph_style;
             ParagraphBuilderImpl builder(paragraph_style, fontCollection);

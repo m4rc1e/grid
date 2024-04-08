@@ -21,6 +21,11 @@ class MasterPage {
         int height;
         int cols;
         int rows;
+        int columnGap;
+        int marginTop;
+        int marginBottom;
+        int marginLeft;
+        int marginRight;
 };
 
 

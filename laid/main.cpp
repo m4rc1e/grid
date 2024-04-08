@@ -13,6 +13,10 @@ int main() {
     auto masterPage = laid::MasterPage();
     masterPage.width = 592;
     masterPage.height = 826;
+    masterPage.marginTop = 24;
+    masterPage.marginBottom = 24;
+    masterPage.marginLeft = 24;
+    masterPage.marginRight = 24;
 
     auto page = laid::Page(masterPage);
     auto box = laid::Box(24, 24, 400, 200);
