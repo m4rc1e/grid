@@ -23,15 +23,15 @@ int main() {
 
     auto page = laid::Page(masterPage);
     auto first = masterPage.getRect(1, 1);
-    auto box = laid::Box(first.startX, first.startY, first.endX - first.startX, first.endY - first.startY);
-    box.addText("Hello, World! This should hopefully wrap, like a burrito", style);
+    auto box = new laid::Box(first.startX, first.startY, first.endX - first.startX, first.endY - first.startY);
+    box->addText("Hello, World! This should hopefully wrap, like a burrito. I'm hoping that this demo of a land filled site is just perfect for me and you. Listening to Donato dozzy is a welcome releif. I still need to keep going but this work will eventually pay off one day far into the future into a new land of hope and promise. We are getting very very close to the hit point and I cannot wait for it.", style);
+    auto second = masterPage.getRect(2, 1);
+    auto box2 = new laid::Box(second.startX, second.startY, second.endX - second.startX, second.endY - second.startY);
+    box->next = box2;
     page.addBox(box);
+    page.addBox(box2);
     doc.addPage(page);
     
 
-    auto second = masterPage.getRect(2, 2);
-    auto box2 = laid::Box(second.startX, second.startY, second.endX - second.startX, second.endY - second.startY);
-    box2.addText("We meet again", style);
-    page.addBox(box2);
     RenderPDF(doc);
 }

@@ -65,6 +65,7 @@ class Box {
         float width;
         float height;
         std::vector<TextRun> text_runs;
+        Box* next;
 
         Box(int x, int y, int width, int height) : x(x), y(y), width(width), height(height) {}
         void addText(std::string text, ParagraphStyle& style) {
@@ -75,13 +76,13 @@ class Box {
 
 class Page {
     public: 
-        Page(MasterPage masterPage) {
+        Page(MasterPage& masterPage) {
             this->masterPage = masterPage;
         }
         MasterPage masterPage;
-        std::vector<Box> boxes;
+        std::vector<Box*> boxes;
 
-        void addBox(Box box) {
+        void addBox(Box* box) {
             boxes.push_back(box);
         }
 };

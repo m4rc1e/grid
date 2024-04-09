@@ -30,6 +30,8 @@
 #include "modules/skparagraph/include/TypefaceFontProvider.h"
 #include "src/core/SkOSFile.h"
 #include "src/utils/SkOSPath.h"
+#include <ranges>
+#include <string_view>
 
 #include <iostream>
 #include "modules/skparagraph/include/ParagraphStyle.h"
@@ -40,6 +42,11 @@
 #include "include/core/SkDocument.h"
 #include "include/docs/SkPDFDocument.h"
 #include <string>
+
+#include <iostream>
+#include <sstream>
+
+
 
 using namespace skia::textlayout;
 
@@ -53,7 +60,6 @@ void renderGuides(SkCanvas* canvas, laid::MasterPage& masterPage) {
     // grid cols
     for (int i=0; i< masterPage.cols; i++) {
         auto gridbox = masterPage.getRect(i, 0);
-        std::cout << masterPage.marginTop << std::endl;
         canvas->drawLine(
             SkPoint::Make(gridbox.startX, masterPage.marginTop),
             SkPoint::Make(gridbox.startX, masterPage.height - masterPage.marginBottom),
@@ -114,20 +120,30 @@ int RenderPDF(laid::Document& laidDoc) {
         for(auto& box : page->boxes) {
             ParagraphStyle paragraph_style;
             ParagraphBuilderImpl builder(paragraph_style, fontCollection);
-            for(auto& text_run : box.text_runs) {
-                std::cout << text_run.text << std::endl;
-                TextStyle text_style;
-                text_style.setColor(SK_ColorBLACK);
-                text_style.setFontFamilies({SkString("Damascus")});
-                text_style.setFontSize(12.0f);
-                paragraph_style.setTextStyle(text_style);
-
-                builder.pushStyle(text_style);
-                builder.addText(text_run.text.data());
-
-                auto paragraph = builder.Build();
-                paragraph->layout(box.width);
-                paragraph->paint(canvas, box.x, box.y);
+            for(auto& text_run : box->text_runs) {
+                std::istringstream ss(text_run.text);
+                std::string token;
+                std::string overflow;
+                while(std::getline(ss, token, ' ')) {
+                    TextStyle text_style;
+                    text_style.setColor(SK_ColorBLACK);
+                    text_style.setFontFamilies({SkString("Helvetica")});
+                    text_style.setFontSize(12.0f);
+                    paragraph_style.setTextStyle(text_style);
+                    builder.pushStyle(text_style);
+                    builder.addText(token.data());
+                    builder.addText(" ");
+                    auto paragraph = builder.Build();
+                    paragraph->layout(box->width);
+                    if (paragraph->getHeight() > box->height+3) {
+                        overflow += token + " ";
+                    } else {
+                        paragraph->paint(canvas, box->x, box->y);
+                    }
+                }
+                if (overflow.size() > 0) {
+                    box->next->addText(overflow, text_run.style);
+                }
             }
         }
         doc->endPage();
