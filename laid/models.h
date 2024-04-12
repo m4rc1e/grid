@@ -65,11 +65,16 @@ class Box {
         float width;
         float height;
         std::vector<TextRun> text_runs;
-        Box* next;
+        std::shared_ptr<Box> next;
+        std::string image_path;
 
         Box(int x, int y, int width, int height) : x(x), y(y), width(width), height(height) {}
         void addText(std::string text, ParagraphStyle& style) {
             text_runs.push_back(TextRun{text, style});
+        }
+
+        void addImage(std::string path) {
+            image_path = path;
         }
 };
 
@@ -80,10 +85,10 @@ class Page {
             this->masterPage = masterPage;
         }
         MasterPage masterPage;
-        std::vector<Box*> boxes;
+        std::vector<std::shared_ptr<Box>> boxes;
 
-        void addBox(Box* box) {
-            boxes.push_back(box);
+        void addBox(std::shared_ptr<Box> box) {
+            boxes.push_back(std::shared_ptr<Box>(box));
         }
 };
 
@@ -93,7 +98,7 @@ class Document {
         std::map<std::string, ParagraphStyle*> paragraph_styles;
         std::map<std::string, MasterPage*> masterPages;
         int page_count;
-        std::vector<Page*> pages;
+        std::vector<std::shared_ptr<Page>> pages;
 
         void addParagraphStyle(ParagraphStyle& paragraphStyle) {
             paragraph_styles[paragraphStyle.name] = &paragraphStyle;
@@ -103,8 +108,8 @@ class Document {
             masterPages[masterPage.name] = &masterPage;
         }
 
-        void addPage(Page& page) {
-            pages.push_back(&page);
+        void addPage(std::shared_ptr<Page> page) {
+            pages.push_back(page);
         }
 };
 

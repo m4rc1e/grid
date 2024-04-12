@@ -50,7 +50,6 @@
 
 using namespace skia::textlayout;
 
-
 void renderGuides(SkCanvas* canvas, laid::MasterPage& masterPage) {
     // grids
     SkPaint paintGrids;
@@ -71,7 +70,6 @@ void renderGuides(SkCanvas* canvas, laid::MasterPage& masterPage) {
             paintGrids
         );
     }
-
     for (int i=0; i< masterPage.rows; i++) {
         auto gridbox = masterPage.getRect(0, i);
         canvas->drawLine(
@@ -118,6 +116,18 @@ int RenderPDF(laid::Document& laidDoc) {
         auto paint = SkPaint();
         renderGuides(canvas, page->masterPage);
         for(auto& box : page->boxes) {
+            // render image
+            if (box->image_path.size() > 0) {
+                auto data = SkData::MakeFromFileName(box->image_path.c_str());
+                auto foo = SkImages::DeferredFromEncodedData(data);
+                canvas->drawImageRect(
+                    foo,
+                    SkRect::MakeXYWH(box->x, box->y, box->width, box->height),
+                    SkSamplingOptions()
+                );
+            }
+            
+            // render text
             ParagraphStyle paragraph_style;
             ParagraphBuilderImpl builder(paragraph_style, fontCollection);
             for(auto& text_run : box->text_runs) {
