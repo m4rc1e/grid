@@ -67,6 +67,7 @@ class Box {
         std::vector<TextRun> text_runs;
         std::shared_ptr<Box> next;
         std::string image_path;
+        std::map<int, std::vector<std::shared_ptr<Box>>> children;
 
         Box(int x, int y, int width, int height) : x(x), y(y), width(width), height(height) {}
         void addText(std::string text, ParagraphStyle& style) {
@@ -75,6 +76,10 @@ class Box {
 
         void addImage(std::string path) {
             image_path = path;
+        }
+
+        void addChild(int idx, std::shared_ptr<Box> box) {
+            children[idx].push_back(box);
         }
 };
 

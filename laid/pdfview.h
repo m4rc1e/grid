@@ -96,6 +96,56 @@ void renderGuides(SkCanvas* canvas, laid::MasterPage& masterPage) {
 }
 
 
+void renderText(SkCanvas* canvas, std::shared_ptr<laid::Box> box, sk_sp<FontCollection> fontCollection) {
+    for(auto& text_run : box->text_runs) {
+        ParagraphStyle paragraph_style;
+        ParagraphBuilderImpl builder(paragraph_style, fontCollection);
+        std::istringstream ss(text_run.text);
+        std::string token;
+        std::string overflow;
+        while(std::getline(ss, token, ' ')) {
+            TextStyle text_style;
+            text_style.setColor(SK_ColorBLACK);
+            text_style.setFontFamilies({SkString("Helvetica")});
+            text_style.setFontSize(12.0f);
+            paragraph_style.setTextStyle(text_style);
+            builder.pushStyle(text_style);
+            builder.addText(token.data());
+            builder.addText(" ");
+            auto paragraph = builder.Build();
+            paragraph->layout(box->width);
+            if (paragraph->getHeight() > box->height+3) {
+                overflow += token + " ";
+            } else {
+                paragraph->paint(canvas, box->x, box->y);
+            }
+        }
+        if (overflow.size() > 0) {
+            box->next->addText(overflow, text_run.style);
+        }
+    }
+
+    for (auto& [idx, children] : box->children) {
+        for(auto& child : children) {
+            renderText(canvas, child, fontCollection);
+        }
+    }
+}
+
+void renderImage(SkCanvas* canvas, std::shared_ptr<laid::Box> box) {
+    // render image
+    if (box->image_path.size() > 0) {
+        auto data = SkData::MakeFromFileName(box->image_path.c_str());
+        auto foo = SkImages::DeferredFromEncodedData(data);
+        canvas->drawImageRect(
+            foo,
+            SkRect::MakeXYWH(box->x, box->y, box->width, box->height),
+            SkSamplingOptions()
+        );
+    }
+}
+
+
 int RenderPDF(laid::Document& laidDoc) {
     auto fontCollection = sk_make_sp<FontCollection>();
     fontCollection->setDefaultFontManager(SkFontMgr::RefDefault());
@@ -116,45 +166,8 @@ int RenderPDF(laid::Document& laidDoc) {
         auto paint = SkPaint();
         renderGuides(canvas, page->masterPage);
         for(auto& box : page->boxes) {
-            // render image
-            if (box->image_path.size() > 0) {
-                auto data = SkData::MakeFromFileName(box->image_path.c_str());
-                auto foo = SkImages::DeferredFromEncodedData(data);
-                canvas->drawImageRect(
-                    foo,
-                    SkRect::MakeXYWH(box->x, box->y, box->width, box->height),
-                    SkSamplingOptions()
-                );
-            }
-            
-            // render text
-            ParagraphStyle paragraph_style;
-            ParagraphBuilderImpl builder(paragraph_style, fontCollection);
-            for(auto& text_run : box->text_runs) {
-                std::istringstream ss(text_run.text);
-                std::string token;
-                std::string overflow;
-                while(std::getline(ss, token, ' ')) {
-                    TextStyle text_style;
-                    text_style.setColor(SK_ColorBLACK);
-                    text_style.setFontFamilies({SkString("Helvetica")});
-                    text_style.setFontSize(12.0f);
-                    paragraph_style.setTextStyle(text_style);
-                    builder.pushStyle(text_style);
-                    builder.addText(token.data());
-                    builder.addText(" ");
-                    auto paragraph = builder.Build();
-                    paragraph->layout(box->width);
-                    if (paragraph->getHeight() > box->height+3) {
-                        overflow += token + " ";
-                    } else {
-                        paragraph->paint(canvas, box->x, box->y);
-                    }
-                }
-                if (overflow.size() > 0) {
-                    box->next->addText(overflow, text_run.style);
-                }
-            }
+            renderImage(canvas, box);
+            renderText(canvas, box, fontCollection);
         }
         doc->endPage();
 
@@ -162,37 +175,6 @@ int RenderPDF(laid::Document& laidDoc) {
     doc->close();
     return 0;
 
-
-//    canvas->clear(SK_ColorWHITE);
-//
-//
-//    TextStyle text_style;
-//    text_style.setColor(SK_ColorBLACK);
-//    text_style.setFontFamilies({SkString("Damascus")});
-//    text_style.setFontSize(12.0f);
-//    ParagraphStyle paragraph_style;
-//    paragraph_style.setTextStyle(text_style);
-//
-//    ParagraphBuilderImpl builder(paragraph_style, fontCollection);
-//    builder.pushStyle(text_style);
-//    std::basic_string<char16_t> text = u"كما قالت المنظمة إن عمالها الذين قتلو كانوا بريطانيين وبولنديين وأستراليين و كذلك فلسطينيين، من بينهم مواطن مزدوج الجنسية، يحمل الجنسيتين الأمريكية والكندية.";
-//    builder.addText(text);
-//
-//    ParagraphBuilderImpl builder2(paragraph_style, fontCollection);
-//    builder2.pushStyle(text_style);
-//    builder2.addText("The American pop star entered the Forbes World's Billionaires List for the first time with $1.1bn (£877m), along with Sam Altman, creator of the AI chatbot ChatGPT on $1bn (£800m).");
-//
-//    auto paragraph = builder.Build();
-//    paragraph->layout(200);
-//    paragraph->paint(canvas, 50, 50);
-//    
-//    auto paragraph2 = builder2.Build();
-//    paragraph2->layout(200);
-//    paragraph2->paint(canvas, 300, 50);
-//
-//    doc->endPage();
-//    doc->close();
-    
 
     return 0;
 }

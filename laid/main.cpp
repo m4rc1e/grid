@@ -24,6 +24,9 @@ int main() {
     auto page = std::make_shared<laid::Page>(masterPage);
     auto first = masterPage.getRect(1, 1);
     auto box = std::make_shared<laid::Box>(first.startX, first.startY, first.endX - first.startX, first.endY - first.startY);
+    auto caption_box = std::make_shared<laid::Box>(0, 0, 200, 24);
+    caption_box->addText("Caption", style);
+    box->addChild(0, caption_box);
     box->addText("Hello, World! This should hopefully wrap, like a burrito. I'm hoping that this demo of a land filled site is just perfect for me and you. Listening to Donato dozzy is a welcome releif. I still need to keep going but this work will eventually pay off one day far into the future into a new land of hope and promise. We are getting very very close to the hit point and I cannot wait for it.", style);
 
     auto second = masterPage.getRect(2, 1);
