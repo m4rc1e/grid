@@ -12,22 +12,24 @@ int main() {
 
     auto masterPage = laid::MasterPage();
     masterPage.width = 592;
-    masterPage.height = 842;
+    masterPage.height = 300;
     masterPage.marginTop = 24;
     masterPage.marginBottom = 24;
-    masterPage.marginLeft = 48;
-    masterPage.marginRight = 36;
+    masterPage.marginLeft = 24;
+    masterPage.marginRight = 24;
     masterPage.cols = 4;
-    masterPage.rows = 4;
+    masterPage.rows = 2;
     masterPage.gap = 12;
+    masterPage.baseline = 12;
 
     auto page = std::make_shared<laid::Page>(masterPage);
     auto first = masterPage.getRect(1, 1);
     auto box = std::make_shared<laid::Box>(first.startX, first.startY, first.endX - first.startX, first.endY - first.startY);
-    auto caption_box = std::make_shared<laid::Box>(0, 0, 200, 24);
-    caption_box->addText("Caption", style);
+    auto zero = masterPage.getRect(0, 1);
+    auto caption_box = std::make_shared<laid::Box>(zero.startX, zero.startY, zero.endX - zero.startX, zero.endY - zero.startY);
+    caption_box->addText("Caption two", style);
     box->addChild(0, caption_box);
-    box->addText("Hello, World! This should hopefully wrap, like a burrito. I'm hoping that this demo of a land filled site is just perfect for me and you. Listening to Donato dozzy is a welcome releif. I still need to keep going but this work will eventually pay off one day far into the future into a new land of hope and promise. We are getting very very close to the hit point and I cannot wait for it.", style);
+    box->addText("Hello, World! This should hopefully wrap, like a burrito. I'm hoping that this demo of a land filled site is just perfect for me and you. Listening to Donato dozzy is a welcome releif. I still need to keep going but this work will eventually pay off one day far into the future into a new land of hope and promise. We are getting very very close to the hit point and I cannot wait for it it it it", style);
 
     auto second = masterPage.getRect(2, 1);
     auto box2 = std::make_shared<laid::Box>(second.startX, second.startY, second.endX - second.startX, second.endY - second.startY);
@@ -40,13 +42,7 @@ int main() {
     auto pic_box = std::make_shared<laid::Box>(third.startX, third.startY, fouth.endX - third.startX, third.endY - third.startY);
     pic_box->addImage("image.png");
     page->addBox(pic_box);
-    
-
     doc.addPage(page);
-    
-
-
-    
 
     RenderPDF(doc);
 }

@@ -36,15 +36,31 @@ class MasterPage {
         float marginBottom;
         float marginLeft;
         float marginRight;
+        float baseline;
     
         Rect getRect(int col, int row) {
-            auto colWidth = (width - marginLeft - marginRight - gap) / cols;
-            auto rowHeight = (height - marginTop - marginBottom - gap) / rows;
-
-            auto startX = marginLeft + (colWidth * col) + ((gap/2) * col);
-            auto endX = startX + colWidth - (gap/2);
-            auto startY = marginTop + (rowHeight * row) + ((gap/2) * row);
-            auto endY = startY + rowHeight - (gap/2);
+            // columns
+            auto workingWidth = width - marginLeft - marginRight - (gap*(cols-1));
+            auto colWidth = (workingWidth / cols);
+            float startX, endX;
+            if (col == 0) {
+                startX = marginLeft;
+                endX = startX + colWidth;
+            } else {
+                startX = marginLeft + ((colWidth * col)) + (gap*col);
+                endX = startX + colWidth;
+            }
+            // rows
+            auto workingHeight = height - marginTop - marginBottom - (gap*(rows-1));
+            auto rowHeight = workingHeight / rows;
+            float startY, endY;
+            if (row == 0) {
+                startY = marginTop;
+                endY = startY + rowHeight;
+            } else {
+                startY = marginTop + (rowHeight * row) + (gap*row);
+                endY = startY + rowHeight;
+            }
             return Rect{startX, startY, endX, endY};
         }
 

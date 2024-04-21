@@ -64,6 +64,7 @@ void renderGuides(SkCanvas* canvas, laid::MasterPage& masterPage) {
             SkPoint::Make(gridbox.startX, masterPage.height - masterPage.marginBottom),
             paintGrids
         );
+        std::cout << "Drawing line from " << gridbox.startX << " to " << gridbox.endX << std::endl;
         canvas->drawLine(
             SkPoint::Make(gridbox.endX, masterPage.marginTop),
             SkPoint::Make(gridbox.endX, masterPage.height - masterPage.marginBottom),
@@ -95,6 +96,18 @@ void renderGuides(SkCanvas* canvas, laid::MasterPage& masterPage) {
 
 }
 
+void renderBaseline(SkCanvas* canvas, laid::MasterPage& masterPage) {
+    SkPaint paintBaseline;
+    paintBaseline.setColor(SK_ColorGRAY);
+    for (int i=masterPage.marginTop; i<= masterPage.height - masterPage.marginBottom; i+=masterPage.baseline) {
+        canvas->drawLine(
+            SkPoint::Make(masterPage.marginLeft, i),
+            SkPoint::Make(masterPage.width - masterPage.marginRight, i),
+            SkPaint()
+        );
+    }
+}
+
 
 void renderText(SkCanvas* canvas, std::shared_ptr<laid::Box> box, sk_sp<FontCollection> fontCollection) {
     for(auto& text_run : box->text_runs) {
@@ -121,6 +134,10 @@ void renderText(SkCanvas* canvas, std::shared_ptr<laid::Box> box, sk_sp<FontColl
             }
         }
         if (overflow.size() > 0) {
+            if (box->next == nullptr) {
+                std::cout << "Text is overflowing and there is no next box to put it in." << std::endl;
+                continue;
+            }
             box->next->addText(overflow, text_run.style);
         }
     }
@@ -165,6 +182,7 @@ int RenderPDF(laid::Document& laidDoc) {
         SkCanvas* canvas = doc->beginPage(width, height);
         auto paint = SkPaint();
         renderGuides(canvas, page->masterPage);
+        renderBaseline(canvas, page->masterPage);
         for(auto& box : page->boxes) {
             renderImage(canvas, box);
             renderText(canvas, box, fontCollection);
