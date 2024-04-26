@@ -112,16 +112,26 @@ void renderBaseline(SkCanvas* canvas, laid::MasterPage& masterPage) {
 void renderText(SkCanvas* canvas, std::shared_ptr<laid::Box> box, sk_sp<FontCollection> fontCollection) {
     for(auto& text_run : box->text_runs) {
         ParagraphStyle paragraph_style;
+            // seems to control leading
+            // https://groups.google.com/g/skia-discuss/c/vyPaQY9SGFs
+            StrutStyle strut_style;
+            strut_style.setFontFamilies({SkString("Helvetica")});
+            strut_style.setStrutEnabled(true);
+            strut_style.setFontSize(12);
+            strut_style.setForceStrutHeight(true);
+
+            TextStyle text_style;
+            text_style.setColor(SK_ColorBLACK);
+            text_style.setFontFamilies({SkString("Inter")});
+            text_style.setFontSize(9.5f);
+            text_style.setTextBaseline(TextBaseline::kAlphabetic);
+            paragraph_style.setTextStyle(text_style);
+            paragraph_style.setStrutStyle(strut_style);
         ParagraphBuilderImpl builder(paragraph_style, fontCollection);
         std::istringstream ss(text_run.text);
         std::string token;
         std::string overflow;
         while(std::getline(ss, token, ' ')) {
-            TextStyle text_style;
-            text_style.setColor(SK_ColorBLACK);
-            text_style.setFontFamilies({SkString("Helvetica")});
-            text_style.setFontSize(12.0f);
-            paragraph_style.setTextStyle(text_style);
             builder.pushStyle(text_style);
             builder.addText(token.data());
             builder.addText(" ");
@@ -181,8 +191,8 @@ int RenderPDF(laid::Document& laidDoc) {
         int height = page->masterPage.height;
         SkCanvas* canvas = doc->beginPage(width, height);
         auto paint = SkPaint();
-        renderGuides(canvas, page->masterPage);
-        renderBaseline(canvas, page->masterPage);
+        //renderGuides(canvas, page->masterPage);
+        //renderBaseline(canvas, page->masterPage);
         for(auto& box : page->boxes) {
             renderImage(canvas, box);
             renderText(canvas, box, fontCollection);
