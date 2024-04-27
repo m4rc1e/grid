@@ -50,6 +50,114 @@
 
 using namespace skia::textlayout;
 
+
+class BuildPDFF {
+public:
+    BuildPDFF(laid::Document& laidDoc, const char* out) : laidDoc(laidDoc), stream(out) {
+        laidDoc = laidDoc;
+        fontCollection->setDefaultFontManager(SkFontMgr::RefDefault());
+        pdf = SkPDF::MakeDocument(&stream, metadata);
+        metadata.fTitle = "My doc";
+        metadata.fCreator = "Example";
+        metadata.fCreation = {0, 2019, 1, 4, 31, 12, 34, 56};
+        metadata.fModified = {0, 2019, 1, 4, 31, 12, 34, 56};
+    };
+
+    laid::Document laidDoc;
+    sk_sp<FontCollection> fontCollection = sk_make_sp<FontCollection>();
+    SkFILEWStream stream;
+    SkPDF::Metadata metadata;
+    sk_sp<SkDocument> pdf;
+
+    void BuildPages() {
+        for(auto& page : laidDoc.pages) {
+            BuildPage(page);
+        }
+        pdf->close();
+    }
+
+    void BuildPage(std::shared_ptr<laid::Page> page) {
+        int width = page->masterPage.width;
+        int height = page->masterPage.height;
+        SkCanvas* canvas = pdf->beginPage(width, height);
+        auto paint = SkPaint();
+        //renderGuides(canvas, page->masterPage);
+        BuildBaseline(canvas, page->masterPage);
+        for(auto& box : page->boxes) {
+            //renderImage(canvas, box);
+            BuildText(canvas, page, box);
+        }
+        pdf->endPage();
+    }
+
+    void BuildBaseline(SkCanvas* canvas, laid::MasterPage& masterPage) {
+        SkPaint paintBaseline;
+        paintBaseline.setColor(SK_ColorGRAY);
+        for (int i=masterPage.marginTop; i<= masterPage.height - masterPage.marginBottom; i+=masterPage.baseline) {
+            canvas->drawLine(
+                SkPoint::Make(masterPage.marginLeft, i),
+                SkPoint::Make(masterPage.width - masterPage.marginRight, i),
+                SkPaint()
+            );
+        }
+    }
+
+    void BuildText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
+        for(auto& text_run : box->text_runs) {
+            ParagraphStyle paragraph_style;
+                // seems to control leading
+                // https://groups.google.com/g/skia-discuss/c/vyPaQY9SGFs
+                StrutStyle strut_style;
+                strut_style.setFontFamilies({SkString("Helvetica")});
+                strut_style.setStrutEnabled(true);
+                strut_style.setFontSize(12);
+                strut_style.setForceStrutHeight(true);
+
+                TextStyle text_style;
+                text_style.setColor(SK_ColorBLACK);
+                text_style.setFontFamilies({SkString("Inter")});
+                text_style.setFontSize(9.5f);
+                text_style.setTextBaseline(TextBaseline::kAlphabetic);
+                paragraph_style.setTextStyle(text_style);
+                paragraph_style.setStrutStyle(strut_style);
+            ParagraphBuilderImpl builder(paragraph_style, fontCollection);
+            std::istringstream ss(text_run.text);
+            std::string token;
+            std::string overflow;
+            while(std::getline(ss, token, ' ')) {
+                builder.pushStyle(text_style);
+                builder.addText(token.data());
+                builder.addText(" ");
+                auto paragraph = builder.Build();
+                paragraph->layout(box->width);
+                if (paragraph->getHeight() > box->height+3) {
+                    overflow += token + " ";
+                } else {
+                    paragraph->paint(canvas, box->x, box->y);
+                }
+            }
+            if (overflow.size() > 0) {
+                if (box->next == nullptr) {
+                    if (page->overflow == true) {
+                        auto newPage = overflowPage(page);
+                        box->next = newPage->boxes[0];
+                    }
+                }
+                box->next->addText(overflow, text_run.style);
+                std::cout << "Overflow: " << overflow << std::endl;
+            }
+        }
+
+        for (auto& [idx, children] : box->children) {
+            for(auto& child : children) {
+                BuildText(canvas, page, child);
+            }
+        }
+    }
+
+
+};
+
 void renderGuides(SkCanvas* canvas, laid::MasterPage& masterPage) {
     // grids
     SkPaint paintGrids;

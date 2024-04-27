@@ -4,11 +4,11 @@
 
 
 int main() {
-    auto doc = laid::Document();
+    auto myDoc = laid::Document();
 
     auto style = laid::ParagraphStyle();
     style.name = "p1";
-    doc.addParagraphStyle(style);
+    myDoc.addParagraphStyle(style);
 
     auto masterPage = laid::MasterPage();
     masterPage.width = 592;
@@ -43,7 +43,8 @@ int main() {
     auto pic_box = std::make_shared<laid::Box>(third.startX, third.startY, fouth.endX - third.startX, third.endY - third.startY);
     pic_box->addImage("image.png");
     page->addBox(pic_box);
-    doc.addPage(page);
+    myDoc.addPage(page);
 
-    RenderPDF(doc);
+    BuildPDFF PDFBuilder(myDoc, "output3.pdf");
+    PDFBuilder.BuildPages();
 }
