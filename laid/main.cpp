@@ -17,12 +17,13 @@ int main() {
     masterPage.marginBottom = 24;
     masterPage.marginLeft = 24;
     masterPage.marginRight = 24;
-    masterPage.cols = 4;
+    masterPage.cols = 6;
     masterPage.rows = 2;
     masterPage.gap = 12;
     masterPage.baseline = 12;
 
     auto page = std::make_shared<laid::Page>(masterPage);
+    page->overflow = true;
     auto first = masterPage.getRect(1, 1);
     auto box = std::make_shared<laid::Box>(first.startX, first.startY, first.endX - first.startX, first.endY - first.startY);
     auto zero = masterPage.getRect(0, 1);

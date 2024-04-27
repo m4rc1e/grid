@@ -109,7 +109,7 @@ void renderBaseline(SkCanvas* canvas, laid::MasterPage& masterPage) {
 }
 
 
-void renderText(SkCanvas* canvas, std::shared_ptr<laid::Box> box, sk_sp<FontCollection> fontCollection) {
+void renderText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box, sk_sp<FontCollection> fontCollection) {
     for(auto& text_run : box->text_runs) {
         ParagraphStyle paragraph_style;
             // seems to control leading
@@ -145,16 +145,19 @@ void renderText(SkCanvas* canvas, std::shared_ptr<laid::Box> box, sk_sp<FontColl
         }
         if (overflow.size() > 0) {
             if (box->next == nullptr) {
-                std::cout << "Text is overflowing and there is no next box to put it in." << std::endl;
-                continue;
+                if (page->overflow == true) {
+                    auto newPage = overflowPage(page);
+                    box->next = newPage->boxes[0];
+                }
             }
             box->next->addText(overflow, text_run.style);
+            std::cout << "Overflow: " << overflow << std::endl;
         }
     }
 
     for (auto& [idx, children] : box->children) {
         for(auto& child : children) {
-            renderText(canvas, child, fontCollection);
+            renderText(canvas, page, child, fontCollection);
         }
     }
 }
@@ -173,6 +176,21 @@ void renderImage(SkCanvas* canvas, std::shared_ptr<laid::Box> box) {
 }
 
 
+void RenderPage(sk_sp<SkDocument> doc, std::shared_ptr<laid::Page> page, sk_sp<FontCollection> fontCollection) {
+    int width = page->masterPage.width;
+    int height = page->masterPage.height;
+    SkCanvas* canvas = doc->beginPage(width, height);
+    auto paint = SkPaint();
+    renderGuides(canvas, page->masterPage);
+    renderBaseline(canvas, page->masterPage);
+    for(auto& box : page->boxes) {
+        renderImage(canvas, box);
+        renderText(canvas, page, box, fontCollection);
+    }
+    doc->endPage();
+}
+
+
 int RenderPDF(laid::Document& laidDoc) {
     auto fontCollection = sk_make_sp<FontCollection>();
     fontCollection->setDefaultFontManager(SkFontMgr::RefDefault());
@@ -187,23 +205,9 @@ int RenderPDF(laid::Document& laidDoc) {
 
     auto doc = SkPDF::MakeDocument(&stream, metadata);
     for(auto& page : laidDoc.pages) {
-        int width = page->masterPage.width;
-        int height = page->masterPage.height;
-        SkCanvas* canvas = doc->beginPage(width, height);
-        auto paint = SkPaint();
-        //renderGuides(canvas, page->masterPage);
-        //renderBaseline(canvas, page->masterPage);
-        for(auto& box : page->boxes) {
-            renderImage(canvas, box);
-            renderText(canvas, box, fontCollection);
-        }
-        doc->endPage();
-
+        RenderPage(doc, page, fontCollection);
     }
     doc->close();
-    return 0;
-
-
     return 0;
 }
 

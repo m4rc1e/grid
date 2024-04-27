@@ -107,12 +107,24 @@ class Page {
         }
         MasterPage masterPage;
         std::vector<std::shared_ptr<Box>> boxes;
+        bool overflow;
 
         void addBox(std::shared_ptr<Box> box) {
             boxes.push_back(std::shared_ptr<Box>(box));
         }
 };
 
+std::shared_ptr<Page> overflowPage(std::shared_ptr<Page> page) {
+    auto newPage = std::make_shared<Page>(page->masterPage);
+    for (auto& box : page->boxes) {
+        auto newBox = std::make_shared<Box>(box->x, box->y, box->width, box->height);
+        newPage->addBox(newBox);
+    }
+    if (!page->boxes.empty() && !newPage->boxes.empty()) {
+        page->boxes.back()->next = newPage->boxes[0];
+    }
+    return newPage;
+}
 
 class Document {
     public:
