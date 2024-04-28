@@ -45,6 +45,13 @@ int main() {
     page->addBox(pic_box);
     myDoc.addPage(page);
 
-    BuildPDFF PDFBuilder(myDoc, "output3.pdf");
+    auto page2 = std::make_shared<laid::Page>(masterPage);
+    auto first2 = masterPage.getRect(0, 0);
+    auto box3 = std::make_shared<laid::Box>(first2.startX, first2.startY, first2.endX - first2.startX, first2.endY - first2.startY);
+    page2->addBox(box3);
+    box3->addText("legacy FML", style);
+    myDoc.addPage(page2);
+
+    BuildPDF PDFBuilder(myDoc, "output3.pdf");
     PDFBuilder.BuildPages();
 }

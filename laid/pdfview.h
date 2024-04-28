@@ -51,9 +51,9 @@
 using namespace skia::textlayout;
 
 
-class BuildPDFF {
+class BuildPDF {
 public:
-    BuildPDFF(laid::Document& laidDoc, const char* out) : laidDoc(laidDoc), stream(out) {
+    BuildPDF(laid::Document& laidDoc, const char* out) : laidDoc(laidDoc), stream(out) {
         laidDoc = laidDoc;
         fontCollection->setDefaultFontManager(SkFontMgr::RefDefault());
         pdf = SkPDF::MakeDocument(&stream, metadata);
@@ -102,6 +102,62 @@ public:
         }
     }
 
+    void BuildGuides(SkCanvas* canvas, laid::MasterPage& masterPage) {
+        // grids
+        SkPaint paintGrids;
+        paintGrids.setStrokeWidth(1.0f);
+        paintGrids.setColor(SK_ColorCYAN);
+        int workingWidth = masterPage.width - masterPage.marginLeft - masterPage.marginRight;
+        // grid cols
+        for (int i=0; i< masterPage.cols; i++) {
+            auto gridbox = masterPage.getRect(i, 0);
+            canvas->drawLine(
+                SkPoint::Make(gridbox.startX, masterPage.marginTop),
+                SkPoint::Make(gridbox.startX, masterPage.height - masterPage.marginBottom),
+                paintGrids
+            );
+            std::cout << "Drawing line from " << gridbox.startX << " to " << gridbox.endX << std::endl;
+            canvas->drawLine(
+                SkPoint::Make(gridbox.endX, masterPage.marginTop),
+                SkPoint::Make(gridbox.endX, masterPage.height - masterPage.marginBottom),
+                paintGrids
+            );
+        }
+        for (int i=0; i< masterPage.rows; i++) {
+            auto gridbox = masterPage.getRect(0, i);
+            canvas->drawLine(
+                SkPoint::Make(masterPage.marginLeft, gridbox.startY),
+                SkPoint::Make(masterPage.width - masterPage.marginRight, gridbox.startY),
+                paintGrids
+            );
+            canvas->drawLine(
+                SkPoint::Make(masterPage.marginLeft, gridbox.endY),
+                SkPoint::Make(masterPage.width - masterPage.marginRight, gridbox.endY),
+                paintGrids
+            );
+        }
+        //margins
+        SkPaint paintMargins;
+        paintMargins.setColor(SK_ColorMAGENTA);
+        paintMargins.setStrokeWidth(1.0f);
+        canvas->drawLine(SkPoint::Make(masterPage.marginLeft, masterPage.marginTop), SkPoint::Make(masterPage.width - masterPage.marginRight, masterPage.marginTop), paintMargins);
+        canvas->drawLine(SkPoint::Make(masterPage.marginLeft, masterPage.marginTop), SkPoint::Make(masterPage.marginLeft, masterPage.height - masterPage.marginBottom), paintMargins);
+        canvas->drawLine(SkPoint::Make(masterPage.width - masterPage.marginRight, masterPage.marginTop), SkPoint::Make(masterPage.width - masterPage.marginRight, masterPage.height - masterPage.marginBottom), paintMargins);
+        canvas->drawLine(SkPoint::Make(masterPage.marginLeft, masterPage.height - masterPage.marginBottom), SkPoint::Make(masterPage.width - masterPage.marginRight, masterPage.height - masterPage.marginBottom), paintMargins);
+    }
+    void BuildImage(SkCanvas* canvas, std::shared_ptr<laid::Box> box) {
+        // render image
+        if (box->image_path.size() > 0) {
+            auto data = SkData::MakeFromFileName(box->image_path.c_str());
+            auto foo = SkImages::DeferredFromEncodedData(data);
+            canvas->drawImageRect(
+                foo,
+                SkRect::MakeXYWH(box->x, box->y, box->width, box->height),
+                SkSamplingOptions()
+            );
+        }
+    }
+
     void BuildText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
         for(auto& text_run : box->text_runs) {
             ParagraphStyle paragraph_style;
@@ -141,6 +197,8 @@ public:
                     if (page->overflow == true) {
                         auto newPage = overflowPage(page);
                         box->next = newPage->boxes[0];
+                        box->next->addText(overflow, text_run.style);
+                        BuildPage(newPage);
                     }
                 }
                 box->next->addText(overflow, text_run.style);
@@ -157,52 +215,6 @@ public:
 
 
 };
-
-void renderGuides(SkCanvas* canvas, laid::MasterPage& masterPage) {
-    // grids
-    SkPaint paintGrids;
-    paintGrids.setStrokeWidth(1.0f);
-    paintGrids.setColor(SK_ColorCYAN);
-    int workingWidth = masterPage.width - masterPage.marginLeft - masterPage.marginRight;
-    // grid cols
-    for (int i=0; i< masterPage.cols; i++) {
-        auto gridbox = masterPage.getRect(i, 0);
-        canvas->drawLine(
-            SkPoint::Make(gridbox.startX, masterPage.marginTop),
-            SkPoint::Make(gridbox.startX, masterPage.height - masterPage.marginBottom),
-            paintGrids
-        );
-        std::cout << "Drawing line from " << gridbox.startX << " to " << gridbox.endX << std::endl;
-        canvas->drawLine(
-            SkPoint::Make(gridbox.endX, masterPage.marginTop),
-            SkPoint::Make(gridbox.endX, masterPage.height - masterPage.marginBottom),
-            paintGrids
-        );
-    }
-    for (int i=0; i< masterPage.rows; i++) {
-        auto gridbox = masterPage.getRect(0, i);
-        canvas->drawLine(
-            SkPoint::Make(masterPage.marginLeft, gridbox.startY),
-            SkPoint::Make(masterPage.width - masterPage.marginRight, gridbox.startY),
-            paintGrids
-        );
-        canvas->drawLine(
-            SkPoint::Make(masterPage.marginLeft, gridbox.endY),
-            SkPoint::Make(masterPage.width - masterPage.marginRight, gridbox.endY),
-            paintGrids
-        );
-    }
-    //margins
-    SkPaint paintMargins;
-    paintMargins.setColor(SK_ColorMAGENTA);
-    paintMargins.setStrokeWidth(1.0f);
-    canvas->drawLine(SkPoint::Make(masterPage.marginLeft, masterPage.marginTop), SkPoint::Make(masterPage.width - masterPage.marginRight, masterPage.marginTop), paintMargins);
-    canvas->drawLine(SkPoint::Make(masterPage.marginLeft, masterPage.marginTop), SkPoint::Make(masterPage.marginLeft, masterPage.height - masterPage.marginBottom), paintMargins);
-    canvas->drawLine(SkPoint::Make(masterPage.width - masterPage.marginRight, masterPage.marginTop), SkPoint::Make(masterPage.width - masterPage.marginRight, masterPage.height - masterPage.marginBottom), paintMargins);
-    canvas->drawLine(SkPoint::Make(masterPage.marginLeft, masterPage.height - masterPage.marginBottom), SkPoint::Make(masterPage.width - masterPage.marginRight, masterPage.height - masterPage.marginBottom), paintMargins);
-    
-
-}
 
 void renderBaseline(SkCanvas* canvas, laid::MasterPage& masterPage) {
     SkPaint paintBaseline;
@@ -270,18 +282,6 @@ void renderText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_
     }
 }
 
-void renderImage(SkCanvas* canvas, std::shared_ptr<laid::Box> box) {
-    // render image
-    if (box->image_path.size() > 0) {
-        auto data = SkData::MakeFromFileName(box->image_path.c_str());
-        auto foo = SkImages::DeferredFromEncodedData(data);
-        canvas->drawImageRect(
-            foo,
-            SkRect::MakeXYWH(box->x, box->y, box->width, box->height),
-            SkSamplingOptions()
-        );
-    }
-}
 
 
 void RenderPage(sk_sp<SkDocument> doc, std::shared_ptr<laid::Page> page, sk_sp<FontCollection> fontCollection) {
