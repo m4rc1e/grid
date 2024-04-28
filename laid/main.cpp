@@ -12,13 +12,13 @@ int main() {
 
     auto masterPage = laid::MasterPage();
     masterPage.width = 592;
-    masterPage.height = 300;
+    masterPage.height = 600;
     masterPage.marginTop = 24;
     masterPage.marginBottom = 24;
     masterPage.marginLeft = 24;
     masterPage.marginRight = 24;
     masterPage.cols = 6;
-    masterPage.rows = 2;
+    masterPage.rows = 4;
     masterPage.gap = 12;
     masterPage.baseline = 12;
 
@@ -53,5 +53,5 @@ int main() {
     myDoc.addPage(page2);
 
     BuildPDF PDFBuilder(myDoc, "output3.pdf");
-    PDFBuilder.BuildPages();
+    PDFBuilder.Build();
 }

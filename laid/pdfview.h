@@ -68,7 +68,35 @@ public:
     SkFILEWStream stream;
     SkPDF::Metadata metadata;
     sk_sp<SkDocument> pdf;
+    std::map<std::string, ParagraphStyle> paragraphStyles;
 
+    void BuildStyles() {
+        ParagraphStyle paragraph_style;
+        // seems to control leading
+        // https://groups.google.com/g/skia-discuss/c/vyPaQY9SGFs
+        StrutStyle strut_style;
+        strut_style.setFontFamilies({SkString("Helvetica")});
+        strut_style.setStrutEnabled(true);
+        strut_style.setFontSize(12);
+        strut_style.setForceStrutHeight(true);
+
+        TextStyle text_style;
+        text_style.setColor(SK_ColorBLACK);
+        text_style.setFontFamilies({SkString("Inter")});
+        text_style.setFontSize(9.5f);
+        text_style.setTextBaseline(TextBaseline::kAlphabetic);
+        paragraph_style.setTextStyle(text_style);
+        paragraph_style.setStrutStyle(strut_style);
+        // TODO update this to use the styles from the document
+        for (auto& [name, style] : laidDoc.paragraph_styles) {
+            paragraphStyles[name] = paragraph_style;
+        }
+
+    }
+    void Build() {
+        BuildStyles();
+        BuildPages();
+    }
     void BuildPages() {
         for(auto& page : laidDoc.pages) {
             BuildPage(page);
@@ -81,10 +109,10 @@ public:
         int height = page->masterPage.height;
         SkCanvas* canvas = pdf->beginPage(width, height);
         auto paint = SkPaint();
-        //renderGuides(canvas, page->masterPage);
+        BuildGuides(canvas, page->masterPage);
         BuildBaseline(canvas, page->masterPage);
         for(auto& box : page->boxes) {
-            //renderImage(canvas, box);
+            BuildImage(canvas, box);
             BuildText(canvas, page, box);
         }
         pdf->endPage();
@@ -147,9 +175,12 @@ public:
     }
     void BuildImage(SkCanvas* canvas, std::shared_ptr<laid::Box> box) {
         // render image
+        // need to fix this
         if (box->image_path.size() > 0) {
+            std::cout << "Rendering image: " << box->image_path << std::endl;
             auto data = SkData::MakeFromFileName(box->image_path.c_str());
             auto foo = SkImages::DeferredFromEncodedData(data);
+            std::cout << "Image width: " << foo->width() << std::endl;
             canvas->drawImageRect(
                 foo,
                 SkRect::MakeXYWH(box->x, box->y, box->width, box->height),
@@ -160,22 +191,8 @@ public:
 
     void BuildText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
         for(auto& text_run : box->text_runs) {
-            ParagraphStyle paragraph_style;
-                // seems to control leading
-                // https://groups.google.com/g/skia-discuss/c/vyPaQY9SGFs
-                StrutStyle strut_style;
-                strut_style.setFontFamilies({SkString("Helvetica")});
-                strut_style.setStrutEnabled(true);
-                strut_style.setFontSize(12);
-                strut_style.setForceStrutHeight(true);
-
-                TextStyle text_style;
-                text_style.setColor(SK_ColorBLACK);
-                text_style.setFontFamilies({SkString("Inter")});
-                text_style.setFontSize(9.5f);
-                text_style.setTextBaseline(TextBaseline::kAlphabetic);
-                paragraph_style.setTextStyle(text_style);
-                paragraph_style.setStrutStyle(strut_style);
+            auto paragraph_style = paragraphStyles[text_run.style.name];
+            auto text_style = paragraph_style.getTextStyle();
             ParagraphBuilderImpl builder(paragraph_style, fontCollection);
             std::istringstream ss(text_run.text);
             std::string token;
@@ -215,108 +232,4 @@ public:
 
 
 };
-
-void renderBaseline(SkCanvas* canvas, laid::MasterPage& masterPage) {
-    SkPaint paintBaseline;
-    paintBaseline.setColor(SK_ColorGRAY);
-    for (int i=masterPage.marginTop; i<= masterPage.height - masterPage.marginBottom; i+=masterPage.baseline) {
-        canvas->drawLine(
-            SkPoint::Make(masterPage.marginLeft, i),
-            SkPoint::Make(masterPage.width - masterPage.marginRight, i),
-            SkPaint()
-        );
-    }
-}
-
-
-void renderText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box, sk_sp<FontCollection> fontCollection) {
-    for(auto& text_run : box->text_runs) {
-        ParagraphStyle paragraph_style;
-            // seems to control leading
-            // https://groups.google.com/g/skia-discuss/c/vyPaQY9SGFs
-            StrutStyle strut_style;
-            strut_style.setFontFamilies({SkString("Helvetica")});
-            strut_style.setStrutEnabled(true);
-            strut_style.setFontSize(12);
-            strut_style.setForceStrutHeight(true);
-
-            TextStyle text_style;
-            text_style.setColor(SK_ColorBLACK);
-            text_style.setFontFamilies({SkString("Inter")});
-            text_style.setFontSize(9.5f);
-            text_style.setTextBaseline(TextBaseline::kAlphabetic);
-            paragraph_style.setTextStyle(text_style);
-            paragraph_style.setStrutStyle(strut_style);
-        ParagraphBuilderImpl builder(paragraph_style, fontCollection);
-        std::istringstream ss(text_run.text);
-        std::string token;
-        std::string overflow;
-        while(std::getline(ss, token, ' ')) {
-            builder.pushStyle(text_style);
-            builder.addText(token.data());
-            builder.addText(" ");
-            auto paragraph = builder.Build();
-            paragraph->layout(box->width);
-            if (paragraph->getHeight() > box->height+3) {
-                overflow += token + " ";
-            } else {
-                paragraph->paint(canvas, box->x, box->y);
-            }
-        }
-        if (overflow.size() > 0) {
-            if (box->next == nullptr) {
-                if (page->overflow == true) {
-                    auto newPage = overflowPage(page);
-                    box->next = newPage->boxes[0];
-                }
-            }
-            box->next->addText(overflow, text_run.style);
-            std::cout << "Overflow: " << overflow << std::endl;
-        }
-    }
-
-    for (auto& [idx, children] : box->children) {
-        for(auto& child : children) {
-            renderText(canvas, page, child, fontCollection);
-        }
-    }
-}
-
-
-
-void RenderPage(sk_sp<SkDocument> doc, std::shared_ptr<laid::Page> page, sk_sp<FontCollection> fontCollection) {
-    int width = page->masterPage.width;
-    int height = page->masterPage.height;
-    SkCanvas* canvas = doc->beginPage(width, height);
-    auto paint = SkPaint();
-    renderGuides(canvas, page->masterPage);
-    renderBaseline(canvas, page->masterPage);
-    for(auto& box : page->boxes) {
-        renderImage(canvas, box);
-        renderText(canvas, page, box, fontCollection);
-    }
-    doc->endPage();
-}
-
-
-int RenderPDF(laid::Document& laidDoc) {
-    auto fontCollection = sk_make_sp<FontCollection>();
-    fontCollection->setDefaultFontManager(SkFontMgr::RefDefault());
-
-    SkFILEWStream stream("output2.pdf");
-
-    SkPDF::Metadata metadata;
-    metadata.fTitle = "My doc";
-    metadata.fCreator = "Example";
-    metadata.fCreation = {0, 2019, 1, 4, 31, 12, 34, 56};
-    metadata.fModified = {0, 2019, 1, 4, 31, 12, 34, 56};
-
-    auto doc = SkPDF::MakeDocument(&stream, metadata);
-    for(auto& page : laidDoc.pages) {
-        RenderPage(doc, page, fontCollection);
-    }
-    doc->close();
-    return 0;
-}
-
 #endif
