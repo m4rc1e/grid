@@ -42,6 +42,7 @@ int main() {
     auto fouth = masterPage.getRect(2, 0);
     auto pic_box = std::make_shared<laid::Box>(third.startX, third.startY, fouth.endX - third.startX, third.endY - third.startY);
     pic_box->addImage("image.png");
+    pic_box->addText("fuck", style);
     page->addBox(pic_box);
     myDoc.addPage(page);
 

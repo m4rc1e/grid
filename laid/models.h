@@ -117,9 +117,12 @@ class Page {
 
 std::shared_ptr<Page> overflowPage(std::shared_ptr<Page> page) {
     auto newPage = std::make_shared<Page>(page->masterPage);
+    
     for (auto& box : page->boxes) {
         auto newBox = std::make_shared<Box>(box->x, box->y, box->width, box->height);
+        newBox->image_path = "";
         newPage->addBox(newBox);
+        break;
     }
     return newPage;
 }
@@ -129,7 +132,8 @@ class Document {
         std::map<std::string, ParagraphStyle*> paragraph_styles;
         std::map<std::string, MasterPage*> masterPages;
         int page_count;
-        std::vector<std::shared_ptr<Page>> pages;
+        std::shared_ptr<Page> pages;
+        std::shared_ptr<Page> lastPage;
 
         void addParagraphStyle(ParagraphStyle& paragraphStyle) {
             paragraph_styles[paragraphStyle.name] = &paragraphStyle;
@@ -140,7 +144,16 @@ class Document {
         }
 
         void addPage(std::shared_ptr<Page> page) {
-            pages.push_back(page);
+            if (this->pages == nullptr) {
+                this->pages = page;
+                return;
+            }
+            auto current = this->pages;
+            while (current->next != nullptr) {
+                current = current->next;
+            }
+            std::cout << current << std::endl;
+            current->next = page;
         }
 };
 

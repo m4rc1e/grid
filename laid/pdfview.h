@@ -3,7 +3,6 @@
 #include "models.h"
 #include <iostream>
 
-
 #include "include/core/SkBitmap.h"
 #include "include/core/SkCanvas.h"
 #include "include/core/SkColor.h"
@@ -45,7 +44,6 @@
 
 #include <iostream>
 #include <sstream>
-
 
 
 using namespace skia::textlayout;
@@ -98,23 +96,28 @@ public:
         BuildPages();
     }
     void BuildPages() {
-        for(auto& page : laidDoc.pages) {
-            BuildPage(page);
+        std::shared_ptr<laid::Page> head = laidDoc.pages;
+        while (head != nullptr) {
+            BuildPage(head);
+            head = head->next;
         }
         pdf->close();
     }
 
     void BuildPage(std::shared_ptr<laid::Page> page) {
+        std::cout << "Building page: " << page << std::endl;
         int width = page->masterPage.width;
         int height = page->masterPage.height;
         SkCanvas* canvas = pdf->beginPage(width, height);
-        auto paint = SkPaint();
         BuildGuides(canvas, page->masterPage);
         BuildBaseline(canvas, page->masterPage);
         for(auto& box : page->boxes) {
-            BuildImage(canvas, box);
+            if (box->image_path.size() > 0) {
+                BuildImage(canvas, box);
+            }
             BuildText(canvas, page, box);
         }
+        std::cout << "Ending page: " << page << std::endl;
         pdf->endPage();
     }
 
@@ -125,7 +128,7 @@ public:
             canvas->drawLine(
                 SkPoint::Make(masterPage.marginLeft, i),
                 SkPoint::Make(masterPage.width - masterPage.marginRight, i),
-                SkPaint()
+                paintBaseline
             );
         }
     }
@@ -144,7 +147,7 @@ public:
                 SkPoint::Make(gridbox.startX, masterPage.height - masterPage.marginBottom),
                 paintGrids
             );
-            std::cout << "Drawing line from " << gridbox.startX << " to " << gridbox.endX << std::endl;
+//            std::cout << "Drawing line from " << gridbox.startX << " to " << gridbox.endX << std::endl;
             canvas->drawLine(
                 SkPoint::Make(gridbox.endX, masterPage.marginTop),
                 SkPoint::Make(gridbox.endX, masterPage.height - masterPage.marginBottom),
@@ -174,15 +177,19 @@ public:
         canvas->drawLine(SkPoint::Make(masterPage.marginLeft, masterPage.height - masterPage.marginBottom), SkPoint::Make(masterPage.width - masterPage.marginRight, masterPage.height - masterPage.marginBottom), paintMargins);
     }
     void BuildImage(SkCanvas* canvas, std::shared_ptr<laid::Box> box) {
+        std::cout << "img:" << box << std::endl;
         // render image
         // need to fix this
+        auto paint = SkPaint();
+        paint.setColor(SK_ColorBLACK);
+        canvas->drawRect(SkRect::MakeXYWH(0, 0, 200, 200), paint);
         if (box->image_path.size() > 0) {
-            std::cout << "Rendering image: " << box->image_path << std::endl;
+            std::cout << "Rendering image canvas: " << canvas << std::endl;
             auto data = SkData::MakeFromFileName(box->image_path.c_str());
-            auto foo = SkImages::DeferredFromEncodedData(data);
-            std::cout << "Image width: " << foo->width() << std::endl;
+            auto img = SkImages::DeferredFromEncodedData(data);
+            std::cout << "Image width: " << img << std::endl;
             canvas->drawImageRect(
-                foo,
+                img,
                 SkRect::MakeXYWH(box->x, box->y, box->width, box->height),
                 SkSamplingOptions()
             );
@@ -190,6 +197,7 @@ public:
     }
 
     void BuildText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
+        std::cout << "txt:" << box << std::endl;
         for(auto& text_run : box->text_runs) {
             auto paragraph_style = paragraphStyles[text_run.style.name];
             auto text_style = paragraph_style.getTextStyle();
@@ -213,13 +221,19 @@ public:
                 if (box->next == nullptr) {
                     if (page->overflow == true) {
                         auto newPage = overflowPage(page);
+                        std::cout << "Overflow page: " << newPage << std::endl;
                         box->next = newPage->boxes[0];
                         box->next->addText(overflow, text_run.style);
-                        BuildPage(newPage);
+                        auto tail = page->next;
+                        page->next = newPage;
+                        page->next->next = tail;
                     }
                 }
-                box->next->addText(overflow, text_run.style);
-                std::cout << "Overflow: " << overflow << std::endl;
+                else {
+                    std::cout << "text on canvas: " << canvas << std::endl;
+                    box->next->addText(overflow, text_run.style);
+                    //std::cout << "Overflow: " << overflow << std::endl;
+                }
             }
         }
 
@@ -229,7 +243,5 @@ public:
             }
         }
     }
-
-
 };
 #endif
