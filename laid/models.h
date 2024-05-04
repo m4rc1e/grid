@@ -11,9 +11,12 @@
 namespace laid {
 
 
-class ParagraphStyle {
+class Style {
     public:
-        std::string name;
+        const char* name;
+        const char* fontName;
+        int fontSize;
+        int leading;
 };
 
 class Rect {
@@ -70,7 +73,7 @@ class MasterPage {
 class TextRun {
     public:
         std::string text;
-        ParagraphStyle style;
+        Style style;
 };
 
 
@@ -86,7 +89,7 @@ class Box {
         std::map<int, std::vector<std::shared_ptr<Box>>> children;
 
         Box(int x, int y, int width, int height) : x(x), y(y), width(width), height(height) {}
-        void addText(std::string text, ParagraphStyle& style) {
+        void addText(std::string text, Style& style) {
             text_runs.push_back(TextRun{text, style});
         }
 
@@ -129,13 +132,13 @@ std::shared_ptr<Page> overflowPage(std::shared_ptr<Page> page) {
 
 class Document {
     public:
-        std::map<std::string, ParagraphStyle*> paragraph_styles;
+        std::map<std::string, Style*> paragraph_styles;
         std::map<std::string, MasterPage*> masterPages;
         int page_count;
         std::shared_ptr<Page> pages;
         std::shared_ptr<Page> lastPage;
 
-        void addParagraphStyle(ParagraphStyle& paragraphStyle) {
+        void addStyle(Style& paragraphStyle) {
             paragraph_styles[paragraphStyle.name] = &paragraphStyle;
         }
 
@@ -144,6 +147,7 @@ class Document {
         }
 
         void addPage(std::shared_ptr<Page> page) {
+            page_count++;
             if (this->pages == nullptr) {
                 this->pages = page;
                 return;

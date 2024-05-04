@@ -69,23 +69,24 @@ public:
     std::map<std::string, ParagraphStyle> paragraphStyles;
 
     void BuildStyles() {
-        ParagraphStyle paragraph_style;
-        // seems to control leading
-        // https://groups.google.com/g/skia-discuss/c/vyPaQY9SGFs
-        StrutStyle strut_style;
-        strut_style.setFontFamilies({SkString("Helvetica")});
-        strut_style.setStrutEnabled(true);
-        strut_style.setFontSize(12);
-        strut_style.setForceStrutHeight(true);
+            ParagraphStyle paragraph_style;
+            // seems to control leading
+            // https://groups.google.com/g/skia-discuss/c/vyPaQY9SGFs
+            StrutStyle strut_style;
+            strut_style.setFontFamilies({SkString("Helvetica")});
+            strut_style.setStrutEnabled(true);
+            strut_style.setFontSize(12);
+            strut_style.setForceStrutHeight(true);
 
-        TextStyle text_style;
-        text_style.setColor(SK_ColorBLACK);
-        text_style.setFontFamilies({SkString("Inter")});
-        text_style.setFontSize(9.5f);
-        text_style.setTextBaseline(TextBaseline::kAlphabetic);
-        paragraph_style.setTextStyle(text_style);
-        paragraph_style.setStrutStyle(strut_style);
-        // TODO update this to use the styles from the document
+            TextStyle text_style;
+            text_style.setColor(SK_ColorBLACK);
+            text_style.setFontFamilies({SkString("Inter")});
+            text_style.setFontSize(9.5f);
+            text_style.setTextBaseline(TextBaseline::kAlphabetic);
+            paragraph_style.setTextStyle(text_style);
+            paragraph_style.setStrutStyle(strut_style);
+            // TODO update this to use the styles from the document
+
         for (auto& [name, style] : laidDoc.paragraph_styles) {
             paragraphStyles[name] = paragraph_style;
         }
@@ -109,8 +110,9 @@ public:
         int width = page->masterPage.width;
         int height = page->masterPage.height;
         SkCanvas* canvas = pdf->beginPage(width, height);
-        BuildGuides(canvas, page->masterPage);
-        BuildBaseline(canvas, page->masterPage);
+        // TODO this infinite loops
+        //BuildGuides(canvas, page->masterPage);
+        //BuildBaseline(canvas, page->masterPage);
         for(auto& box : page->boxes) {
             if (box->image_path.size() > 0) {
                 BuildImage(canvas, box);
@@ -178,11 +180,6 @@ public:
     }
     void BuildImage(SkCanvas* canvas, std::shared_ptr<laid::Box> box) {
         std::cout << "img:" << box << std::endl;
-        // render image
-        // need to fix this
-        auto paint = SkPaint();
-        paint.setColor(SK_ColorBLACK);
-        canvas->drawRect(SkRect::MakeXYWH(0, 0, 200, 200), paint);
         if (box->image_path.size() > 0) {
             std::cout << "Rendering image canvas: " << canvas << std::endl;
             auto data = SkData::MakeFromFileName(box->image_path.c_str());
@@ -214,6 +211,7 @@ public:
                 if (paragraph->getHeight() > box->height+3) {
                     overflow += token + " ";
                 } else {
+                    std::cout << "painting" << box->height << box->x << " " << box->y << std::endl;
                     paragraph->paint(canvas, box->x, box->y);
                 }
             }
@@ -235,6 +233,7 @@ public:
                     //std::cout << "Overflow: " << overflow << std::endl;
                 }
             }
+        std::cout << "done" << std::endl;
         }
 
         for (auto& [idx, children] : box->children) {
