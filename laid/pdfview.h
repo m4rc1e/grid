@@ -113,8 +113,8 @@ public:
         int width = page->masterPage.width;
         int height = page->masterPage.height;
         SkCanvas* canvas = pdf->beginPage(width, height);
-        BuildGuides(canvas, page->masterPage);
-        BuildBaseline(canvas, page->masterPage);
+        //BuildGuides(canvas, page->masterPage);
+        //BuildBaseline(canvas, page->masterPage);
         for(auto& box : page->boxes) {
             if (box->image_path.size() > 0) {
                 BuildImage(canvas, box);
@@ -197,6 +197,7 @@ public:
 
     void BuildText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
         std::cout << "txt:" << box << std::endl;
+        float offset = 0;
         for(auto& text_run : box->text_runs) {
             auto paragraph_style = paragraphStyles[text_run.style.name];
             auto text_style = paragraph_style.getTextStyle();
@@ -214,7 +215,7 @@ public:
                     overflow += token + " ";
                 } else {
                     std::cout << "painting" << box->height << box->x << " " << box->y << std::endl;
-                    paragraph->paint(canvas, box->x, box->y);
+                    paragraph->paint(canvas, box->x, box->y+offset);
                 }
             }
             if (overflow.size() > 0) {
@@ -235,6 +236,7 @@ public:
                     //std::cout << "Overflow: " << overflow << std::endl;
                 }
             }
+            offset += paragraph_style.getStrutStyle().getFontSize();
         std::cout << "done" << std::endl;
         }
 

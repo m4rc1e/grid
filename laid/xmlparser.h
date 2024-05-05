@@ -45,7 +45,8 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
             auto height = box_node.attribute("height").as_int();
             auto box = std::make_shared<laid::Box>(x, y, width, height);
             for (pugi::xml_node text_node: box_node.children("text")) {
-                auto style = doc->paragraph_styles["p"];
+                auto styleName = text_node.attribute("style").as_string();
+                auto style = doc->paragraph_styles[styleName];
                 auto text = text_node.text().as_string();
                 box->addText(text, style);
             }
