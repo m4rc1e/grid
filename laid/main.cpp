@@ -6,6 +6,7 @@
 
 int main() {
     auto myDoc = laid::load_file("sketches/sketch4.xml");
-    BuildPDF PDFBuilder(*myDoc, "output3.pdf");
+    BuildPDF PDFBuilder(myDoc, "output3.pdf");
     PDFBuilder.Build();
+    std::cout << "Hello, World!" << std::endl;
 }

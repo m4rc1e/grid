@@ -13,11 +13,12 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
     // build master pages
     for (pugi::xml_node node: xml_doc_start.child("head").child("masterPages").children("masterPage")) {
         laid::MasterPage masterPage;
-        masterPage.name = node.attribute("name").as_string();
+        masterPage.name = std::string(node.attribute("name").as_string());
         masterPage.height = node.attribute("height").as_int();
         masterPage.width = node.attribute("width").as_int();
         masterPage.cols = node.attribute("columns").as_int();
         masterPage.rows = node.attribute("rows").as_int();
+        masterPage.baseline = node.attribute("baseline").as_int();
 
         doc->addMasterPage(masterPage);
     }
@@ -25,8 +26,9 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
     // build styles
     for (pugi::xml_node node: xml_doc_start.child("head").child("styles").children("style")) {
         laid::Style style;
-        style.name = node.attribute("name").as_string();
-        style.fontName = node.attribute("fontName").as_string();
+        auto nn = node.attribute("name").as_string();
+        style.name = std::string(node.attribute("name").as_string());
+        style.fontName = std::string(node.attribute("fontName").as_string());
         style.fontSize = node.attribute("fontSize").as_int();
         style.leading = node.attribute("leading").as_int();
         doc->addStyle(style);
@@ -43,9 +45,9 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
             auto height = box_node.attribute("height").as_int();
             auto box = std::make_shared<laid::Box>(x, y, width, height);
             for (pugi::xml_node text_node: box_node.children("text")) {
-                auto style = doc->paragraph_styles[text_node.attribute("style").as_string()];
+                auto style = doc->paragraph_styles["p"];
                 auto text = text_node.text().as_string();
-                box->addText(text, *style);
+                box->addText(text, style);
             }
             page->addBox(box);
         }

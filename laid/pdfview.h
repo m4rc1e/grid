@@ -51,7 +51,7 @@ using namespace skia::textlayout;
 
 class BuildPDF {
 public:
-    BuildPDF(laid::Document& laidDoc, const char* out) : laidDoc(laidDoc), stream(out) {
+    BuildPDF(std::shared_ptr<laid::Document> laidDoc, const char* out) : laidDoc(laidDoc), stream(out) {
         laidDoc = laidDoc;
         fontCollection->setDefaultFontManager(SkFontMgr::RefDefault());
         pdf = SkPDF::MakeDocument(&stream, metadata);
@@ -61,7 +61,7 @@ public:
         metadata.fModified = {0, 2019, 1, 4, 31, 12, 34, 56};
     };
 
-    laid::Document laidDoc;
+    std::shared_ptr<laid::Document> laidDoc;
     sk_sp<FontCollection> fontCollection = sk_make_sp<FontCollection>();
     SkFILEWStream stream;
     SkPDF::Metadata metadata;
@@ -69,25 +69,28 @@ public:
     std::map<std::string, ParagraphStyle> paragraphStyles;
 
     void BuildStyles() {
+        for (auto& [name, style] : laidDoc->paragraph_styles) {
             ParagraphStyle paragraph_style;
             // seems to control leading
             // https://groups.google.com/g/skia-discuss/c/vyPaQY9SGFs
             StrutStyle strut_style;
             strut_style.setFontFamilies({SkString("Helvetica")});
             strut_style.setStrutEnabled(true);
-            strut_style.setFontSize(12);
+            if (style.leading > 0) {
+                strut_style.setFontSize(style.leading);
+            } else {
+                strut_style.setFontSize(style.fontSize * 1.2);
+            }
             strut_style.setForceStrutHeight(true);
 
             TextStyle text_style;
             text_style.setColor(SK_ColorBLACK);
-            text_style.setFontFamilies({SkString("Inter")});
-            text_style.setFontSize(9.5f);
+            text_style.setFontFamilies({SkString(style.fontName)});
+            text_style.setFontSize(style.fontSize);
             text_style.setTextBaseline(TextBaseline::kAlphabetic);
             paragraph_style.setTextStyle(text_style);
             paragraph_style.setStrutStyle(strut_style);
-            // TODO update this to use the styles from the document
-
-        for (auto& [name, style] : laidDoc.paragraph_styles) {
+            
             paragraphStyles[name] = paragraph_style;
         }
 
@@ -97,7 +100,7 @@ public:
         BuildPages();
     }
     void BuildPages() {
-        std::shared_ptr<laid::Page> head = laidDoc.pages;
+        std::shared_ptr<laid::Page> head = laidDoc->pages;
         while (head != nullptr) {
             BuildPage(head);
             head = head->next;
@@ -110,9 +113,8 @@ public:
         int width = page->masterPage.width;
         int height = page->masterPage.height;
         SkCanvas* canvas = pdf->beginPage(width, height);
-        // TODO this infinite loops
-        //BuildGuides(canvas, page->masterPage);
-        //BuildBaseline(canvas, page->masterPage);
+        BuildGuides(canvas, page->masterPage);
+        BuildBaseline(canvas, page->masterPage);
         for(auto& box : page->boxes) {
             if (box->image_path.size() > 0) {
                 BuildImage(canvas, box);
