@@ -38,6 +38,7 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
     for (pugi::xml_node node: xml_doc_start.child("body").child("pages").children("page")) {
         auto masterName = node.attribute("masterPage").as_string();
         auto page = std::make_shared<laid::Page>(*doc->masterPages[masterName]);
+        page->overflow = node.attribute("overflow").as_bool();
         for (pugi::xml_node box_node: node.children("box")) {
             auto x = box_node.attribute("x").as_int();
             auto y = box_node.attribute("y").as_int();
@@ -57,13 +58,4 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
     }
     return doc;
 }
-
-
-//int main() {
-//    auto doc = load_file("sketches/sketch4.xml");
-//    std::cout << "Master Pages: " << doc->masterPages.size() << std::endl;
-//    std::cout << "Styles: " << doc->paragraph_styles.size() << std::endl;
-//    std::cout << "Pages: " << doc->page_count << std::endl;
-//}
-
-} // namespace laid
+}

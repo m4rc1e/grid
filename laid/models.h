@@ -89,11 +89,11 @@ class Box {
         std::map<int, std::vector<std::shared_ptr<Box>>> children;
 
         Box(int x, int y, int width, int height) : x(x), y(y), width(width), height(height) {}
-        void addText(std::string text, Style style) {
+        void addText(const std::string& text, Style style) {
             text_runs.push_back(TextRun{text, style});
         }
 
-        void addImage(std::string path) {
+        void addImage(const std::string& path) {
             image_path = path;
         }
 

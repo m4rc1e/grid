@@ -198,7 +198,8 @@ public:
     void BuildText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
         std::cout << "txt:" << box << std::endl;
         float offset = 0;
-        for(auto& text_run : box->text_runs) {
+        for (size_t textrun_idx = 0; textrun_idx < box->text_runs.size(); textrun_idx++) {
+            auto& text_run = box->text_runs[textrun_idx];
             auto paragraph_style = paragraphStyles[text_run.style.name];
             auto text_style = paragraph_style.getTextStyle();
             ParagraphBuilderImpl builder(paragraph_style, fontCollection);
@@ -225,18 +226,27 @@ public:
                         std::cout << "Overflow page: " << newPage << std::endl;
                         box->next = newPage->boxes[0];
                         box->next->addText(overflow, text_run.style);
+                        // add the rest of the text runs to the next box
+                        for (int j=textrun_idx+1; j<box->text_runs.size(); j++) {
+                            box->next->text_runs.push_back(box->text_runs[j]);
+                        }
                         auto tail = page->next;
                         page->next = newPage;
-                        page->next->next = tail;
+                        std::cout << "added page" << std::endl;
+                        newPage->next = tail;
+                        return; // stop processing the rest of the text runs
                     }
                 }
                 else {
                     std::cout << "text on canvas: " << canvas << std::endl;
                     box->next->addText(overflow, text_run.style);
-                    //std::cout << "Overflow: " << overflow << std::endl;
+                    for (int j=textrun_idx+1; j<box->text_runs.size(); j++) {
+                        box->next->text_runs.push_back(box->text_runs[j]);
+                    }
+                    break; // stop processing the rest of the text runs
                 }
             }
-            offset += paragraph_style.getStrutStyle().getFontSize();
+            offset += paragraph->getHeight();
         std::cout << "done" << std::endl;
         }
 
