@@ -205,19 +205,19 @@ public:
             std::istringstream ss(text_run.text);
             std::string token;
             std::string overflow;
+            std::unique_ptr<skia::textlayout::Paragraph>  paragraph;
             while(std::getline(ss, token, ' ')) {
                 builder.pushStyle(text_style);
                 builder.addText(token.data());
                 builder.addText(" ");
-                auto paragraph = builder.Build();
+                paragraph = builder.Build();
                 paragraph->layout(box->width);
                 if (paragraph->getHeight() > box->height+3) {
                     overflow += token + " ";
-                } else {
-                    std::cout << "painting" << box->height << box->x << " " << box->y << std::endl;
-                    paragraph->paint(canvas, box->x, box->y+offset);
                 }
             }
+            std::cout << "painting" << box->height << box->x << " " << box->y << std::endl;
+            paragraph->paint(canvas, box->x, box->y+offset);
             if (overflow.size() > 0) {
                 if (box->next == nullptr) {
                     if (page->overflow == true) {
