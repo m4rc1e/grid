@@ -209,15 +209,17 @@ public:
             auto& text_run = box->text_runs[textrun_idx];
             auto paragraph_style = paragraphStyles[text_run.style.name];
             auto text_style = paragraph_style.getTextStyle();
+            auto strut_style = paragraph_style.getStrutStyle();
             ParagraphBuilderImpl builder(paragraph_style, fontCollection);
-            std::istringstream ss(text_run.text + " "); // " " added at end due to delimiter for std::getline
+            auto text = text_run.text + "  ";
+            std::istringstream ss(text); // " " added at end due to delimiter for std::getline
             std::string token;
             std::string overflow;
             std::unique_ptr<skia::textlayout::Paragraph>  paragraph;
             while(std::getline(ss, token, ' ')) {
                 paragraph = builder.Build();
                 paragraph->layout(box->width);
-                if (paragraph->getHeight() > box->height) {
+                if (paragraph->getHeight() + strut_style.getFontSize()*1 > box->height || offset + strut_style.getFontSize()*1 > box->height) {
                     std::cout << "overflow:" << token << std::endl;
                     overflow += token + " ";
                 } else {
@@ -227,6 +229,7 @@ public:
                 }
             }
             paragraph->paint(canvas, box->x, box->y+offset);
+            offset += paragraph->getHeight();
             // deal with overflow
             if (overflow.size() > 0) {
                 std::cout << "we have an overflow" << std::endl;
@@ -241,6 +244,12 @@ public:
                         page->next = newPage;
                         std::cout << "added page" << std::endl;
                         newPage->next = tail;
+                        // add the rest of the text runs to the next box
+                        for (int j=textrun_idx+1; j<box->text_runs.size(); j++) {
+                            std::cout << "adding text run to next box" << std::endl;
+                            box->next->text_runs.push_back(box->text_runs[j]);
+                        }
+                        return;
                     }
                 }
             }
