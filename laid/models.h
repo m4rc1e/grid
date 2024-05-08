@@ -120,6 +120,7 @@ class Page {
 
 std::shared_ptr<Page> overflowPage(std::shared_ptr<Page> page) {
     auto newPage = std::make_shared<Page>(page->masterPage);
+    newPage->overflow = true;
     
     for (auto& box : page->boxes) {
         auto newBox = std::make_shared<Box>(box->x, box->y, box->width, box->height);

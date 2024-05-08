@@ -195,6 +195,13 @@ public:
         }
     }
 
+    
+   /* BuildText2
+   
+   - Iterate through text runs
+    - if a full text run fits, paint it. If not paint what fits and add the rest to the next box
+
+   */
     void BuildText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
         std::cout << "txt:" << box << std::endl;
         float offset = 0;
@@ -203,58 +210,91 @@ public:
             auto paragraph_style = paragraphStyles[text_run.style.name];
             auto text_style = paragraph_style.getTextStyle();
             ParagraphBuilderImpl builder(paragraph_style, fontCollection);
-            std::istringstream ss(text_run.text);
+            std::istringstream ss(text_run.text + " "); // " " added at end due to delimiter for std::getline
             std::string token;
             std::string overflow;
             std::unique_ptr<skia::textlayout::Paragraph>  paragraph;
             while(std::getline(ss, token, ' ')) {
-                builder.pushStyle(text_style);
-                builder.addText(token.data());
-                builder.addText(" ");
                 paragraph = builder.Build();
                 paragraph->layout(box->width);
-                if (paragraph->getHeight() > box->height+3) {
+                if (paragraph->getHeight() > box->height) {
+                    std::cout << "overflow:" << token << std::endl;
                     overflow += token + " ";
+                } else {
+                    builder.pushStyle(text_style);
+                    builder.addText(token.data());
+                    builder.addText(" ");
                 }
             }
-            std::cout << "painting" << box->height << box->x << " " << box->y << std::endl;
             paragraph->paint(canvas, box->x, box->y+offset);
+            // deal with overflow
             if (overflow.size() > 0) {
+                std::cout << "we have an overflow" << std::endl;
                 if (box->next == nullptr) {
+                    // overflow onto new page
                     if (page->overflow == true) {
                         auto newPage = overflowPage(page);
                         std::cout << "Overflow page: " << newPage << std::endl;
                         box->next = newPage->boxes[0];
                         box->next->addText(overflow, text_run.style);
-                        // add the rest of the text runs to the next box
-                        for (int j=textrun_idx+1; j<box->text_runs.size(); j++) {
-                            box->next->text_runs.push_back(box->text_runs[j]);
-                        }
                         auto tail = page->next;
                         page->next = newPage;
                         std::cout << "added page" << std::endl;
                         newPage->next = tail;
-                        return; // stop processing the rest of the text runs
                     }
                 }
-                else {
-                    std::cout << "text on canvas: " << canvas << std::endl;
-                    box->next->addText(overflow, text_run.style);
-                    for (int j=textrun_idx+1; j<box->text_runs.size(); j++) {
-                        box->next->text_runs.push_back(box->text_runs[j]);
-                    }
-                    break; // stop processing the rest of the text runs
-                }
-            }
-            offset += paragraph->getHeight();
-        std::cout << "done" << std::endl;
-        }
-
-        for (auto& [idx, children] : box->children) {
-            for(auto& child : children) {
-                BuildText(canvas, page, child);
             }
         }
     }
+//                builder.pushStyle(text_style);
+//                builder.addText(token.data());
+//                builder.addText(" ");
+//                paragraph = builder.Build();
+//                paragraph->layout(box->width);
+//                std::cout << "paragraph height: " << paragraph->getHeight() << " box height: " << box->height << std::endl;
+//                if (paragraph->getHeight() > box->height+3) {
+//                    overflow += token + " ";
+//                    std::cout << "overflow: " << overflow << std::endl;
+//                }
+//            }
+//            std::cout << "painting" << box->height << box->x << " " << box->y << std::endl;
+//            paragraph->paint(canvas, box->x, box->y+offset);
+//            if (overflow.size() > 0) {
+//                std::cout << "we have an overflow" << std::endl;
+//                if (box->next == nullptr) {
+//                    if (page->overflow == true) {
+//                        auto newPage = overflowPage(page);
+//                        std::cout << "Overflow page: " << newPage << std::endl;
+//                        box->next = newPage->boxes[0];
+//                        box->next->addText(overflow, text_run.style);
+////                        // add the rest of the text runs to the next box
+////                        for (int j=textrun_idx+1; j<box->text_runs.size(); j++) {
+////                            box->next->text_runs.push_back(box->text_runs[j]);
+////                        }
+//                        auto tail = page->next;
+//                        page->next = newPage;
+//                        std::cout << "added page" << std::endl;
+//                        newPage->next = tail;
+//                        return; // stop processing the rest of the text runs
+//                    }
+//                }
+// //               else {
+// //                   std::cout << "text on canvas: " << canvas << std::endl;
+// //                   box->next->addText(overflow, text_run.style);
+// //                   for (int j=textrun_idx+1; j<box->text_runs.size(); j++) {
+// //                       box->next->text_runs.push_back(box->text_runs[j]);
+// //                   }
+// //                   break; // stop processing the rest of the text runs
+// //               }
+//            }
+//            offset += paragraph->getHeight();
+//        std::cout << "done" << std::endl;
+//        }
+//
+//        for (auto& [idx, children] : box->children) {
+//            for(auto& child : children) {
+//                BuildText(canvas, page, child);
+//            }
+//        }
 };
 #endif
