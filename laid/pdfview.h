@@ -113,9 +113,10 @@ public:
         int width = page->masterPage.width;
         int height = page->masterPage.height;
         SkCanvas* canvas = pdf->beginPage(width, height);
-        //BuildGuides(canvas, page->masterPage);
-        //BuildBaseline(canvas, page->masterPage);
+        BuildGuides(canvas, page->masterPage);
+        BuildBaseline(canvas, page->masterPage);
         for(auto& box : page->boxes) {
+            BuildBoxRect(canvas, box);
             if (box->image_path.size() > 0) {
                 BuildImage(canvas, box);
             }
@@ -126,6 +127,10 @@ public:
     }
 
     void BuildBaseline(SkCanvas* canvas, laid::MasterPage& masterPage) {
+        // no baseline, no draw!
+        if (masterPage.baseline == 0) {
+            return;
+        }
         SkPaint paintBaseline;
         paintBaseline.setColor(SK_ColorGRAY);
         for (int i=masterPage.marginTop; i<= masterPage.height - masterPage.marginBottom; i+=masterPage.baseline) {
@@ -135,6 +140,16 @@ public:
                 paintBaseline
             );
         }
+    }
+
+    void BuildBoxRect(SkCanvas* canvas, std::shared_ptr<laid::Box> box) {
+        SkPaint paintBox;
+        paintBox.setColor(SK_ColorRED);
+        paintBox.setStyle(SkPaint::kStroke_Style);
+        canvas->drawRect(
+            SkRect::MakeXYWH(box->x, box->y, box->width, box->height),
+            paintBox
+        );
     }
 
     void BuildGuides(SkCanvas* canvas, laid::MasterPage& masterPage) {
