@@ -234,7 +234,7 @@ public:
             while(std::getline(ss, token, ' ')) {
                 paragraph = builder.Build();
                 paragraph->layout(box->width);
-                if (paragraph->getHeight() + strut_style.getFontSize()*1 > box->height || offset + strut_style.getFontSize()*1 > box->height) {
+                if (paragraph->getHeight() + strut_style.getFontSize()*1.2 > box->height || offset + strut_style.getFontSize()*1.2 > box->height) {
                     std::cout << "overflow:" << token << std::endl;
                     overflow += token + " ";
                 } else {
