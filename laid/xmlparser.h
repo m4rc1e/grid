@@ -39,12 +39,18 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
         auto masterName = node.attribute("masterPage").as_string();
         auto page = std::make_shared<laid::Page>(*doc->masterPages[masterName]);
         page->overflow = node.attribute("overflow").as_bool();
+        std::shared_ptr<laid::Box> prev;
+        bool overflowNext = false;
         for (pugi::xml_node box_node: node.children("box")) {
             auto x = box_node.attribute("x").as_int();
             auto y = box_node.attribute("y").as_int();
             auto width = box_node.attribute("width").as_int();
             auto height = box_node.attribute("height").as_int();
             auto box = std::make_shared<laid::Box>(x, y, width, height);
+            if (overflowNext) {
+                prev->next = box;
+            }
+            overflowNext = box_node.attribute("overflowNext").as_bool();
             for (pugi::xml_node text_node: box_node.children("text")) {
                 auto styleName = text_node.attribute("style").as_string();
                 auto style = doc->paragraph_styles[styleName];
@@ -52,6 +58,7 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
                 box->addText(text, style);
             }
             page->addBox(box);
+            prev = box;
         }
         // TODO add linkedboxes
         doc->addPage(page);

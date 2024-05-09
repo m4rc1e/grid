@@ -266,6 +266,16 @@ public:
                         }
                         return;
                     }
+                } else {
+                    box->next->addText(overflow, text_run.style);
+                    auto tail = page->next;
+                    std::cout << "added page" << std::endl;
+                    // add the rest of the text runs to the next box
+                    for (int j=textrun_idx+1; j<box->text_runs.size(); j++) {
+                        std::cout << "adding text run to next box" << std::endl;
+                        box->next->text_runs.push_back(box->text_runs[j]);
+                    }
+                    return;
                 }
             }
         }
