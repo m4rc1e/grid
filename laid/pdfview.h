@@ -49,6 +49,43 @@
 using namespace skia::textlayout;
 
 
+class TextSetter {
+    public:
+        TextSetter(int width, int height, sk_sp<FontCollection> fontCollection) : 
+            width(width),
+            height(height),
+            fontCollection(fontCollection),
+            builder(skia::textlayout::ParagraphStyle(), fontCollection) {
+        }
+        int width;
+        int height;
+        std::string text;
+        std::string overflow;
+        skia::textlayout::ParagraphStyle paragraph_style;
+        sk_sp<FontCollection> fontCollection;
+        ParagraphBuilderImpl builder;
+        std::unique_ptr<skia::textlayout::Paragraph>  paragraph;
+        
+        void SetText(
+            std::string text,
+            skia::textlayout::ParagraphStyle paragraph_style
+        ) {
+            skia::textlayout::TextStyle text_style = paragraph_style.getTextStyle();
+            skia::textlayout::StrutStyle  strut_style = paragraph_style.getStrutStyle();
+
+            builder.pushStyle(text_style);
+            builder.addText(text.data());
+            paragraph = builder.Build();
+            paragraph->layout(width);
+        }
+        void Paint(SkCanvas* canvas) {
+            paragraph->paint(canvas, 50, 50);
+        }
+        bool HasOverflowingText() {
+            return paragraph->getHeight() > width;
+        }
+};
+
 class BuildPDF {
 public:
     BuildPDF(std::shared_ptr<laid::Document> laidDoc, const char* out) : laidDoc(laidDoc), stream(out) {
@@ -218,68 +255,77 @@ public:
 
    */
     void BuildText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
-        std::cout << "txt:" << box << std::endl;
-        float offset = 0;
+        TextSetter textSetter(box->width, box->height, fontCollection);
         for (size_t textrun_idx = 0; textrun_idx < box->text_runs.size(); textrun_idx++) {
             auto& text_run = box->text_runs[textrun_idx];
-            auto paragraph_style = paragraphStyles[text_run.style.name];
-            auto text_style = paragraph_style.getTextStyle();
-            auto strut_style = paragraph_style.getStrutStyle();
-            ParagraphBuilderImpl builder(paragraph_style, fontCollection);
-            auto text = text_run.text + "  ";
-            std::istringstream ss(text); // " " added at end due to delimiter for std::getline
-            std::string token;
-            std::string overflow;
-            std::unique_ptr<skia::textlayout::Paragraph>  paragraph;
-            while(std::getline(ss, token, ' ')) {
-                paragraph = builder.Build();
-                paragraph->layout(box->width);
-                if (paragraph->getHeight() + strut_style.getFontSize()*1.2 > box->height || offset + strut_style.getFontSize()*1.2 > box->height) {
-                    std::cout << "overflow:" << token << std::endl;
-                    overflow += token + " ";
-                } else {
-                    builder.pushStyle(text_style);
-                    builder.addText(token.data());
-                    builder.addText(" ");
+            textSetter.SetText(text_run.text, paragraphStyles[text_run.style.name]);
+            if (textSetter.HasOverflowingText()) {
+                if (box->next == nullptr && page->overflow == true) {
+ 
                 }
             }
-            paragraph->paint(canvas, box->x, box->y+offset);
-            offset += paragraph->getHeight();
-            // deal with overflow
-            if (overflow.size() > 0) {
-                std::cout << "we have an overflow" << std::endl;
-                if (box->next == nullptr) {
-                    // overflow onto new page
-                    if (page->overflow == true) {
-                        auto newPage = overflowPage(page);
-                        std::cout << "Overflow page: " << newPage << std::endl;
-                        box->next = newPage->boxes[0];
-                        box->next->addText(overflow, text_run.style);
-                        auto tail = page->next;
-                        page->next = newPage;
-                        std::cout << "added page" << std::endl;
-                        newPage->next = tail;
-                        // add the rest of the text runs to the next box
-                        for (int j=textrun_idx+1; j<box->text_runs.size(); j++) {
-                            std::cout << "adding text run to next box" << std::endl;
-                            box->next->text_runs.push_back(box->text_runs[j]);
-                        }
-                        return;
-                    }
-                } else {
-                    box->next->addText(overflow, text_run.style);
-                    auto tail = page->next;
-                    std::cout << "added page" << std::endl;
-                    // add the rest of the text runs to the next box
-                    for (int j=textrun_idx+1; j<box->text_runs.size(); j++) {
-                        std::cout << "adding text run to next box" << std::endl;
-                        box->next->text_runs.push_back(box->text_runs[j]);
-                    }
-                    return;
-                }
-            }
-        }
-    }
+        };
+        textSetter.Paint(canvas);
+
+//            auto& text_run = box->text_runs[textrun_idx];
+//            auto paragraph_style = paragraphStyles[text_run.style.name];
+//            auto text_style = paragraph_style.getTextStyle();
+//            auto strut_style = paragraph_style.getStrutStyle();
+//            ParagraphBuilderImpl builder(paragraph_style, fontCollection);
+//            auto text = text_run.text + "  ";
+//            std::istringstream ss(text); // " " added at end due to delimiter for std::getline
+//            std::string token;
+//            std::string overflow;
+//            std::unique_ptr<skia::textlayout::Paragraph>  paragraph;
+//            while(std::getline(ss, token, ' ')) {
+//                paragraph = builder.Build();
+//                paragraph->layout(box->width);
+//                if (paragraph->getHeight() + strut_style.getFontSize()*1.2 > box->height || offset + strut_style.getFontSize()*1.2 > box->height) {
+//                    std::cout << "overflow:" << token << std::endl;
+//                    overflow += token + " ";
+//                } else {
+//                    builder.pushStyle(text_style);
+//                    builder.addText(token.data());
+//                    builder.addText(" ");
+//                }
+//            }
+//            paragraph->paint(canvas, box->x, box->y+offset);
+//            offset += paragraph->getHeight();
+//            // deal with overflow
+//            if (overflow.size() > 0) {
+//                std::cout << "we have an overflow" << std::endl;
+//                if (box->next == nullptr) {
+//                    // overflow onto new page
+//                    if (page->overflow == true) {
+//                        auto newPage = overflowPage(page);
+//                        std::cout << "Overflow page: " << newPage << std::endl;
+//                        box->next = newPage->boxes[0];
+//                        box->next->addText(overflow, text_run.style);
+//                        auto tail = page->next;
+//                        page->next = newPage;
+//                        std::cout << "added page" << std::endl;
+//                        newPage->next = tail;
+//                        // add the rest of the text runs to the next box
+//                        for (int j=textrun_idx+1; j<box->text_runs.size(); j++) {
+//                            std::cout << "adding text run to next box" << std::endl;
+//                            box->next->text_runs.push_back(box->text_runs[j]);
+//                        }
+//                        return;
+//                    }
+//                } else {
+//                    box->next->addText(overflow, text_run.style);
+//                    auto tail = page->next;
+//                    std::cout << "added page" << std::endl;
+//                    // add the rest of the text runs to the next box
+//                    for (int j=textrun_idx+1; j<box->text_runs.size(); j++) {
+//                        std::cout << "adding text run to next box" << std::endl;
+//                        box->next->text_runs.push_back(box->text_runs[j]);
+//                    }
+//                    return;
+//                }
+//            }
+//        }
+//    }
 //                builder.pushStyle(text_style);
 //                builder.addText(token.data());
 //                builder.addText(" ");
@@ -330,5 +376,6 @@ public:
 //                BuildText(canvas, page, child);
 //            }
 //        }
+};
 };
 #endif

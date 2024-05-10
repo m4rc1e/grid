@@ -5,7 +5,7 @@
 
 
 int main() {
-    auto myDoc = laid::load_file("sketches/one_page_multi_box.xml");
+    auto myDoc = laid::load_file("sketches/one_page_one_box.xml");
     BuildPDF PDFBuilder(myDoc, "output3.pdf");
     PDFBuilder.Build();
 }
