@@ -55,16 +55,20 @@ class TextSetter {
             width(width),
             height(height),
             fontCollection(fontCollection),
-            builder(skia::textlayout::ParagraphStyle(), fontCollection) {
+            builder(skia::textlayout::ParagraphStyle(), fontCollection),
+            prevBuilder(skia::textlayout::ParagraphStyle(), fontCollection) {
         }
         int width;
         int height;
+        bool paintPrev;
         std::string text;
         std::string overflow;
         skia::textlayout::ParagraphStyle paragraph_style;
         sk_sp<FontCollection> fontCollection;
+        ParagraphBuilderImpl prevBuilder;
         ParagraphBuilderImpl builder;
         std::unique_ptr<skia::textlayout::Paragraph>  paragraph;
+        std::unique_ptr<skia::textlayout::Paragraph>  prevParagraph;
         
         void SetText(
             std::string text,
@@ -73,16 +77,40 @@ class TextSetter {
             skia::textlayout::TextStyle text_style = paragraph_style.getTextStyle();
             skia::textlayout::StrutStyle  strut_style = paragraph_style.getStrutStyle();
 
-            builder.pushStyle(text_style);
-            builder.addText(text.data());
-            paragraph = builder.Build();
-            paragraph->layout(width);
+
+            std::istringstream ss(text); // " " added at end due to delimiter for std::getline
+            std::string token;
+            std::string overflow;
+            
+            
+            while(std::getline(ss, token, ' ')) {
+                builder.pushStyle(text_style);
+                builder.addText(token.data());
+                builder.addText(" ");
+                paragraph = builder.Build();
+                paragraph->layout(width);
+
+                if (paragraph->getHeight() > height) {
+                    paintPrev = true;
+                    return;
+                }
+                prevBuilder.pushStyle(text_style);
+                prevBuilder.addText(token.data());
+                prevBuilder.addText(" ");
+                prevParagraph = prevBuilder.Build();
+                prevParagraph->layout(width);
+                std::cout << token << std::endl;
+            };
         }
-        void Paint(SkCanvas* canvas) {
-            paragraph->paint(canvas, 50, 50);
+        void Paint(int x, int y, SkCanvas* canvas) {
+            if (paintPrev == true) {
+                prevParagraph->paint(canvas, x, y);
+                return;
+            }
+            paragraph->paint(canvas, x, y);
         }
         bool HasOverflowingText() {
-            return paragraph->getHeight() > width;
+            return paragraph->getHeight() > height;
         }
 };
 
@@ -259,13 +287,8 @@ public:
         for (size_t textrun_idx = 0; textrun_idx < box->text_runs.size(); textrun_idx++) {
             auto& text_run = box->text_runs[textrun_idx];
             textSetter.SetText(text_run.text, paragraphStyles[text_run.style.name]);
-            if (textSetter.HasOverflowingText()) {
-                if (box->next == nullptr && page->overflow == true) {
- 
-                }
-            }
-        };
-        textSetter.Paint(canvas);
+        }
+        textSetter.Paint(box->x, box->y, canvas);
 
 //            auto& text_run = box->text_runs[textrun_idx];
 //            auto paragraph_style = paragraphStyles[text_run.style.name];
