@@ -104,6 +104,14 @@ class Box {
             box->prev = std::make_shared<Box>(*this);
         }
 
+        std::shared_ptr<Box> getFirst() {
+            auto current = std::make_shared<Box>(*this);
+            while (current->prev != nullptr) {
+                current = current->prev;
+            }
+            return current;
+        }
+
         void addChild(int idx, std::shared_ptr<Box> box) {
             children[idx].push_back(box);
         }
@@ -165,9 +173,7 @@ class Document {
             
             for (auto& box : page->boxes) {
                 auto newBox = std::make_shared<Box>(box->x, box->y, box->width, box->height);
-                newBox->image_path = "";
                 newPage->addBox(newBox);
-                break;
             }
             auto tail = page->next;
             page->next = newPage;
