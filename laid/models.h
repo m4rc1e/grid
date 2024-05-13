@@ -83,8 +83,10 @@ class Box {
         float y;
         float width;
         float height;
+        int pageIdx;
         std::vector<TextRun> text_runs;
         std::shared_ptr<Box> next;
+        std::shared_ptr<Box> prev;
         std::string image_path;
         std::map<int, std::vector<std::shared_ptr<Box>>> children;
 
@@ -95,6 +97,11 @@ class Box {
 
         void addImage(const std::string& path) {
             image_path = path;
+        }
+
+        void addNext(std::shared_ptr<Box> box) {
+            next = box;
+            box->prev = std::make_shared<Box>(*this);
         }
 
         void addChild(int idx, std::shared_ptr<Box> box) {
@@ -112,10 +119,14 @@ class Page {
         std::vector<std::shared_ptr<Box>> boxes;
         bool overflow;
         std::shared_ptr<Page> next;
+        int boxIdx = 0;
 
         void addBox(std::shared_ptr<Box> box) {
+            box->pageIdx = boxIdx;
             boxes.push_back(std::shared_ptr<Box>(box));
+            boxIdx += 1;
         }
+
 
 };
 

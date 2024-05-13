@@ -48,7 +48,7 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
             auto height = box_node.attribute("height").as_int();
             auto box = std::make_shared<laid::Box>(x, y, width, height);
             if (overflowNext) {
-                prev->next = box;
+                prev->addNext(box);
             }
             overflowNext = box_node.attribute("overflowNext").as_bool();
             for (pugi::xml_node text_node: box_node.children("text")) {
