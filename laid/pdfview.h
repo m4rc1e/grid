@@ -297,12 +297,12 @@ public:
                     }
                     textSetter.Paint(box->x, box->y, canvas);
                     return;
-                    }
                 } else {
                     std::cout << "Overflowing text in box!" << std::endl;
                 }
             }
         textSetter.Paint(box->x, box->y, canvas);
     }
+};
 };
 #endif
