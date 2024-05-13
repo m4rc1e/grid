@@ -295,7 +295,10 @@ public:
                         page->next = newPage;
                         newPage->next = tail;
                         textSetter.Paint(box->x, box->y, canvas);
-                        // TODO add textruns to the new box
+                        for (size_t i = textrun_idx + 1; i < box->text_runs.size(); i++) {
+                            auto& overflow_text_run = box->text_runs[i];
+                            newPage->boxes[0]->addText(overflow_text_run.text, overflow_text_run.style);
+                        }
                         return;
                     }
                 }
