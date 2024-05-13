@@ -285,26 +285,24 @@ public:
             auto& text_run = box->text_runs[textrun_idx];
             textSetter.SetText(text_run.text, paragraphStyles[text_run.style.name]);
             if (textSetter.HasOverflowingText()) {
-                if (page->overflow == true) {
-                    if (box->next == nullptr) {
-                        auto newPage = overflowPage(page);
-                        box->next = newPage->boxes[0];
-                        newPage->boxes[0]->addText(textSetter.overflow, text_run.style);
-
-                        auto tail = page->next;
-                        page->next = newPage;
-                        newPage->next = tail;
-                        textSetter.Paint(box->x, box->y, canvas);
-                        for (size_t i = textrun_idx + 1; i < box->text_runs.size(); i++) {
-                            auto& overflow_text_run = box->text_runs[i];
-                            newPage->boxes[0]->addText(overflow_text_run.text, overflow_text_run.style);
-                        }
-                        return;
+                if (page->overflow == true && box->next == nullptr) {
+                    auto newPage = laidDoc->overflowPage(page);
+                    box->next = newPage->boxes[0];
+                }
+                if (box->next) {
+                    box->next->addText(textSetter.overflow, text_run.style);
+                    for (size_t i = textrun_idx + 1; i < box->text_runs.size(); i++) {
+                        auto& overflow_text_run = box->text_runs[i];
+                        box->next->addText(overflow_text_run.text, overflow_text_run.style);
                     }
+                    textSetter.Paint(box->x, box->y, canvas);
+                    return;
+                    }
+                } else {
+                    std::cout << "Overflowing text in box!" << std::endl;
                 }
             }
-        }
         textSetter.Paint(box->x, box->y, canvas);
-    };
+    }
 };
 #endif
