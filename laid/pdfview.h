@@ -284,6 +284,22 @@ public:
         for (size_t textrun_idx = 0; textrun_idx < box->text_runs.size(); textrun_idx++) {
             auto& text_run = box->text_runs[textrun_idx];
             textSetter.SetText(text_run.text, paragraphStyles[text_run.style.name]);
+            if (textSetter.HasOverflowingText()) {
+                if (page->overflow == true) {
+                    if (box->next == nullptr) {
+                        auto newPage = overflowPage(page);
+                        box->next = newPage->boxes[0];
+                        newPage->boxes[0]->addText(textSetter.overflow, text_run.style);
+
+                        auto tail = page->next;
+                        page->next = newPage;
+                        newPage->next = tail;
+                        textSetter.Paint(box->x, box->y, canvas);
+                        // TODO add textruns to the new box
+                        return;
+                    }
+                }
+            }
         }
         textSetter.Paint(box->x, box->y, canvas);
     };
