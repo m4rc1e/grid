@@ -287,8 +287,6 @@ public:
             if (textSetter.HasOverflowingText()) {
                 if (page->overflow == true && box->next == nullptr) {
                     auto newPage = laidDoc->overflowPage(page);
-                    auto boxStartIdx = box->getFirst()->pageIdx;
-                    box->next = newPage->boxes[boxStartIdx];
                 }
                 if (box->next) {
                     box->next->addText(textSetter.overflow, text_run.style);

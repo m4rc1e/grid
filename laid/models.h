@@ -129,9 +129,9 @@ class Page {
         std::shared_ptr<Page> next;
         int boxIdx = 0;
 
-        void addBox(std::shared_ptr<Box> box) {
+        void addBox(std::shared_ptr<Box>& box) {
             box->pageIdx = boxIdx;
-            boxes.push_back(std::shared_ptr<Box>(box));
+            boxes.push_back(box);
             boxIdx += 1;
         }
 
