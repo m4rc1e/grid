@@ -1,6 +1,7 @@
 #include <iostream>
 #include "pugixml.hpp"
 #include "models.h"
+#include <stdexcept>
 
 namespace laid {
 
@@ -14,6 +15,9 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
     for (pugi::xml_node node: xml_doc_start.child("head").child("masterPages").children("masterPage")) {
         laid::MasterPage masterPage;
         masterPage.name = std::string(node.attribute("name").as_string());
+        if (masterPage.name == "") {
+            throw std::invalid_argument("Master page must have a name!");
+        }
         masterPage.height = node.attribute("height").as_int();
         masterPage.width = node.attribute("width").as_int();
         masterPage.cols = node.attribute("columns").as_int();
@@ -26,11 +30,26 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
     // build styles
     for (pugi::xml_node node: xml_doc_start.child("head").child("styles").children("style")) {
         laid::Style style;
-        auto nn = node.attribute("name").as_string();
         style.name = std::string(node.attribute("name").as_string());
+        if (style.name == "") {
+            throw std::invalid_argument("Style must have a name!");
+        }
         style.fontName = std::string(node.attribute("fontName").as_string());
+        if (style.fontName == "") {
+            style.fontName = "Arial";
+        }
         style.fontSize = node.attribute("fontSize").as_int();
+        if (style.fontSize == 0) {
+            style.fontSize = 10;
+        }
         style.leading = node.attribute("leading").as_int();
+        if (style.leading == 0) {
+            if (style.fontSize != 0) {
+                style.leading = style.fontSize * 1.2;
+            } else {
+                style.leading = 12;
+            }
+        }
         doc->addStyle(style);
     }
 
@@ -60,7 +79,6 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
             page->addBox(box);
             prev = box;
         }
-        // TODO add linkedboxes
         doc->addPage(page);
     }
     return doc;

@@ -17,6 +17,10 @@ class Style {
         std::string fontName;
         int fontSize;
         int leading;
+
+        int fontSizeFromLeading(int leading) {
+            return leading * 0.8333;
+        }
 };
 
 class Rect {
@@ -91,6 +95,7 @@ class Box {
         std::map<int, std::vector<std::shared_ptr<Box>>> children;
 
         Box(int x, int y, int width, int height) : x(x), y(y), width(width), height(height) {}
+
         void addText(const std::string& text, Style style) {
             text_runs.push_back(TextRun{text, style});
         }
