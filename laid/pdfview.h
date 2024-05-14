@@ -280,6 +280,7 @@ public:
 
    */
     void BuildText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
+        std::cout << "text: " << box << std::endl;
         TextSetter textSetter(box->width, box->height, fontCollection);
         for (size_t textrun_idx = 0; textrun_idx < box->text_runs.size(); textrun_idx++) {
             auto& text_run = box->text_runs[textrun_idx];

@@ -104,12 +104,12 @@ class Box {
             box->prev = std::make_shared<Box>(*this);
         }
 
-        std::shared_ptr<Box> getFirst() {
-            auto current = std::make_shared<Box>(*this);
+        int getFirst() {
+            auto current = this;
             while (current->prev != nullptr) {
-                current = current->prev;
+                current = current->prev.get();
             }
-            return current;
+            return current->pageIdx;
         }
 
         void addChild(int idx, std::shared_ptr<Box> box) {
@@ -174,6 +174,13 @@ class Document {
             for (auto& box : page->boxes) {
                 auto newBox = std::make_shared<Box>(box->x, box->y, box->width, box->height);
                 newPage->addBox(newBox);
+            }
+            for (size_t i = 0; i < page->boxes.size(); i++) {
+                auto oldBox = page->boxes[i];
+                auto newBox = newPage->boxes[i];
+                if (oldBox->next == nullptr) {
+                    oldBox->next = newPage->boxes[newBox->getFirst()];
+                }
             }
             auto tail = page->next;
             page->next = newPage;
