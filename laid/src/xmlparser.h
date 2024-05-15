@@ -23,6 +23,10 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
         masterPage.cols = node.attribute("columns").as_int();
         masterPage.rows = node.attribute("rows").as_int();
         masterPage.baseline = node.attribute("baseline").as_int();
+        masterPage.marginLeft = node.attribute("marginLeft").as_int();
+        masterPage.marginRight = node.attribute("marginRight").as_int();
+        masterPage.marginTop = node.attribute("marginTop").as_int();
+        masterPage.marginBottom = node.attribute("marginBottom").as_int();
 
         doc->addMasterPage(masterPage);
     }
@@ -61,10 +65,35 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
         std::shared_ptr<laid::Box> prev;
         bool overflowNext = false;
         for (pugi::xml_node box_node: node.children("box")) {
-            auto x = box_node.attribute("x").as_int();
-            auto y = box_node.attribute("y").as_int();
-            auto width = box_node.attribute("width").as_int();
-            auto height = box_node.attribute("height").as_int();
+            auto gx = box_node.attribute("gX").as_int();
+            auto gy = box_node.attribute("gY").as_int();
+            auto gWidth = box_node.attribute("gWidth").as_int();
+            auto gHeight = box_node.attribute("gHeight").as_int();
+
+            std::cout << gx << " " << gy << " " << gWidth << " " << gHeight << std::endl;
+
+            auto start = page->masterPage.getRect(gx, gy);
+            auto end = page->masterPage.getRect(gx + gWidth, gy + gHeight);
+
+            auto x = start.startX;
+            auto y = start.startY;
+            auto width = end.endX - start.startX;
+            auto height = end.endY - start.startY;
+            
+            
+            if (box_node.attribute("x").as_int() != 0) {
+                x = box_node.attribute("x").as_int();
+            }
+            if (box_node.attribute("y").as_int() != 0) {
+                y = box_node.attribute("y").as_int();
+            }
+            if (box_node.attribute("width").as_int() != 0) {
+                width = box_node.attribute("width").as_int();
+            }
+            if (box_node.attribute("height").as_int() != 0) {
+                height = box_node.attribute("height").as_int();
+            }
+
             auto box = std::make_shared<laid::Box>(x, y, width, height);
             if (overflowNext) {
                 prev->addNext(box);
