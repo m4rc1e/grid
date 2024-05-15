@@ -113,7 +113,7 @@ class TextSetter {
 
 class BuildPDF {
 public:
-    BuildPDF(std::shared_ptr<laid::Document> laidDoc, const char* out) : laidDoc(laidDoc), stream(out) {
+    BuildPDF(std::shared_ptr<laid::Document> laidDoc, const char* out, bool debug) : laidDoc(laidDoc), stream(out), debug(debug) {
         laidDoc = laidDoc;
         fontCollection->setDefaultFontManager(SkFontMgr::RefDefault());
         pdf = SkPDF::MakeDocument(&stream, metadata);
@@ -129,6 +129,7 @@ public:
     SkPDF::Metadata metadata;
     sk_sp<SkDocument> pdf;
     std::map<std::string, ParagraphStyle> paragraphStyles;
+    bool debug;
 
     void BuildStyles() {
         for (auto& [name, style] : laidDoc->paragraph_styles) {
@@ -175,10 +176,14 @@ public:
         int width = page->masterPage.width;
         int height = page->masterPage.height;
         SkCanvas* canvas = pdf->beginPage(width, height);
-        BuildGuides(canvas, page->masterPage);
-        BuildBaseline(canvas, page->masterPage);
+        if (debug == true) {
+            BuildGuides(canvas, page->masterPage);
+            BuildBaseline(canvas, page->masterPage);
+        }
         for(auto& box : page->boxes) {
-            BuildBoxRect(canvas, box);
+            if (debug == true) {
+                BuildBoxRect(canvas, box);
+            }
             if (box->image_path.size() > 0) {
                 BuildImage(canvas, box);
             }
