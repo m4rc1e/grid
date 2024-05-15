@@ -27,6 +27,7 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
         masterPage.marginRight = node.attribute("marginRight").as_int();
         masterPage.marginTop = node.attribute("marginTop").as_int();
         masterPage.marginBottom = node.attribute("marginBottom").as_int();
+        masterPage.gap = node.attribute("gap").as_int();
 
         doc->addMasterPage(masterPage);
     }
