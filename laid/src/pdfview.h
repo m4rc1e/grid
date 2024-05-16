@@ -54,9 +54,7 @@ class TextSetter {
         TextSetter(int width, int height, sk_sp<FontCollection> fontCollection) : 
             width(width),
             height(height),
-            fontCollection(fontCollection),
-            builder(skia::textlayout::ParagraphStyle(), fontCollection),
-            prevBuilder(skia::textlayout::ParagraphStyle(), fontCollection) {
+            fontCollection(fontCollection) {
         }
         int width;
         int height;
@@ -65,8 +63,6 @@ class TextSetter {
         std::string overflow;
         skia::textlayout::ParagraphStyle paragraph_style;
         sk_sp<FontCollection> fontCollection;
-        ParagraphBuilderImpl prevBuilder;
-        ParagraphBuilderImpl builder;
         std::unique_ptr<skia::textlayout::Paragraph>  paragraph;
         std::unique_ptr<skia::textlayout::Paragraph>  prevParagraph;
         
@@ -74,6 +70,8 @@ class TextSetter {
             std::string text,
             skia::textlayout::ParagraphStyle paragraph_style
         ) {
+            ParagraphBuilderImpl builder(paragraph_style, fontCollection);
+            ParagraphBuilderImpl prevBuilder(paragraph_style, fontCollection);
             skia::textlayout::TextStyle text_style = paragraph_style.getTextStyle();
             skia::textlayout::StrutStyle  strut_style = paragraph_style.getStrutStyle();
 
