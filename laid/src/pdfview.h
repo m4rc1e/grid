@@ -179,13 +179,13 @@ public:
             BuildBaseline(canvas, page->masterPage);
         }
         for(auto& box : page->boxes) {
-            if (debug == true) {
-                BuildBoxRect(canvas, box);
-            }
             if (box->image_path.size() > 0) {
                 BuildImage(canvas, box);
             }
             BuildText(canvas, page, box);
+            if (debug == true) {
+                BuildBoxRect(canvas, box);
+            }
         }
         std::cout << "Ending page: " << page << std::endl;
         pdf->endPage();
@@ -211,6 +211,22 @@ public:
         SkPaint paintBox;
         paintBox.setColor(SK_ColorRED);
         paintBox.setStyle(SkPaint::kStroke_Style);
+
+        SkPaint paintText;
+        paintText.setColor(SK_ColorMAGENTA);
+        
+        std::string labelText = "x:" + std::to_string(int(box->x)) + " y:" + std::to_string(int(box->y)) + " w:" + std::to_string(int(box->width)) + " h:" + std::to_string(int(box->height)) + " page_idx:" + std::to_string(box->pageIdx) + " first_idx:" + std::to_string(box->getFirst());
+        auto font = SkFont();
+        font.setSize(2);
+        canvas->drawSimpleText(
+            labelText.c_str(),
+            labelText.size(),
+            SkTextEncoding::kUTF8,
+            box->x + 2,
+            box->y - 2,
+            font,
+            paintText
+        );
         canvas->drawRect(
             SkRect::MakeXYWH(box->x, box->y, box->width, box->height),
             paintBox

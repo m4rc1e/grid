@@ -17,4 +17,5 @@ int main(int argc, char *argv[]) {
     auto myDoc = laid::load_file("sketches/gcoords.xml");
     BuildPDF PDFBuilder(myDoc, "output3.pdf", debug);
     PDFBuilder.Build();
+    std::cout << "Done!" << std::endl;
 }

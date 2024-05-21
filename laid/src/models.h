@@ -90,7 +90,7 @@ class Box {
         int pageIdx;
         std::vector<TextRun> text_runs;
         std::shared_ptr<Box> next;
-        std::shared_ptr<Box> prev;
+        laid::Box* prev;
         std::string image_path;
         std::map<int, std::vector<std::shared_ptr<Box>>> children;
 
@@ -106,14 +106,16 @@ class Box {
 
         void addNext(std::shared_ptr<Box> box) {
             next = box;
-            box->prev = std::make_shared<Box>(*this);
+            box->prev = this;
         }
 
         int getFirst() {
             auto current = this;
             while (current->prev != nullptr) {
-                current = current->prev.get();
+                std::cout << "looping" << std::endl;
+                current = current->prev;
             }
+            std::cout << current->pageIdx << " got" << std::endl;
             return current->pageIdx;
         }
 
@@ -176,15 +178,28 @@ class Document {
             auto newPage = std::make_shared<Page>(page->masterPage);
             newPage->overflow = true;
             
+            std::shared_ptr<Page> prev;
             for (auto& box : page->boxes) {
                 auto newBox = std::make_shared<Box>(box->x, box->y, box->width, box->height);
                 newPage->addBox(newBox);
             }
+            // link boxes
             for (size_t i = 0; i < page->boxes.size(); i++) {
                 auto oldBox = page->boxes[i];
                 auto newBox = newPage->boxes[i];
+                if (oldBox->next != nullptr) {
+                    newBox->next = newPage->boxes[oldBox->next->pageIdx];
+                }
+                if (oldBox->prev != nullptr) {
+                    newBox->prev = newPage->boxes[oldBox->prev->pageIdx].get();
+                }
+            }
+            // link first box on this page
+            for (size_t i = 0; i < page->boxes.size(); i++) {
+                auto oldBox = page->boxes[i];
+                auto newBox = newPage->boxes[i];                
                 if (oldBox->next == nullptr) {
-                    oldBox->next = newPage->boxes[newBox->getFirst()];
+                    oldBox->next = newPage->boxes[oldBox->getFirst()];
                 }
             }
             auto tail = page->next;
