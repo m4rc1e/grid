@@ -59,12 +59,12 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
     }
 
     // build pages
+    bool overflowNext = false;
     for (pugi::xml_node node: xml_doc_start.child("body").child("pages").children("page")) {
         auto masterName = node.attribute("masterPage").as_string();
         auto page = std::make_shared<laid::Page>(*doc->masterPages[masterName]);
         page->overflow = node.attribute("overflow").as_bool();
         std::shared_ptr<laid::Box> prev;
-        bool overflowNext = false;
         for (pugi::xml_node box_node: node.children("box")) {
             auto gx = box_node.attribute("gX").as_int();
             auto gy = box_node.attribute("gY").as_int();
