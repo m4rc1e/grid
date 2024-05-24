@@ -50,11 +50,22 @@ using namespace skia::textlayout;
 
 
 class TextSetter {
+    private:
+        ParagraphBuilderImpl builder;
+        ParagraphBuilderImpl prevBuilder;
+
     public:
-        TextSetter(int width, int height, sk_sp<FontCollection> fontCollection) : 
+        TextSetter(
+            int width,
+            int height,
+            skia::textlayout::ParagraphStyle& paragraph_style,
+            sk_sp<FontCollection> fontCollection) : 
             width(width),
             height(height),
-            fontCollection(fontCollection) {
+            paragraph_style(paragraph_style),
+            fontCollection(fontCollection),
+            builder(paragraph_style, fontCollection),
+            prevBuilder(paragraph_style, fontCollection) {
         }
         int width;
         int height;
@@ -70,10 +81,8 @@ class TextSetter {
             std::string text,
             skia::textlayout::ParagraphStyle paragraph_style
         ) {
-            ParagraphBuilderImpl builder(paragraph_style, fontCollection);
-            ParagraphBuilderImpl prevBuilder(paragraph_style, fontCollection);
-            skia::textlayout::TextStyle text_style = paragraph_style.getTextStyle();
-            skia::textlayout::StrutStyle  strut_style = paragraph_style.getStrutStyle();
+            auto text_style = paragraph_style.getTextStyle();
+            auto  strut_style = paragraph_style.getStrutStyle();
 
             std::istringstream ss(text); // " " added at end due to delimiter for std::getline
             std::string token;
@@ -108,6 +117,7 @@ class TextSetter {
             return overflow.size() > 0;
         }
 };
+
 
 class BuildPDF {
 public:
@@ -292,35 +302,40 @@ public:
     }
 
     
-   /* BuildText2
-   
-   - Iterate through text runs
-    - if a full text run fits, paint it. If not paint what fits and add the rest to the next box
-
-   */
     void BuildText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
-        std::cout << "text: " << box << std::endl;
-        TextSetter textSetter(box->width, box->height, fontCollection);
-        for (size_t textrun_idx = 0; textrun_idx < box->text_runs.size(); textrun_idx++) {
-            auto& text_run = box->text_runs[textrun_idx];
-            textSetter.SetText(text_run.text, paragraphStyles[text_run.style.name]);
-            if (textSetter.HasOverflowingText()) {
-                if (page->overflow == true && box->next == nullptr) {
-                    auto newPage = laidDoc->overflowPage(page);
-                }
-                if (box->next) {
-                    box->next->addText(textSetter.overflow, text_run.style);
-                    for (size_t i = textrun_idx + 1; i < box->text_runs.size(); i++) {
-                        auto& overflow_text_run = box->text_runs[i];
-                        box->next->addText(overflow_text_run.text, overflow_text_run.style);
+        for (size_t paragraph_idx = 0; paragraph_idx < box->paragraphs.size(); paragraph_idx++) {
+            auto paragraph = box->paragraphs[paragraph_idx];
+            auto paraStyle = paragraphStyles[paragraph->style];
+            TextSetter textSetter(box->width, box->height, paraStyle, fontCollection);
+
+            for (size_t textrun_idx = 0; textrun_idx < paragraph->text_runs.size(); textrun_idx++) {
+                auto& text_run = paragraph->text_runs[textrun_idx];
+                textSetter.SetText(text_run.text, paragraphStyles[text_run.style]);
+                if (textSetter.HasOverflowingText()) {
+                    if (page->overflow == true && box->next == nullptr) {
+                        auto newPage = laidDoc->overflowPage(page);
                     }
-                    textSetter.Paint(box->x, box->y, canvas);
-                    return;
-                } else {
-                    std::cout << "Overflowing text in box!" << std::endl;
+                    if (box->next) {
+                        auto newParagraph = std::make_shared<laid::Paragraph>();
+                        box->next->addParagraph(newParagraph);
+                        newParagraph->addText(textSetter.overflow, text_run.style);
+                        
+                        for (size_t i = paragraph_idx + 1; i < box->paragraphs.size(); i++) {
+                            auto& overflow_paragraph = box->paragraphs[i];
+                            box->next->addParagraph(overflow_paragraph);
+                            for (size_t i = textrun_idx + 1; i < paragraph->text_runs.size(); i++) {
+                                auto& overflow_text_run = paragraph->text_runs[i];
+                                overflow_paragraph->addText(overflow_text_run.text, overflow_text_run.style);
+                            }
+                        }
+                        textSetter.Paint(box->x, box->y, canvas);
+                        return;
+                    } else {
+                        std::cout << "Overflowing text in box!" << std::endl;
+                    }
                 }
-            }
-        textSetter.Paint(box->x, box->y, canvas);
+            textSetter.Paint(box->x, box->y, canvas);
+        }
     }
 };
 };

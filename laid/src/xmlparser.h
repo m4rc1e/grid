@@ -5,6 +5,19 @@
 
 namespace laid {
 
+
+void parseParagraph(pugi::xml_node node, std::shared_ptr<laid::Paragraph> paragraph) {
+    pugi::xpath_node_set nodes = node.select_nodes(".//text()");
+    for (pugi::xpath_node_set::const_iterator it = nodes.begin(); it != nodes.end(); ++it)
+    {
+        pugi::xml_node node = it->node();
+        auto text = node.text().as_string();
+        std::string style = node.parent().attribute("style").as_string();
+        paragraph->addText(text, style);
+    }
+}
+
+
 std::shared_ptr<laid::Document> load_file(const char* filename) {
     pugi::xml_document xml_doc;
     pugi::xml_parse_result result = xml_doc.load_file(filename);
@@ -100,11 +113,11 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
                 prev->addNext(box);
             }
             overflowNext = box_node.attribute("overflowNext").as_bool();
-            for (pugi::xml_node text_node: box_node.children("text")) {
-                auto styleName = text_node.attribute("style").as_string();
-                auto style = doc->paragraph_styles[styleName];
-                auto text = text_node.text().as_string();
-                box->addText(text, style);
+            for (pugi::xml_node paragraph_node: box_node.children("para")) {
+                auto paragraph = std::make_shared<laid::Paragraph>();
+                paragraph->style = paragraph_node.attribute("style").as_string();
+                parseParagraph(paragraph_node, paragraph);
+                box->addParagraph(paragraph);
             }
             page->addBox(box);
             prev = box;

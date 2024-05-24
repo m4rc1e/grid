@@ -30,7 +30,7 @@
                 "-framework",
                 "QuartzCore",
                 "${file}",
-                "/Users/marcfoley/Documents/laid/laid/src/pugixml.cpp",
+                "${fileDirname}/pugixml.cpp",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}"
             ],

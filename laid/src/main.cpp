@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
             debug = true;
         }
     }
-    auto myDoc = laid::load_file("sketches/magazine_article.xml");
+    auto myDoc = laid::load_file("../sketches/paragraph.xml");
     BuildPDF PDFBuilder(myDoc, "output3.pdf", debug);
     PDFBuilder.Build();
     std::cout << "Done!" << std::endl;

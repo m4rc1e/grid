@@ -77,7 +77,17 @@ class MasterPage {
 class TextRun {
     public:
         std::string text;
-        Style style;
+        std::string style;
+};
+
+class Paragraph {
+    public:
+        std::vector<TextRun> text_runs;
+        std::string style;
+
+        void addText(const std::string& text, std::string& style) {
+            text_runs.push_back(TextRun{text, style});
+        }
 };
 
 
@@ -88,7 +98,7 @@ class Box {
         float width;
         float height;
         int pageIdx;
-        std::vector<TextRun> text_runs;
+        std::vector<std::shared_ptr<Paragraph>> paragraphs;
         std::shared_ptr<Box> next;
         laid::Box* prev;
         std::string image_path;
@@ -96,8 +106,8 @@ class Box {
 
         Box(int x, int y, int width, int height) : x(x), y(y), width(width), height(height) {}
 
-        void addText(const std::string& text, Style style) {
-            text_runs.push_back(TextRun{text, style});
+        void addParagraph(std::shared_ptr<Paragraph> paragraph) {
+            paragraphs.push_back(paragraph);
         }
 
         void addImage(const std::string& path) {
