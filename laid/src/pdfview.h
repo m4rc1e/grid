@@ -303,6 +303,7 @@ public:
 
     
     void BuildText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
+        int offset = 0;
         for (size_t paragraph_idx = 0; paragraph_idx < box->paragraphs.size(); paragraph_idx++) {
             auto paragraph = box->paragraphs[paragraph_idx];
             auto paraStyle = paragraphStyles[paragraph->style];
@@ -334,8 +335,11 @@ public:
                         std::cout << "Overflowing text in box!" << std::endl;
                     }
                 }
-            textSetter.Paint(box->x, box->y, canvas);
-        }
+            }
+            textSetter.Paint(box->x, box->y+offset, canvas);
+            // always add a new line when paragraph ends. 
+            // TODO perhaps each box should have a y pos of where content currently is
+            offset += paraStyle.getStrutStyle().getFontSize();
     }
 };
 };
