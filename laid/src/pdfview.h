@@ -161,6 +161,13 @@ public:
             text_style.setColor(SK_ColorBLACK);
             text_style.setFontFamilies({SkString(style.fontName)});
             text_style.setFontSize(style.fontSize);
+            
+            SkFontStyle::Weight weight = static_cast<SkFontStyle::Weight>(style.weight);
+            SkFontStyle::Width width = static_cast<SkFontStyle::Width>(style.width);
+            SkFontStyle::Slant slant = static_cast<SkFontStyle::Slant>(style.slant);
+            SkFontStyle fontStyle(weight, width, slant);
+            text_style.setFontStyle(fontStyle);
+            
             text_style.setTextBaseline(TextBaseline::kAlphabetic);
             paragraph_style.setTextStyle(text_style);
             paragraph_style.setStrutStyle(strut_style);
@@ -304,7 +311,6 @@ public:
         }
     }
 
-    
     void BuildText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
         int offset = 0;
         for (size_t paragraph_idx = 0; paragraph_idx < box->paragraphs.size(); paragraph_idx++) {

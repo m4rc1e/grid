@@ -68,6 +68,32 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
                 style.leading = 12;
             }
         }
+        auto weight = node.attribute("weight").as_int();
+        // TODO we can only support multiples of 100
+        if (weight == 0) {
+            style.weight = 400;
+        } else {
+            style.weight = weight;
+        }
+
+        auto width = node.attribute("width").as_int();
+        // TODO supported range is 1-9
+        if (width == 0) {
+            // normal width
+            style.width = 5;
+        } else {
+            style.width = width;
+        }
+
+        auto slant = node.attribute("slant").as_int();
+        // TODO supported range is 1-3
+        if (slant == 0) {
+            // normal slant
+            style.slant = 0;
+        } else {
+            style.slant = slant;
+        }
+
         doc->addStyle(style);
     }
 
