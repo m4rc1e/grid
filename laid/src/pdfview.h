@@ -69,6 +69,7 @@ class TextSetter {
         }
         int width;
         int height;
+        int contentHeight;
         bool paintPrev;
         std::string text;
         std::string overflow;
@@ -109,9 +110,11 @@ class TextSetter {
         void Paint(int x, int y, SkCanvas* canvas) {
             if (paintPrev == true) {
                 prevParagraph->paint(canvas, x, y);
+                contentHeight = prevParagraph->getHeight();
                 return;
             }
             paragraph->paint(canvas, x, y);
+            contentHeight = paragraph->getHeight();
         }
         bool HasOverflowingText() {
             return overflow.size() > 0;
@@ -339,7 +342,7 @@ public:
             textSetter.Paint(box->x, box->y+offset, canvas);
             // always add a new line when paragraph ends. 
             // TODO perhaps each box should have a y pos of where content currently is
-            offset += paraStyle.getStrutStyle().getFontSize();
+            offset += textSetter.contentHeight;
     }
 };
 };
