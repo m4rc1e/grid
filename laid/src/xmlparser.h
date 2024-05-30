@@ -97,14 +97,22 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
         doc->addStyle(style);
     }
 
+    // maps used to link boxes in the whole document
+    std::map<std::string, std::shared_ptr<laid::Box>> boxes;
+    std::map<std::string, std::string> boxMap;
+
     // build pages
-    bool overflowNext = false;
     for (pugi::xml_node node: xml_doc_start.child("body").child("pages").children("page")) {
         auto masterName = node.attribute("masterPage").as_string();
         auto page = std::make_shared<laid::Page>(*doc->masterPages[masterName]);
         page->overflow = node.attribute("overflow").as_bool();
         std::shared_ptr<laid::Box> prev;
         for (pugi::xml_node box_node: node.children("box")) {
+            auto name = box_node.attribute("name").as_string();
+            if (name == "") {
+                throw std::invalid_argument("Box must have a name!");
+            }
+            auto next = box_node.attribute("next").as_string();
             auto gx = box_node.attribute("gX").as_int();
             auto gy = box_node.attribute("gY").as_int();
             auto gWidth = box_node.attribute("gWidth").as_int();
@@ -119,8 +127,7 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
             auto y = start.startY;
             auto width = end.endX - start.startX;
             auto height = end.endY - start.startY;
-            
-            
+
             if (box_node.attribute("x").as_int() != 0) {
                 x = box_node.attribute("x").as_int();
             }
@@ -135,10 +142,8 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
             }
 
             auto box = std::make_shared<laid::Box>(x, y, width, height);
-            if (overflowNext) {
-                prev->addNext(box);
-            }
-            overflowNext = box_node.attribute("overflowNext").as_bool();
+            boxes[name] = box;
+            boxMap[name] = next;
             for (pugi::xml_node paragraph_node: box_node.children("para")) {
                 auto paragraph = std::make_shared<laid::Paragraph>();
                 paragraph->style = paragraph_node.attribute("style").as_string();
@@ -149,6 +154,11 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
             prev = box;
         }
         doc->addPage(page);
+    }
+    // link boxes
+    for(const auto &pair : boxMap) {
+        boxes[pair.first]->next = boxes[pair.second];
+        // TODO prev linkage
     }
     return doc;
 }
