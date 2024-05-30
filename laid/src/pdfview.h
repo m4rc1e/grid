@@ -109,6 +109,9 @@ class TextSetter {
         }
         void Paint(int x, int y, SkCanvas* canvas) {
             if (paintPrev == true) {
+                if (prevParagraph == nullptr) {
+                    return;
+                }
                 prevParagraph->paint(canvas, x, y);
                 contentHeight = prevParagraph->getHeight();
                 return;
@@ -316,7 +319,7 @@ public:
         for (size_t paragraph_idx = 0; paragraph_idx < box->paragraphs.size(); paragraph_idx++) {
             auto paragraph = box->paragraphs[paragraph_idx];
             auto paraStyle = paragraphStyles[paragraph->style];
-            TextSetter textSetter(box->width, box->height, paraStyle, fontCollection);
+            TextSetter textSetter(box->width, box->height - offset, paraStyle, fontCollection);
 
             for (size_t textrun_idx = 0; textrun_idx < paragraph->text_runs.size(); textrun_idx++) {
                 auto& text_run = paragraph->text_runs[textrun_idx];

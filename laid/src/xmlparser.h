@@ -162,7 +162,6 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
         }
         boxes[pair.first]->next = boxes[pair.second];
         boxes[pair.second]->prev = boxes[pair.first].get();
-        // TODO prev linkage
     }
     return doc;
 }
