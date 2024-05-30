@@ -157,7 +157,11 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
     }
     // link boxes
     for(const auto &pair : boxMap) {
+        if (pair.second == "" || pair.first == "") {
+            continue;
+        }
         boxes[pair.first]->next = boxes[pair.second];
+        boxes[pair.second]->prev = boxes[pair.first].get();
         // TODO prev linkage
     }
     return doc;
