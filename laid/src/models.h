@@ -15,6 +15,7 @@ class Style {
     public:
         std::string name;
         std::string fontName;
+        std::string inherit;
         int weight;
         int width;
         int slant;

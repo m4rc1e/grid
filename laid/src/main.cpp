@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
             debug = true;
         }
     }
-    auto myDoc = laid::load_file("../sketches/small_paragraphs.xml");
+    auto myDoc = laid::load_file("../sketches/style_inheritance.xml");
     BuildPDF PDFBuilder(myDoc, "output3.pdf", debug);
     PDFBuilder.Build();
     std::cout << "Done!" << std::endl;

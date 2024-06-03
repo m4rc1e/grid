@@ -146,7 +146,12 @@ public:
     bool debug;
 
     void BuildStyles() {
+        // build non-inherited styles first
         for (auto& [name, style] : laidDoc->paragraph_styles) {
+            if (style.inherit.size() > 0) {
+                continue;
+            }
+
             ParagraphStyle paragraph_style;
             // seems to control leading
             // https://groups.google.com/g/skia-discuss/c/vyPaQY9SGFs
@@ -161,6 +166,7 @@ public:
             strut_style.setForceStrutHeight(true);
 
             TextStyle text_style;
+            std::cout << "drago" << std::endl;
             text_style.setColor(SK_ColorBLACK);
             text_style.setFontFamilies({SkString(style.fontName)});
             text_style.setFontSize(style.fontSize);
@@ -175,6 +181,24 @@ public:
             paragraph_style.setTextStyle(text_style);
             paragraph_style.setStrutStyle(strut_style);
             
+            paragraphStyles[name] = paragraph_style;
+        }
+        // build inheritable styles
+        for (auto& [name, style] : laidDoc->paragraph_styles) {
+            if (style.inherit.size() == 0) {
+                continue;
+            }
+            auto inherit = paragraphStyles[style.inherit];
+            auto text_style = inherit.getTextStyle();
+            // TODO we probably wanna dedup this effort
+            SkFontStyle::Weight weight = static_cast<SkFontStyle::Weight>(style.weight);
+            SkFontStyle::Width width = static_cast<SkFontStyle::Width>(style.width);
+            SkFontStyle::Slant slant = static_cast<SkFontStyle::Slant>(style.slant);
+            SkFontStyle fontStyle(weight, width, slant);
+            text_style.setFontStyle(fontStyle);
+            ParagraphStyle paragraph_style;
+            paragraph_style.setTextStyle(text_style);
+            paragraph_style.setStrutStyle(inherit.getStrutStyle());
             paragraphStyles[name] = paragraph_style;
         }
 

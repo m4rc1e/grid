@@ -52,6 +52,10 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
         if (style.name == "") {
             throw std::invalid_argument("Style must have a name!");
         }
+        auto inherit = node.attribute("inherit").as_string();
+        if (inherit != "") {
+            style.inherit = inherit;
+        }
         style.fontName = std::string(node.attribute("fontName").as_string());
         if (style.fontName == "") {
             style.fontName = "Arial";
