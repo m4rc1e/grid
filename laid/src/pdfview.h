@@ -166,8 +166,13 @@ public:
             strut_style.setForceStrutHeight(true);
 
             TextStyle text_style;
-            std::cout << "drago" << std::endl;
-            text_style.setColor(SK_ColorBLACK);
+            if (style.swatch != "") {
+                auto color = laidDoc->swatches[style.swatch].parseRGB();
+                text_style.setColor(SkColorSetRGB(color.r, color.g, color.b));
+            } else {
+                text_style.setColor(SK_ColorBLACK);
+            }
+            
             text_style.setFontFamilies({SkString(style.fontName)});
             text_style.setFontSize(style.fontSize);
             

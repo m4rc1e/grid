@@ -1,6 +1,6 @@
 # Laid
 
-A layout engine based on swiss grids
+A layout engine based on swiss grids. The manifesto 
 
 ## Roadmap
 
@@ -9,6 +9,7 @@ A layout engine based on swiss grids
 - [x] Overflowing pages
 - [x] Overflowing text boxes
 - [x] Linking text boxes
+- [x] Images
 - [ ] Sibling text boxes
 - [x] Style inheritance
 - [ ] Swatches

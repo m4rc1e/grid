@@ -17,6 +17,12 @@ void parseParagraph(pugi::xml_node node, std::shared_ptr<laid::Paragraph> paragr
     }
 }
 
+void parseSwatch(pugi::xml_node node, std::shared_ptr<laid::Document> doc) {
+    auto swatch = laid::Swatch();
+    swatch.name = node.attribute("name").as_string();
+    swatch.color = node.attribute("rgb").as_string();
+    doc->addSwatch(swatch);
+}
 
 std::shared_ptr<laid::Document> load_file(const char* filename) {
     pugi::xml_document xml_doc;
@@ -45,6 +51,10 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
         doc->addMasterPage(masterPage);
     }
 
+    // build swatches
+    for (pugi::xml_node node: xml_doc_start.child("head").child("swatches").children("swatch")) {
+        parseSwatch(node, doc);
+    }
     // build styles
     for (pugi::xml_node node: xml_doc_start.child("head").child("styles").children("style")) {
         laid::Style style;
@@ -96,6 +106,11 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
             style.slant = 0;
         } else {
             style.slant = slant;
+        }
+
+        auto swatch = node.attribute("swatch").as_string();
+        if (swatch != "") {
+            style.swatch = swatch;
         }
 
         doc->addStyle(style);

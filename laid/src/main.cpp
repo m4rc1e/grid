@@ -4,7 +4,6 @@
 #include "xmlparser.h"
 
 
-
 int main(int argc, char *argv[]) {
     // This can be refactored into an argument parser class
     bool debug = true;
@@ -14,7 +13,7 @@ int main(int argc, char *argv[]) {
             debug = true;
         }
     }
-    auto myDoc = laid::load_file("../sketches/style_inheritance.xml");
+    auto myDoc = laid::load_file("../sketches/swatch.xml");
     BuildPDF PDFBuilder(myDoc, "output3.pdf", debug);
     PDFBuilder.Build();
     std::cout << "Done!" << std::endl;

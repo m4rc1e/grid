@@ -6,6 +6,8 @@
 #include <vector>
 #include <iostream>
 #include <tuple>
+#include <iostream>
+#include <sstream>
 
 
 namespace laid {
@@ -16,6 +18,7 @@ class Style {
         std::string name;
         std::string fontName;
         std::string inherit;
+        std::string swatch;
         int weight;
         int width;
         int slant;
@@ -95,6 +98,27 @@ class Paragraph {
 };
 
 
+class RGBColor {
+    public:
+        int r;
+        int g;
+        int b;
+};
+class Swatch {
+    public:
+        std::string name;
+        std::string color;
+
+    RGBColor parseRGB() {
+        std::istringstream ss(color); // " " added at end due to delimiter for std::getline
+        char ch; // to discard the '-' character
+        int r, g, b;
+        ss >> r >> ch >> g >> ch >> b;
+        return RGBColor{r, g, b};
+    } 
+};
+
+
 class Box {
     public:
         float x;
@@ -161,11 +185,16 @@ class Page {
 
 class Document {
     public:
+        std::map<std::string, Swatch> swatches;
         std::map<std::string, Style> paragraph_styles;
         std::map<std::string, MasterPage*> masterPages;
         int page_count;
         std::shared_ptr<Page> pages;
         std::shared_ptr<Page> lastPage;
+
+        void addSwatch(Swatch& swatch) {
+            swatches[swatch.name] = swatch;
+        }
 
         void addStyle(Style paragraphStyle) {
             paragraph_styles[paragraphStyle.name] = paragraphStyle;
