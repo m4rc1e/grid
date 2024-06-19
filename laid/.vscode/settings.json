@@ -72,6 +72,7 @@
         "set": "cpp",
         "stack": "cpp",
         "unordered_set": "cpp",
-        "ranges": "cpp"
+        "ranges": "cpp",
+        "valarray": "cpp"
     }
 }

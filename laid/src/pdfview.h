@@ -2,6 +2,7 @@
 #define PDFVIEW_H
 #include "models.h"
 #include <iostream>
+#include <iterator> // For std::next
 
 #include "include/core/SkBitmap.h"
 #include "include/core/SkCanvas.h"
@@ -76,6 +77,7 @@ public:
     }
     int width;
     int height;
+    float contentHeight;
     std::string overflowingText;
     
     bool hasOverflowingText() {
@@ -116,6 +118,7 @@ public:
             builder.addText(" ");
             paragraph = builder.Build();
             paragraph->layout(width);
+            contentHeight = paragraph->getHeight();
 
         }
     }
@@ -412,22 +415,47 @@ public:
             laid::Box{200, 150, 100, 100}
         };
         int offset = 0;
-        for (size_t paragraph_idx = 0; paragraph_idx < box->paragraphs.size(); paragraph_idx++) {
-            auto paragraph = box->paragraphs[paragraph_idx];
-            auto paraStyle = paragraphStyles[paragraph->style];
-            TextSetter textSetter(box->width, box->height, paraStyle, std::vector<laid::Box>{});
+        for (size_t paraIdx = 0; paraIdx < box->paragraphs.size(); paraIdx++) {
+            auto paragraph = box->paragraphs[paraIdx];
+            auto paragraphStyle = paragraphStyles[paragraph->style];
+            TextSetter textSetter(box->width, box->height - offset, paragraphStyle, std::vector<laid::Box>{});
 
-            for (size_t textrun_idx = 0; textrun_idx < paragraph->text_runs.size(); textrun_idx++) {
-                auto& text_run = paragraph->text_runs[textrun_idx];
+            for (size_t runIdx = 0; runIdx < paragraph->text_runs.size(); runIdx++) {
+                auto& text_run = paragraph->text_runs[runIdx];
                 textSetter.SetText(text_run.text, paragraphStyles[text_run.style]);
                 if (textSetter.hasOverflowingText()) {
-                    std::cout << "Overflowing text!";
+
+                    // if there isn't a next box and the page is overflowing, add another page
+                    if (box->next == nullptr && page->overflow == true) {
+                        laidDoc->overflowPage(page);
+                    }
+                    
+                    // push content to next box
+                    if (box->next != nullptr) {
+                        auto nextBox = box->next;
+                        auto overflow_run = laid::TextRun{
+                            textSetter.overflowingText,
+                            text_run.style
+                        };
+                        auto para = laid::Paragraph{
+                            std::vector<laid::TextRun>{overflow_run},
+                            text_run.style
+                        };
+                        for (size_t i = runIdx + 1; i < paragraph->text_runs.size(); i++) {
+                            para.text_runs.push_back(paragraph->text_runs[i]);
+                        }
+                        nextBox->addParagraph(std::make_shared<laid::Paragraph>(para));
+                        for (size_t i = paraIdx + 1; i < box->paragraphs.size(); i++) {
+                            nextBox->addParagraph(box->paragraphs[i]);
+                        }
+
+                    }
+                    textSetter.paint(box->x, box->y+offset, canvas);
+                    return;
                 }
             }
             textSetter.paint(box->x, box->y+offset, canvas);
-            // always add a new line when paragraph ends. 
-            // TODO perhaps each box should have a y pos of where content currently is
-            offset += 0;
+            offset += textSetter.contentHeight;
         }
     };
 };
