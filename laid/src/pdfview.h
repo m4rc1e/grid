@@ -402,69 +402,25 @@ public:
 
     void BuildText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
 
-        TextStyle text_style;
-        text_style.setFontFamilies({SkString("Inter")});
-        text_style.setColor(SK_ColorBLACK);
-        text_style.setFontSize(14);
-        text_style.setWordSpacing(5);
-        text_style.setLetterSpacing(1);
-        text_style.setDecorationColor(SK_ColorBLACK);
-        text_style.setDecoration(TextDecoration::kUnderline);
-        
-        ParagraphStyle paragraph_style;
-        paragraph_style.turnHintingOff();
-        paragraph_style.setTextStyle(text_style);
-
         std::vector<laid::Box> boxes = {
             laid::Box{300, 0, 200, 100},
             laid::Box{200, 150, 100, 100}
         };
-        TextSetter textSetter(box->width, box->height, paragraph_style, boxes);
-        textSetter.SetText("On 15 June 1974 the National Front held a march through central London in support of the compulsory repatriation of immigrants. The march was to end at Conway Hall in Red Lion Square. A counter-demonstration was planned by Liberation, an anti-colonial pressure group. During the late 1960s and early 1970s, the London council of Liberation had been increasingly infiltrated by hard-left political activists, and they invited several hard-left organisations to join them in the march. When the Liberation march reached Red Lion Square, the International Marxist Group (IMG) twice charged the police cordon blocking access to Conway Hall. Police reinforcements, including mounted police and units of the Special Patrol Group, forced the rioting demonstrators out of the square. As the ranks of people moved away from the square, Gately was found unconscious on the ground. He was taken to hospital and died later that day. Two further disturbances took place in the vicinity, both involving clashes between the police and the IMG contingent. A public inquiry into the events was conducted by Lord Scarman. He found no evidence that Gately had been killed by the police, as had been alleged by some elements of the hard-left press, and concluded that those who started the riot carry a measure of moral responsibility for his death; and the responsibility is a heavy one.[1] He found fault with some actions of the police on the day. The events in the square made the National Front a household name in the UK, although it is debatable if this had any impact on their share of the vote in subsequent general elections. Although the IMG was heavily criticised by the press and public, there was a rise in localised support and the willingness to demonstrate against the National Front and its policies. There was further violence associated with National Front marches and the counter-demonstrations they faced, including in Birmingham, Manchester, the East End of London (all 1977) and in 1979 in Southall, which led to the death of Blair Peach. After Peach's death, the Labour Party Member of Parliament Syd Bidwell, who had been about to give a speech in Red Lion Square when the violence started, described Peach and Gately as martyrs against fascism and racism.",
-            paragraph_style
-        );
-        textSetter.paint(box->x, box->y, canvas);
-//        int offset = 0;
-//        for (size_t paragraph_idx = 0; paragraph_idx < box->paragraphs.size(); paragraph_idx++) {
-//            auto paragraph = box->paragraphs[paragraph_idx];
-//            auto paraStyle = paragraphStyles[paragraph->style];
-//            std::cout << "style: " << paragraph->style << std::endl;
-//            TextSetter textSetter(box->width, box->height - offset, paraStyle, std::vector<laid::Box>{});
-//
-//            for (size_t textrun_idx = 0; textrun_idx < paragraph->text_runs.size(); textrun_idx++) {
-//                auto& text_run = paragraph->text_runs[textrun_idx];
-//                textSetter.SetText(text_run.text, paragraphStyles[text_run.style]);
-//                if (textSetter.HasOverflowingText()) {
-//                    if (page->overflow == true && box->next == nullptr) {
-//                        auto newPage = laidDoc->overflowPage(page);
-//                    }
-//
-//                        auto newParagraph = std::make_shared<laid::Paragraph>();
-//                        newParagraph->style = paragraph->style;
-//                        box->next->addParagraph(newParagraph);
-//                        std::cout << "text_run_style: " << text_run.style << std::endl;
-//                        newParagraph->addText(textSetter.overflowingText, text_run.style);
-//                        
-//                        for (size_t i = paragraph_idx + 1; i < box->paragraphs.size(); i++) {
-//                            auto& overflow_paragraph = box->paragraphs[i];
-//                            box->next->addParagraph(overflow_paragraph);
-//                            for (size_t i = textrun_idx + 1; i < paragraph->text_runs.size(); i++) {
-//                                auto& overflow_text_run = paragraph->text_runs[i];
-//                                std::cout << "overflowing text run: " << overflow_text_run.style << std::endl;
-//                                overflow_paragraph->addText(overflow_text_run.text, overflow_text_run.style);
-//                            }
-//                        }
-//                        textSetter.paint(box->x, box->y, canvas);
-//                    } else {
-//                        std::cout << "Overflowing text in box!" << std::endl;
-//                    }
-//                }
-//            }
-//            textSetter.Paint(box->x, box->y+offset, canvas);
-//            // always add a new line when paragraph ends. 
-//            // TODO perhaps each box should have a y pos of where content currently is
-//            offset += textSetter.contentHeight;
-//        }
+        int offset = 0;
+        for (size_t paragraph_idx = 0; paragraph_idx < box->paragraphs.size(); paragraph_idx++) {
+            auto paragraph = box->paragraphs[paragraph_idx];
+            auto paraStyle = paragraphStyles[paragraph->style];
+            TextSetter textSetter(box->width, box->height - offset, paraStyle, std::vector<laid::Box>{});
+
+            for (size_t textrun_idx = 0; textrun_idx < paragraph->text_runs.size(); textrun_idx++) {
+                auto& text_run = paragraph->text_runs[textrun_idx];
+                textSetter.SetText(text_run.text, paragraphStyles[text_run.style]);
+            }
+            textSetter.paint(box->x, box->y+offset, canvas);
+            // always add a new line when paragraph ends. 
+            // TODO perhaps each box should have a y pos of where content currently is
+            offset += 0;
+        }
     };
 };
 #endif
