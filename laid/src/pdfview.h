@@ -74,6 +74,7 @@ public:
         paragraph_style(paragraph_style),
         boxes(boxes),
         builder(paragraph_style, fontCollection) {
+            paragraph = builder.Build();
     }
     int width;
     int height;
@@ -86,7 +87,7 @@ public:
 
     void SetText(
         std::string text,
-        skia::textlayout::ParagraphStyle paragraph_style
+        skia::textlayout::ParagraphStyle& paragraph_style
     ) {
         auto text_style = paragraph_style.getTextStyle();
         builder.pushStyle(text_style);
@@ -96,7 +97,6 @@ public:
 
         auto maxLines = int(height / text_style.getFontSize());
 
-        paragraph = builder.Build();
         while (std::getline(ss, token, ' ')) {
             auto currentCursor = getCursor(paragraph.get());
             auto nextCursor = getNextCursor(token, paragraph_style, paragraph.get());
