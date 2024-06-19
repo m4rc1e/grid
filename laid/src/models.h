@@ -126,13 +126,14 @@ class Box {
         float width;
         float height;
         int pageIdx;
+        int zIndex;
         std::vector<std::shared_ptr<Paragraph>> paragraphs;
         std::shared_ptr<Box> next;
         laid::Box* prev;
         std::string image_path;
         std::map<int, std::vector<std::shared_ptr<Box>>> children;
 
-        Box(int x, int y, int width, int height) : x(x), y(y), width(width), height(height) {}
+        Box(float x, float y, float width, float height) : x(x), y(y), width(width), height(height) {}
 
         void addParagraph(std::shared_ptr<Paragraph> paragraph) {
             paragraphs.push_back(paragraph);

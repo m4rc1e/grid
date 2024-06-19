@@ -408,16 +408,23 @@ public:
     }
 
     void BuildText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
-        // we'll come back to the collision detection later
-        std::vector<laid::Box> boxes = {
-            laid::Box{300, 0, 200, 100},
-            laid::Box{200, 150, 100, 100}
-        };
+        // Find boxes that collide with the current box and have a zIndex greater than current box
+        std::vector<laid::Box> collisionBoxes;
+        for (auto childBox : page->boxes) {
+            if (childBox == box) {
+                continue;
+            }
+            if (childBox->zIndex > box->zIndex) {
+                auto collideBox = laid::Box(childBox->x - box->x, childBox->y - box->y, childBox->width, childBox->height);
+                collisionBoxes.push_back(collideBox);
+            }
+
+        }
         int offset = 0;
         for (size_t paraIdx = 0; paraIdx < box->paragraphs.size(); paraIdx++) {
             auto paragraph = box->paragraphs[paraIdx];
             auto paragraphStyle = paragraphStyles[paragraph->style];
-            TextSetter textSetter(box->width, box->height - offset, paragraphStyle, boxes);
+            TextSetter textSetter(box->width, box->height - offset, paragraphStyle, collisionBoxes);
 
             for (size_t runIdx = 0; runIdx < paragraph->text_runs.size(); runIdx++) {
                 auto& text_run = paragraph->text_runs[runIdx];

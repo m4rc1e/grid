@@ -132,10 +132,10 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
                 throw std::invalid_argument("Box must have a name!");
             }
             auto next = box_node.attribute("next").as_string();
-            auto gx = box_node.attribute("gX").as_int();
-            auto gy = box_node.attribute("gY").as_int();
-            auto gWidth = box_node.attribute("gWidth").as_int();
-            auto gHeight = box_node.attribute("gHeight").as_int();
+            auto gx = box_node.attribute("gX").as_float();
+            auto gy = box_node.attribute("gY").as_float();
+            auto gWidth = box_node.attribute("gWidth").as_float();
+            auto gHeight = box_node.attribute("gHeight").as_float();
 
             std::cout << gx << " " << gy << " " << gWidth << " " << gHeight << std::endl;
 
@@ -147,20 +147,21 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
             auto width = end.endX - start.startX;
             auto height = end.endY - start.startY;
 
-            if (box_node.attribute("x").as_int() != 0) {
-                x = box_node.attribute("x").as_int();
+            if (box_node.attribute("x").as_float() != 0) {
+                x = box_node.attribute("x").as_float();
             }
-            if (box_node.attribute("y").as_int() != 0) {
-                y = box_node.attribute("y").as_int();
+            if (box_node.attribute("y").as_float() != 0) {
+                y = box_node.attribute("y").as_float();
             }
-            if (box_node.attribute("width").as_int() != 0) {
-                width = box_node.attribute("width").as_int();
+            if (box_node.attribute("width").as_float() != 0) {
+                width = box_node.attribute("width").as_float();
             }
-            if (box_node.attribute("height").as_int() != 0) {
-                height = box_node.attribute("height").as_int();
+            if (box_node.attribute("height").as_float() != 0) {
+                height = box_node.attribute("height").as_float();
             }
-
+            int zIndex = box_node.attribute("zIndex").as_int();
             auto box = std::make_shared<laid::Box>(x, y, width, height);
+            box->zIndex = zIndex;
             boxes[name] = box;
             boxMap[name] = next;
             for (pugi::xml_node paragraph_node: box_node.children("para")) {
