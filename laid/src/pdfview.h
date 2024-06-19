@@ -68,11 +68,11 @@ public:
         float width,
         float height,
         skia::textlayout::ParagraphStyle paragraph_style,
-        std::vector<laid::Box> boxes) : 
+        std::vector<laid::Box>& myBoxes) : 
         width(width),
         height(height),
         paragraph_style(paragraph_style),
-        boxes(boxes),
+        boxes(myBoxes),
         builder(paragraph_style, fontCollection) {
             paragraph = builder.Build();
     }
@@ -80,6 +80,7 @@ public:
     int height;
     float contentHeight;
     std::string overflowingText;
+    std::vector<laid::Box> boxes;
     
     bool hasOverflowingText() {
         return overflowingText.size() > 0;
@@ -182,7 +183,6 @@ private:
     std::unique_ptr<skia::textlayout::Paragraph>  paragraph;
     skia::textlayout::ParagraphStyle paragraph_style;
 
-    std::vector<laid::Box>& boxes;
 };
 
 class BuildPDF {
@@ -408,7 +408,6 @@ public:
     }
 
     void BuildText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
-
         // we'll come back to the collision detection later
         std::vector<laid::Box> boxes = {
             laid::Box{300, 0, 200, 100},
@@ -418,7 +417,7 @@ public:
         for (size_t paraIdx = 0; paraIdx < box->paragraphs.size(); paraIdx++) {
             auto paragraph = box->paragraphs[paraIdx];
             auto paragraphStyle = paragraphStyles[paragraph->style];
-            TextSetter textSetter(box->width, box->height - offset, paragraphStyle, std::vector<laid::Box>{});
+            TextSetter textSetter(box->width, box->height - offset, paragraphStyle, boxes);
 
             for (size_t runIdx = 0; runIdx < paragraph->text_runs.size(); runIdx++) {
                 auto& text_run = paragraph->text_runs[runIdx];

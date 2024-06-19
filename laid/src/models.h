@@ -179,8 +179,6 @@ class Page {
             boxes.push_back(box);
             boxIdx += 1;
         }
-
-
 };
 
 class Document {
