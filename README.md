@@ -12,8 +12,9 @@ A layout engine based on swiss grids. The manifesto
 - [x] Images
 - [ ] Sibling text boxes
 - [x] Style inheritance
-- [ ] Swatches
-- [ ] xml preprocesser to handle imports
-- [ ] spreads
+- [x] Collisions
+- [x] Swatches
+- [ ] XML preprocesser to handle imports
+- [ ] Spreads
 - [ ] CMYK support
 - [ ] Print settings
