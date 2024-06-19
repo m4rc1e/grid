@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
             debug = true;
         }
     }
-    auto myDoc = laid::load_file("../sketches/swatch.xml");
+    auto myDoc = laid::load_file("../sketches/multi_page_one_box.xml");
     BuildPDF PDFBuilder(myDoc, "output3.pdf", debug);
     PDFBuilder.Build();
     std::cout << "Done!" << std::endl;

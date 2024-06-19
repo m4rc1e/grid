@@ -78,6 +78,10 @@ public:
     int height;
     std::string overflowingText;
     
+    bool hasOverflowingText() {
+        return overflowingText.size() > 0;
+    }
+
     void SetText(
         std::string text,
         skia::textlayout::ParagraphStyle paragraph_style
@@ -97,7 +101,7 @@ public:
             auto currentLine = int(paragraph->lineNumber());
 
             // Handle exceeding height of box
-            if (currentLine >= maxLines -1 && nextCursor.x > width || currentLine >= maxLines) {
+            if (currentLine >= maxLines -1 && nextCursor.x > width || currentLine >= maxLines -1) {
                 std::cout << "overflowing" << '\n';
                 overflowingText += token + " ";
                 continue;
@@ -402,6 +406,7 @@ public:
 
     void BuildText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
 
+        // we'll come back to the collision detection later
         std::vector<laid::Box> boxes = {
             laid::Box{300, 0, 200, 100},
             laid::Box{200, 150, 100, 100}
@@ -410,11 +415,14 @@ public:
         for (size_t paragraph_idx = 0; paragraph_idx < box->paragraphs.size(); paragraph_idx++) {
             auto paragraph = box->paragraphs[paragraph_idx];
             auto paraStyle = paragraphStyles[paragraph->style];
-            TextSetter textSetter(box->width, box->height - offset, paraStyle, std::vector<laid::Box>{});
+            TextSetter textSetter(box->width, box->height, paraStyle, std::vector<laid::Box>{});
 
             for (size_t textrun_idx = 0; textrun_idx < paragraph->text_runs.size(); textrun_idx++) {
                 auto& text_run = paragraph->text_runs[textrun_idx];
                 textSetter.SetText(text_run.text, paragraphStyles[text_run.style]);
+                if (textSetter.hasOverflowingText()) {
+                    std::cout << "Overflowing text!";
+                }
             }
             textSetter.paint(box->x, box->y+offset, canvas);
             // always add a new line when paragraph ends. 
