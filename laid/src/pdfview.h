@@ -407,8 +407,9 @@ public:
         }
     }
 
-    void BuildText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
-        // Find boxes that collide with the current box and have a zIndex greater than current box
+    // Find boxes that collide with the current box and have a zIndex greater than current box
+    // offset the box relative to the main box
+    std::vector<laid::Box> collidingBoxes(std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
         std::vector<laid::Box> collisionBoxes;
         for (auto childBox : page->boxes) {
             if (childBox == box) {
@@ -420,6 +421,11 @@ public:
             }
 
         }
+        return collisionBoxes;
+    }
+
+    void BuildText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
+        auto collisionBoxes = collidingBoxes(page, box);
         int offset = 0;
         for (size_t paraIdx = 0; paraIdx < box->paragraphs.size(); paraIdx++) {
             auto paragraph = box->paragraphs[paraIdx];
