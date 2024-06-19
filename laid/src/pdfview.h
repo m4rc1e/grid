@@ -112,7 +112,13 @@ public:
             // Handle collisions with other Boxes
             auto collidedBox = boxCollision(nextCursor);
             if (collidedBox) {
-                addPlaceholder(collidedBox->width - (currentCursor.x - collidedBox->x));
+                if (currentCursor.x > nextCursor.x) {
+                    std::cout << "col";
+                    addPlaceholder(collidedBox->width);
+                } else {
+                    addPlaceholder(collidedBox->width - (currentCursor.x - collidedBox->x));
+                }
+                
             }
 
             builder.addText(token.data());
@@ -131,8 +137,6 @@ public:
     CursorPos getNextCursor(std::string token, ParagraphStyle style, Paragraph* paragraph) {
         auto cursor = getCursor(paragraph);
 
-        sk_sp<FontCollection> fontCollection = sk_make_sp<FontCollection>();
-        fontCollection->setDefaultFontManager(SkFontMgr::RefDefault());
         ParagraphBuilderImpl wordBuilder(style, fontCollection);
         auto text_style = style.getTextStyle();
         wordBuilder.pushStyle(text_style);
@@ -141,6 +145,9 @@ public:
         auto wordParagraph = wordBuilder.Build();
         wordParagraph->layout(width);
         auto wordCursor = getCursor(wordParagraph.get());
+        if (cursor.x + wordCursor.x >= width) {
+            return CursorPos{wordCursor.x, cursor.y + 12};
+        }
         return CursorPos{cursor.x + wordCursor.x, cursor.y};
     }
 
