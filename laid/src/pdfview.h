@@ -104,7 +104,8 @@ public:
             auto currentLine = int(paragraph->lineNumber());
 
             // Handle exceeding height of box
-            if (currentLine >= maxLines -1 && nextCursor.x > width || currentLine >= maxLines -1) {
+            
+            if (nextCursor.y > height) {
                 std::cout << "overflowing" << '\n';
                 overflowingText += token + " ";
                 continue;
@@ -468,6 +469,9 @@ public:
                             nextBox->addParagraph(box->paragraphs[i]);
                         }
 
+                    } else {
+                        std::cout << "overflowing text" << '\n';
+                        std::cout << textSetter.overflowingText << '\n';
                     }
                     textSetter.paint(box->x, box->y+offset, canvas);
                     return;
