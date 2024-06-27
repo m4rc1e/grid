@@ -447,7 +447,15 @@ public:
 
                     // if there isn't a next box and the page is overflowing, add another page
                     if (box->next == nullptr && page->overflow == true) {
-                        laidDoc->overflowPage(page);
+                        if (page->type == laid::Page::PageType::Single) {
+                            laidDoc->overflowPage(page);
+                        } else if (page->type == laid::Page::PageType::Left) {
+                            auto rightPage = page->next;
+                            laidDoc->overflowSpread(page, rightPage);
+                        } else if (page->type == laid::Page::PageType::Right) {
+                            auto leftPage = page->prev;
+                            laidDoc->overflowSpread(leftPage, page);
+                        }
                     }
                     
                     // push content to next box

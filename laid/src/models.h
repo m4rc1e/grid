@@ -130,6 +130,7 @@ class Box {
         std::vector<std::shared_ptr<Paragraph>> paragraphs;
         std::shared_ptr<Box> next;
         laid::Box* prev;
+        std::shared_ptr<Box> prev2;
         std::string image_path;
         std::map<int, std::vector<std::shared_ptr<Box>>> children;
 
@@ -158,6 +159,17 @@ class Box {
             return current->pageIdx;
         }
 
+        std::shared_ptr<Box> getFirst2() {
+            if (prev2 == nullptr) {
+                return nullptr;
+            }
+            auto current = prev2;
+            while (current->prev2 != nullptr) {
+                current = current->prev2;
+            }
+            return current;
+        }
+
         void addChild(int idx, std::shared_ptr<Box> box) {
             children[idx].push_back(box);
         }
@@ -178,6 +190,7 @@ class Page {
         std::vector<std::shared_ptr<Box>> boxes;
         bool overflow;
         std::shared_ptr<Page> next;
+        std::shared_ptr<Page> prev;
         int boxIdx = 0;
         PageType type = PageType::Single;
 
@@ -209,6 +222,7 @@ class Spread {
                 }
                 page->addBox(box);
             }
+            page->overflow = overflow;
             return page;
         }
 
@@ -227,6 +241,7 @@ class Spread {
                     page->addBox(newbox);
                 }
             }
+            page->overflow = overflow;
             return page;
         }
 
@@ -267,8 +282,11 @@ class Document {
             current->next = page;
         }
         void addSpread(std::shared_ptr<Spread> spread) {
-            addPage(spread->leftPage());
-            addPage(spread->rightPage());
+            auto leftPage = spread->leftPage();
+            auto rightPage = spread->rightPage();
+            rightPage->prev = leftPage;
+            addPage(leftPage);
+            addPage(rightPage);
         }
         std::shared_ptr<Page> overflowPage(std::shared_ptr<Page> page) {
             auto newPage = std::make_shared<Page>(page->masterPage);
@@ -302,6 +320,50 @@ class Document {
             page->next = newPage;
             newPage->next = tail;
             return newPage;
+        }
+        void overflowSpread(std::shared_ptr<Page> leftPage, std::shared_ptr<Page> rightPage) {
+            std::cout << "overflow spread" << '\n';
+            std::cout << "overflow spread2" << '\n';
+            auto leftBoxes = leftPage->boxes;
+            auto rightBoxes = rightPage->boxes;
+
+            auto boxMap = std::map<std::shared_ptr<laid::Box>, std::shared_ptr<laid::Box>>();
+            // create new left page
+            auto newLeftPage = std::make_shared<Page>(leftPage->masterPage);
+            for (auto& box : leftBoxes) {
+                auto newbox = std::make_shared<Box>(box->x, box->y, box->width, box->height);
+                boxMap[box] = newbox;
+                newLeftPage->addBox(newbox);
+            }
+
+            // create new right page
+            auto newRightPage = std::make_shared<Page>(rightPage->masterPage);
+            for (auto& box : rightBoxes) {
+                auto newbox = std::make_shared<Box>(box->x, box->y, box->width, box->height);
+                boxMap[box] = newbox;
+                newRightPage->addBox(newbox);
+            }
+            
+            // link boxes
+            for (auto& box : leftBoxes) {
+                boxMap[box]->next = boxMap[box->next];
+            }
+            for (auto& box : rightBoxes) {
+                boxMap[box]->next = boxMap[box->next];
+            }
+            // link first to last
+            for (auto& box : leftBoxes) {
+                if (box->next == nullptr) {
+                    box->next = boxMap[box->getFirst2()];
+                }
+            }
+            for (auto& box : rightBoxes) {
+                if (box->next == nullptr) {
+                    box->next = boxMap[box->getFirst2()];
+                }
+            }
+            rightPage->next = newLeftPage;
+            newLeftPage->next = newRightPage;
         }
 };
 
