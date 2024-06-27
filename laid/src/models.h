@@ -322,14 +322,14 @@ class Document {
             return newPage;
         }
         void overflowSpread(std::shared_ptr<Page> leftPage, std::shared_ptr<Page> rightPage) {
-            std::cout << "overflow spread" << '\n';
-            std::cout << "overflow spread2" << '\n';
             auto leftBoxes = leftPage->boxes;
             auto rightBoxes = rightPage->boxes;
 
             auto boxMap = std::map<std::shared_ptr<laid::Box>, std::shared_ptr<laid::Box>>();
             // create new left page
             auto newLeftPage = std::make_shared<Page>(leftPage->masterPage);
+            newLeftPage->overflow = true;
+            newLeftPage->type = Page::PageType::Left;
             for (auto& box : leftBoxes) {
                 auto newbox = std::make_shared<Box>(box->x, box->y, box->width, box->height);
                 boxMap[box] = newbox;
@@ -338,6 +338,8 @@ class Document {
 
             // create new right page
             auto newRightPage = std::make_shared<Page>(rightPage->masterPage);
+            newRightPage->overflow = true;
+            newRightPage->type = Page::PageType::Right;
             for (auto& box : rightBoxes) {
                 auto newbox = std::make_shared<Box>(box->x, box->y, box->width, box->height);
                 boxMap[box] = newbox;
@@ -347,9 +349,15 @@ class Document {
             // link boxes
             for (auto& box : leftBoxes) {
                 boxMap[box]->next = boxMap[box->next];
+                if (boxMap[box->next] != nullptr) {
+                    boxMap[box->next]->prev2 = boxMap[box];
+                }
             }
             for (auto& box : rightBoxes) {
                 boxMap[box]->next = boxMap[box->next];
+                if (boxMap[box->next] != nullptr) {
+                    boxMap[box->next]->prev2 = boxMap[box];
+                }
             }
             // link first to last
             for (auto& box : leftBoxes) {
@@ -362,9 +370,17 @@ class Document {
                     box->next = boxMap[box->getFirst2()];
                 }
             }
+            auto tail = rightPage->next;
             rightPage->next = newLeftPage;
+            newLeftPage->prev = rightPage;
             newLeftPage->next = newRightPage;
+            newRightPage->prev = newLeftPage;
+            newRightPage->next = tail;
+            if (tail != nullptr) { 
+                tail->prev = newRightPage;
+            }
         }
+
 };
 
 } // namespace laid
