@@ -166,6 +166,11 @@ class Box {
 
 class Page {
     public: 
+        enum class PageType {
+            Single,
+            Left,
+            Right
+        };
         Page(MasterPage& masterPage) {
             this->masterPage = masterPage;
         }
@@ -174,12 +179,57 @@ class Page {
         bool overflow;
         std::shared_ptr<Page> next;
         int boxIdx = 0;
+        PageType type = PageType::Single;
 
         void addBox(std::shared_ptr<Box>& box) {
             box->pageIdx = boxIdx;
             boxes.push_back(box);
             boxIdx += 1;
         }
+};
+
+class Spread {
+    public:
+        Spread(MasterPage& leftMaster, MasterPage& rightMaster) : leftMaster(leftMaster), rightMaster(rightMaster) {}
+        MasterPage leftMaster;
+        MasterPage rightMaster;
+        std::vector<std::shared_ptr<Box>> boxes;
+        bool overflow;
+
+        void addBox(std::shared_ptr<Box>& box) {
+            boxes.push_back(box);
+        }
+
+        std::shared_ptr<Page> leftPage() {
+            auto page = std::make_shared<Page>(leftMaster);
+            page->type = Page::PageType::Left;
+            for (auto& box : boxes) {
+                if (box->x > leftMaster.width) {
+                    continue;
+                }
+                page->addBox(box);
+            }
+            return page;
+        }
+
+        std::shared_ptr<Page> rightPage() {
+            auto page = std::make_shared<Page>(rightMaster);
+            page->type = Page::PageType::Right;
+            for (auto& box : boxes) {
+                if (box->x > leftMaster.width) {
+                    box->x -= leftMaster.width;
+                    page->addBox(box);
+                }
+                // duplicate the box if it sits between both pages
+                if (box->x + box->width > leftMaster.width) {
+                    auto newbox = std::make_shared<Box>(*box);
+                    newbox->x -= leftMaster.width;
+                    page->addBox(newbox);
+                }
+            }
+            return page;
+        }
+
 };
 
 class Document {
@@ -215,6 +265,10 @@ class Document {
             }
             std::cout << current << std::endl;
             current->next = page;
+        }
+        void addSpread(std::shared_ptr<Spread> spread) {
+            addPage(spread->leftPage());
+            addPage(spread->rightPage());
         }
         std::shared_ptr<Page> overflowPage(std::shared_ptr<Page> page) {
             auto newPage = std::make_shared<Page>(page->masterPage);
