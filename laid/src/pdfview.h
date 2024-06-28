@@ -339,7 +339,7 @@ public:
         SkPaint paintText;
         paintText.setColor(SK_ColorMAGENTA);
         
-        std::string labelText = "x:" + std::to_string(int(box->x)) + " y:" + std::to_string(int(box->y)) + " w:" + std::to_string(int(box->width)) + " h:" + std::to_string(int(box->height)) + " page_idx:" + std::to_string(box->pageIdx) + " first_idx:" + std::to_string(box->getFirst());
+        std::string labelText = "x:" + std::to_string(int(box->x)) + " y:" + std::to_string(int(box->y)) + " w:" + std::to_string(int(box->width)) + " h:" + std::to_string(int(box->height));
         auto font = SkFont();
         font.setSize(2);
         canvas->drawSimpleText(

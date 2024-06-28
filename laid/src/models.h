@@ -113,12 +113,10 @@ class Box {
         float y;
         float width;
         float height;
-        int pageIdx;
         int zIndex;
         std::vector<std::shared_ptr<Paragraph>> paragraphs;
         std::shared_ptr<Box> next;
-        laid::Box* prev;
-        std::shared_ptr<Box> prev2;
+        std::shared_ptr<Box> prev;
         std::string image_path;
         std::map<int, std::vector<std::shared_ptr<Box>>> children;
 
@@ -134,26 +132,15 @@ class Box {
 
         void addNext(std::shared_ptr<Box> box) {
             next = box;
-            box->prev = this;
         }
 
-        int getFirst() {
-            auto current = this;
-            while (current->prev != nullptr) {
-                std::cout << "looping" << std::endl;
-                current = current->prev;
-            }
-            std::cout << current->pageIdx << " got" << std::endl;
-            return current->pageIdx;
-        }
-
-        std::shared_ptr<Box> getFirst2() {
-            if (prev2 == nullptr) {
+        std::shared_ptr<Box> getFirst() {
+            if (prev == nullptr) {
                 return nullptr;
             }
-            auto current = prev2;
-            while (current->prev2 != nullptr) {
-                current = current->prev2;
+            auto current = prev;
+            while (current->prev != nullptr) {
+                current = current->prev;
             }
             return current;
         }
@@ -196,7 +183,6 @@ class Page : public PageObject {
         PageType type = PageType::Single;
 
         void addBox(std::shared_ptr<Box>& box) {
-            box->pageIdx = boxIdx;
             boxes.push_back(box);
             boxIdx += 1;
         }
@@ -313,31 +299,29 @@ class Document {
             auto newPage = std::make_shared<Page>(page->masterPage);
             newPage->overflow = true;
             
+            auto boxMap = std::map<std::shared_ptr<laid::Box>, std::shared_ptr<laid::Box>>();
+            
+        
             std::shared_ptr<Page> prev;
             for (auto& box : page->boxes) {
                 auto newBox = std::make_shared<Box>(box->x, box->y, box->width, box->height);
+                boxMap[box] = newBox;
                 newPage->addBox(newBox);
             }
             // link boxes
-            for (size_t i = 0; i < page->boxes.size(); i++) {
-                auto oldBox = page->boxes[i];
-                auto newBox = newPage->boxes[i];
-                if (oldBox->next != nullptr) {
-                    newBox->next = newPage->boxes[oldBox->next->pageIdx];
+            for (auto& box : page->boxes) {
+                boxMap[box]->next = boxMap[box->next];
+                if (boxMap[box->next] != nullptr) {
+                    boxMap[box->next]->prev = boxMap[box];
                 }
+            }
+            // link first to last
+            for (auto& box : page->boxes) {
+                if (box->next == nullptr) {
+                    box->next = boxMap[box->getFirst()];
+                }
+            }
 
-                if (oldBox->prev != nullptr) {
-                    newBox->prev = newPage->boxes[oldBox->prev->pageIdx].get();
-                }
-            }
-            // link first box on this page
-            for (size_t i = 0; i < page->boxes.size(); i++) {
-                auto oldBox = page->boxes[i];
-                auto newBox = newPage->boxes[i];                
-                if (oldBox->next == nullptr) {
-                    oldBox->next = newPage->boxes[oldBox->getFirst()];
-                }
-            }
             auto tail = page->next;
             page->next = newPage;
             newPage->next = tail;
@@ -372,24 +356,24 @@ class Document {
             for (auto& box : leftBoxes) {
                 boxMap[box]->next = boxMap[box->next];
                 if (boxMap[box->next] != nullptr) {
-                    boxMap[box->next]->prev2 = boxMap[box];
+                    boxMap[box->next]->prev = boxMap[box];
                 }
             }
             for (auto& box : rightBoxes) {
                 boxMap[box]->next = boxMap[box->next];
                 if (boxMap[box->next] != nullptr) {
-                    boxMap[box->next]->prev2 = boxMap[box];
+                    boxMap[box->next]->prev = boxMap[box];
                 }
             }
             // link first to last
             for (auto& box : leftBoxes) {
                 if (box->next == nullptr) {
-                    box->next = boxMap[box->getFirst2()];
+                    box->next = boxMap[box->getFirst()];
                 }
             }
             for (auto& box : rightBoxes) {
                 if (box->next == nullptr) {
-                    box->next = boxMap[box->getFirst2()];
+                    box->next = boxMap[box->getFirst()];
                 }
             }
             auto tail = rightPage->next;

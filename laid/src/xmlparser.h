@@ -245,8 +245,7 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
             continue;
         }
         boxes[pair.first]->next = boxes[pair.second];
-        boxes[pair.second]->prev = boxes[pair.first].get();
-        boxes[pair.second]->prev2 = boxes[pair.first];
+        boxes[pair.second]->prev = boxes[pair.first];
     }
     return doc;
 }
