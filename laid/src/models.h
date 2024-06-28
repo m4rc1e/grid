@@ -267,7 +267,6 @@ class Spread : public PageObject {
             page->overflow = overflow;
             return page;
         }
-
 };
 
 class Document {
@@ -404,7 +403,6 @@ class Document {
                 tail->prev = newRightPage;
             }
         }
-
 };
 
 } // namespace laid
