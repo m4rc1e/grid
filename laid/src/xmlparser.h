@@ -165,34 +165,58 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
                 throw std::invalid_argument("Box must have a name!");
             }
             auto next = box_node.attribute("next").as_string();
-            auto gx = box_node.attribute("gX").as_float();
-            auto gy = box_node.attribute("gY").as_float();
-
-            auto gWidth = box_node.attribute("gWidth").as_float();
-            auto gHeight = box_node.attribute("gHeight").as_float();
-
-            std::cout << gx << " " << gy << " " << gWidth << " " << gHeight << std::endl;
-
-            auto start = basePage->getRect(gx, gy);
-            auto end = basePage->getRect(gx + gWidth - 1, gy + gHeight - 1);
-
-            auto x = start.startX;
-            auto y = start.startY;
-            auto width = end.endX - start.startX;
-            auto height = end.endY - start.startY;
-
-            if (box_node.attribute("x").empty() == false) {
-                x = box_node.attribute("x").as_float();
+            
+            float x, y, width, height;
+            // x pos
+            auto gxpos = box_node.attribute("gX");
+            auto xpos = box_node.attribute("x");
+            if (xpos.empty() == false) {
+                x = xpos.as_float();
+            } else if (gxpos.empty() == false) {
+                auto rect = basePage->getRect(gxpos.as_float(), 1);
+                x = rect.startX;
+            } else {
+                throw std::invalid_argument("Box must have an x or gX attribute!"); 
             }
-            if (box_node.attribute("y").empty() == false) {
-                y = box_node.attribute("y").as_float();
+
+            // y pos
+            auto gypos = box_node.attribute("gY");
+            auto ypos = box_node.attribute("y");
+            if (ypos.empty() == false) {
+                y = ypos.as_float();
+            } else if (gypos.empty() == false) {
+                auto rect = basePage->getRect(1, gypos.as_float());
+                y = rect.startX;
+            } else {
+                throw std::invalid_argument("Box must have an x or gX attribute!"); 
             }
-            if (box_node.attribute("width").empty() == false) {
-                width = box_node.attribute("width").as_float();
+
+            // width
+            auto gwidth = box_node.attribute("gWidth");
+            auto widthlen = box_node.attribute("width");
+            if (gwidth.empty() == false) {
+                auto start = basePage->getRect(1, 1);
+                auto end = basePage->getRect(gwidth.as_float(), 1);
+                width = end.endX - start.startX;
+            } else if (widthlen.empty() == false) {
+                width = widthlen.as_float();
+            } else {
+                throw std::invalid_argument("Box must have a width or gWidth attribute!"); 
             }
-            if (box_node.attribute("height").empty() == false) {
-                height = box_node.attribute("height").as_float();
+
+            // height
+            auto gheight = box_node.attribute("gHeight");
+            auto heightlen = box_node.attribute("height");
+            if (gheight.empty() == false) {
+                auto start = basePage->getRect(1, 1);
+                auto end = basePage->getRect(1, gheight.as_float());
+                height = end.endY - start.startY;
+            } else if (heightlen.empty() == false) {
+                height = heightlen.as_float();
+            } else {
+                throw std::invalid_argument("Box must have a height or gHeight attribute!"); 
             }
+
             int zIndex = box_node.attribute("zIndex").as_int();
             auto box = std::make_shared<laid::Box>(x, y, width, height);
             box->zIndex = zIndex;
