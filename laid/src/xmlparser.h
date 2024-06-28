@@ -18,11 +18,18 @@ void parseParagraph(pugi::xml_node node, std::shared_ptr<laid::Paragraph> paragr
     }
 }
 
-void parseSwatch(pugi::xml_node node, std::shared_ptr<laid::Document> doc) {
-    auto swatch = laid::Swatch();
-    swatch.name = node.attribute("name").as_string();
-    swatch.color = node.attribute("rgb").as_string();
-    doc->addSwatch(swatch);
+void parseColor(pugi::xml_node node, std::shared_ptr<laid::Document> doc) {
+    auto color = laid::RGBColor();
+    color.name = node.attribute("name").as_string();
+    auto colString = node.attribute("rgb").as_string();
+        std::istringstream ss(colString);
+        char ch; // to discard the '-' character
+        int r, g, b;
+        ss >> r >> ch >> g >> ch >> b;
+        color.r = r;
+        color.g = g;
+        color.b = b;
+    doc->addColor(color);
 }
 
 void parsePage(pugi::xml_node node, std::shared_ptr<laid::Document> doc) {
@@ -60,8 +67,8 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
     }
 
     // build swatches
-    for (pugi::xml_node node: xml_doc_start.child("head").child("swatches").children("swatch")) {
-        parseSwatch(node, doc);
+    for (pugi::xml_node node: xml_doc_start.child("head").child("colors").children("color")) {
+        parseColor(node, doc);
     }
     // build styles
     for (pugi::xml_node node: xml_doc_start.child("head").child("styles").children("style")) {
@@ -116,9 +123,9 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
             style.slant = slant;
         }
 
-        auto swatch = node.attribute("swatch").as_string();
-        if (swatch != "") {
-            style.swatch = swatch;
+        auto color = node.attribute("color").as_string();
+        if (color != "") {
+            style.color = color;
         }
 
         doc->addStyle(style);

@@ -235,8 +235,8 @@ public:
             strut_style.setForceStrutHeight(true);
 
             TextStyle text_style;
-            if (style.swatch != "") {
-                auto color = laidDoc->swatches[style.swatch].parseRGB();
+            if (style.color != "") {
+                auto color = laidDoc->colors[style.color];
                 text_style.setColor(SkColorSetRGB(color.r, color.g, color.b));
             } else {
                 text_style.setColor(SK_ColorBLACK);

@@ -18,7 +18,7 @@ class Style {
         std::string name;
         std::string fontName;
         std::string inherit;
-        std::string swatch;
+        std::string color;
         int weight;
         int width;
         int slant;
@@ -100,22 +100,10 @@ class Paragraph {
 
 class RGBColor {
     public:
+        std::string name;
         int r;
         int g;
         int b;
-};
-class Swatch {
-    public:
-        std::string name;
-        std::string color;
-
-    RGBColor parseRGB() {
-        std::istringstream ss(color); // " " added at end due to delimiter for std::getline
-        char ch; // to discard the '-' character
-        int r, g, b;
-        ss >> r >> ch >> g >> ch >> b;
-        return RGBColor{r, g, b};
-    } 
 };
 
 
@@ -212,6 +200,10 @@ class Page : public PageObject {
             boxes.push_back(box);
             boxIdx += 1;
         }
+
+        Rect getRect(int x, int y) {
+            return masterPage.getRect(x, y);
+        }
 };
 
 class Spread : public PageObject {
@@ -271,15 +263,16 @@ class Spread : public PageObject {
 
 class Document {
     public:
-        std::map<std::string, Swatch> swatches;
+        // TODO what about CMYK colors?
+        std::map<std::string, RGBColor> colors;
         std::map<std::string, Style> paragraph_styles;
         std::map<std::string, MasterPage*> masterPages;
         int page_count;
         std::shared_ptr<Page> pages;
         std::shared_ptr<Page> lastPage;
 
-        void addSwatch(Swatch& swatch) {
-            swatches[swatch.name] = swatch;
+        void addColor(RGBColor& color) {
+            colors[color.name] = color;
         }
 
         void addStyle(Style paragraphStyle) {
