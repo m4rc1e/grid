@@ -174,7 +174,7 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
             std::cout << gx << " " << gy << " " << gWidth << " " << gHeight << std::endl;
 
             auto start = basePage->getRect(gx, gy);
-            auto end = basePage->getRect(gx + gWidth, gy + gHeight);
+            auto end = basePage->getRect(gx + gWidth - 1, gy + gHeight - 1);
 
             auto x = start.startX;
             auto y = start.startY;

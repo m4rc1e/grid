@@ -202,7 +202,10 @@ class Page : public PageObject {
         }
 
         Rect getRect(int x, int y) {
-            return masterPage.getRect(x, y);
+            if (x <= 0 || x > masterPage.cols || y <= 0 || y > masterPage.rows) {
+                throw std::invalid_argument("Invalid coordinates");
+            }
+            return masterPage.getRect(x-1, y-1);
         }
 };
 
@@ -215,13 +218,16 @@ class Spread : public PageObject {
         bool overflow;
 
         Rect getRect(int col, int row) {
+            if (col <= 0 || col > leftMaster.cols + rightMaster.cols || row <= 0 || row > leftMaster.rows + rightMaster.rows) {
+                throw std::invalid_argument("Invalid coordinates");
+            }
             if (col > leftMaster.cols) {
-                auto rect = rightMaster.getRect(col - leftMaster.cols, row);
+                auto rect = rightMaster.getRect(col - leftMaster.cols - 1, row - 1);
                 rect.startX += leftMaster.width;
                 rect.endX += leftMaster.width;
                 return rect;
             }
-            return leftMaster.getRect(col, row);
+            return leftMaster.getRect(col-1, row-1);
         }
 
         void addBox(std::shared_ptr<Box>& box) {
