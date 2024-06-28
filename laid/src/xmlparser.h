@@ -2,6 +2,7 @@
 #include "pugixml.hpp"
 #include "models.h"
 #include <stdexcept>
+#include <cstring>
 
 namespace laid {
 
@@ -22,6 +23,13 @@ void parseSwatch(pugi::xml_node node, std::shared_ptr<laid::Document> doc) {
     swatch.name = node.attribute("name").as_string();
     swatch.color = node.attribute("rgb").as_string();
     doc->addSwatch(swatch);
+}
+
+void parsePage(pugi::xml_node node, std::shared_ptr<laid::Document> doc) {
+    auto masterName = node.attribute("masterPage").as_string();
+    auto page = std::make_shared<laid::Page>(*doc->masterPages[masterName]);
+    page->overflow = node.attribute("overflow").as_bool();
+    doc->addPage(page);
 }
 
 std::shared_ptr<laid::Document> load_file(const char* filename) {
@@ -121,10 +129,28 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
     std::map<std::string, std::string> boxMap;
 
     // build pages
-    for (pugi::xml_node node: xml_doc_start.child("body").child("pages").children("page")) {
-        auto masterName = node.attribute("masterPage").as_string();
-        auto page = std::make_shared<laid::Page>(*doc->masterPages[masterName]);
-        page->overflow = node.attribute("overflow").as_bool();
+    bool isSpread = false;
+    for (pugi::xml_node node: xml_doc_start.child("body").child("pages").children()) {
+        auto basePage = std::make_shared<laid::PageObject>();
+        if (std::strcmp(node.name(), "page") == 0) {
+            auto masterName = std::string(node.attribute("masterPage").as_string());
+            auto page = std::make_shared<laid::Page>(*doc->masterPages[masterName]);
+            page->overflow = node.attribute("overflow").as_bool();
+            // Set other Page-specific properties
+            basePage = page; // Assuming basePage is meant to hold any PageObject
+        } else if (std::strcmp(node.name(), "spread") == 0) {
+            isSpread = true;
+            auto leftMaster = std::string(node.attribute("leftMaster").as_string());
+            auto rightMaster = std::string(node.attribute("rightMaster").as_string());
+            auto spread = std::make_shared<laid::Spread>(
+                *doc->masterPages[leftMaster],
+                *doc->masterPages[rightMaster]
+            );
+            spread->overflow = node.attribute("overflow").as_bool();
+            // Set other Spread-specific properties
+            basePage = spread; // Assuming basePage is meant to hold any PageObject
+        }
+
         std::shared_ptr<laid::Box> prev;
         for (pugi::xml_node box_node: node.children("box")) {
             auto name = box_node.attribute("name").as_string();
@@ -134,29 +160,30 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
             auto next = box_node.attribute("next").as_string();
             auto gx = box_node.attribute("gX").as_float();
             auto gy = box_node.attribute("gY").as_float();
+
             auto gWidth = box_node.attribute("gWidth").as_float();
             auto gHeight = box_node.attribute("gHeight").as_float();
 
             std::cout << gx << " " << gy << " " << gWidth << " " << gHeight << std::endl;
 
-            auto start = page->masterPage.getRect(gx, gy);
-            auto end = page->masterPage.getRect(gx + gWidth, gy + gHeight);
+            auto start = basePage->getRect(gx, gy);
+            auto end = basePage->getRect(gx + gWidth, gy + gHeight);
 
             auto x = start.startX;
             auto y = start.startY;
             auto width = end.endX - start.startX;
             auto height = end.endY - start.startY;
 
-            if (box_node.attribute("x").as_float() != 0) {
+            if (box_node.attribute("x").empty() == false) {
                 x = box_node.attribute("x").as_float();
             }
-            if (box_node.attribute("y").as_float() != 0) {
+            if (box_node.attribute("y").empty() == false) {
                 y = box_node.attribute("y").as_float();
             }
-            if (box_node.attribute("width").as_float() != 0) {
+            if (box_node.attribute("width").empty() == false) {
                 width = box_node.attribute("width").as_float();
             }
-            if (box_node.attribute("height").as_float() != 0) {
+            if (box_node.attribute("height").empty() == false) {
                 height = box_node.attribute("height").as_float();
             }
             int zIndex = box_node.attribute("zIndex").as_int();
@@ -170,10 +197,16 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
                 parseParagraph(paragraph_node, paragraph);
                 box->addParagraph(paragraph);
             }
-            page->addBox(box);
+            basePage->addBox(box);
             prev = box;
         }
-        doc->addPage(page);
+        if (isSpread == true) {
+            auto spread = std::dynamic_pointer_cast<laid::Spread>(basePage);
+            doc->addSpread(spread);
+        }
+        else {
+            doc->addPage(std::dynamic_pointer_cast<laid::Page>(basePage));
+        }
     }
     // link boxes
     for(const auto &pair : boxMap) {
@@ -182,6 +215,7 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
         }
         boxes[pair.first]->next = boxes[pair.second];
         boxes[pair.second]->prev = boxes[pair.first].get();
+        boxes[pair.second]->prev2 = boxes[pair.first];
     }
     return doc;
 }

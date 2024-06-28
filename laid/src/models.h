@@ -176,7 +176,20 @@ class Box {
 };
 
 
-class Page {
+class PageObject {
+    public:
+        std::vector<std::shared_ptr<Box>> boxes;
+        virtual void addBox(std::shared_ptr<Box>& box) {
+            // Base implementation
+        }
+        virtual Rect getRect(int x, int y) {
+            // Base implementation
+        }
+        bool overflow;
+};
+
+
+class Page : public PageObject {
     public: 
         enum class PageType {
             Single,
@@ -201,13 +214,23 @@ class Page {
         }
 };
 
-class Spread {
+class Spread : public PageObject {
     public:
         Spread(MasterPage& leftMaster, MasterPage& rightMaster) : leftMaster(leftMaster), rightMaster(rightMaster) {}
         MasterPage leftMaster;
         MasterPage rightMaster;
         std::vector<std::shared_ptr<Box>> boxes;
         bool overflow;
+
+        Rect getRect(int col, int row) {
+            if (col > leftMaster.cols) {
+                auto rect = rightMaster.getRect(col - leftMaster.cols, row);
+                rect.startX += leftMaster.width;
+                rect.endX += leftMaster.width;
+                return rect;
+            }
+            return leftMaster.getRect(col, row);
+        }
 
         void addBox(std::shared_ptr<Box>& box) {
             boxes.push_back(box);
@@ -304,6 +327,7 @@ class Document {
                 if (oldBox->next != nullptr) {
                     newBox->next = newPage->boxes[oldBox->next->pageIdx];
                 }
+
                 if (oldBox->prev != nullptr) {
                     newBox->prev = newPage->boxes[oldBox->prev->pageIdx].get();
                 }
