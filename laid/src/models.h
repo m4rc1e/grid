@@ -318,7 +318,11 @@ class Document {
             // link first to last
             for (auto& box : page->boxes) {
                 if (box->next == nullptr) {
-                    box->next = boxMap[box->getFirst()];
+                    if (box->getFirst() == nullptr) {
+                        box->next = boxMap[box];
+                    } else {
+                        box->next = boxMap[box->getFirst()];
+                    }
                 }
             }
 
