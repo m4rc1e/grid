@@ -296,7 +296,10 @@ public:
         std::cout << "Building page: " << page << std::endl;
         int width = page->masterPage.width;
         int height = page->masterPage.height;
-        SkCanvas* canvas = pdf->beginPage(width, height);
+        // TODO get these values from the print struct
+        SkCanvas* canvas = pdf->beginPage(width+200, height+200);
+        canvas->translate(100, 100);
+        BuildCrops(canvas, page->masterPage);
         if (debug == true) {
             BuildGuides(canvas, page->masterPage);
             BuildBaseline(canvas, page->masterPage);
@@ -312,6 +315,26 @@ public:
         }
         std::cout << "Ending page: " << page << std::endl;
         pdf->endPage();
+    }
+
+    void BuildCrops(SkCanvas* canvas, laid::MasterPage masterPage) {
+        SkPaint paintCrop;
+        paintCrop.setColor(SK_ColorBLACK);
+        paintCrop.setStrokeWidth(.25f);
+        paintCrop.setStyle(SkPaint::kStroke_Style);
+        // top left
+        canvas->drawLine(SkPoint::Make(-3, 0), SkPoint::Make(-10, 0), paintCrop);
+        canvas->drawLine(SkPoint::Make(0, -3), SkPoint::Make(0, -10), paintCrop);
+        // top right
+        canvas->drawLine(SkPoint::Make(masterPage.width + 3, 0), SkPoint::Make(masterPage.width + 10, 0), paintCrop);
+        canvas->drawLine(SkPoint::Make(masterPage.width, - 3), SkPoint::Make(masterPage.width, - 10), paintCrop);
+        // bottom left
+        canvas->drawLine(SkPoint::Make(-3, masterPage.height), SkPoint::Make(-10, masterPage.height), paintCrop);
+        canvas->drawLine(SkPoint::Make(0, masterPage.height + 3), SkPoint::Make(0, masterPage.height + 10), paintCrop);
+        // bottom right
+        canvas->drawLine(SkPoint::Make(masterPage.width + 3, masterPage.height), SkPoint::Make(masterPage.width + 10, masterPage.height), paintCrop);
+        canvas->drawLine(SkPoint::Make(masterPage.width, masterPage.height + 3), SkPoint::Make(masterPage.width, masterPage.height + 10), paintCrop);
+        std::cout << "Done crops" << std::endl;
     }
 
     void BuildBaseline(SkCanvas* canvas, laid::MasterPage& masterPage) {
