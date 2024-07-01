@@ -1,6 +1,7 @@
 #ifndef PDFVIEW_H
 #define PDFVIEW_H
 #include "models.h"
+#include "print.h"
 #include <iostream>
 #include <iterator> // For std::next
 
@@ -195,7 +196,7 @@ private:
 
 class BuildPDF {
 public:
-    BuildPDF(std::shared_ptr<laid::Document> laidDoc, const char* out, bool debug) : laidDoc(laidDoc), stream(out), debug(debug) {
+    BuildPDF(std::shared_ptr<laid::Document> laidDoc, const char* out, PrintSettings printSettings, bool debug) : laidDoc(laidDoc), stream(out), printSettings(printSettings), debug(debug) {
         setupFontCollection();
         laidDoc = laidDoc;
         fontCollection->setDefaultFontManager(SkFontMgr::RefDefault());
@@ -212,6 +213,7 @@ public:
     SkPDF::Metadata metadata;
     sk_sp<SkDocument> pdf;
     std::map<std::string, ParagraphStyle> paragraphStyles;
+    PrintSettings printSettings;
     bool debug;
 
     void BuildStyles() {
@@ -296,9 +298,11 @@ public:
         std::cout << "Building page: " << page << std::endl;
         int width = page->masterPage.width;
         int height = page->masterPage.height;
-        // TODO get these values from the print struct
-        SkCanvas* canvas = pdf->beginPage(width+200, height+200);
-        canvas->translate(100, 100);
+        SkCanvas* canvas = pdf->beginPage(printSettings.paperWidth, printSettings.paperHeight);
+        auto widthOffset = (printSettings.paperWidth - width) / 2;
+        auto heightOffset = (printSettings.paperHeight - height) / 2;
+        canvas->translate(widthOffset, heightOffset);
+
         BuildCrops(canvas, page->masterPage);
         if (debug == true) {
             BuildGuides(canvas, page->masterPage);

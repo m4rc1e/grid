@@ -2,17 +2,7 @@
 #include "models.h"
 #include "pdfview.h"
 #include "xmlparser.h"
-
-
-// We should be thinking about saddle stiching as well.
-// Currently, only perfect binding works
-struct PrintSettings {
-    // A4 by default. Maybe it should be US Letter
-    float paperWidth = 595;
-    float paperHeight = 842;
-    bool cropMarks = false;
-    bool spreads = false;
-};
+#include "print.h"
 
 
 int main(int argc, char *argv[]) {
@@ -24,8 +14,10 @@ int main(int argc, char *argv[]) {
             debug = true;
         }
     }
+    auto printSettings = PrintSettings();
+
     auto myDoc = laid::load_file("../sketches/multi_page_two_col.xml");
-    BuildPDF PDFBuilder(myDoc, "output3.pdf", debug);
+    BuildPDF PDFBuilder(myDoc, "output3.pdf", printSettings, debug);
     PDFBuilder.Build();
     std::cout << "Done!" << std::endl;
 }
