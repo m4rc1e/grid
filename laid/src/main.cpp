@@ -14,6 +14,7 @@ int main(int argc, char *argv[]) {
             debug = true;
         }
     }
+
     auto printSettings = PrintSettings();
 
     auto myDoc = laid::load_file("../sketches/multi_page_two_col.xml");

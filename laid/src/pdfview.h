@@ -287,7 +287,6 @@ public:
     void BuildPages() {
         std::shared_ptr<laid::Page> head = laidDoc->pages;
         while (head != nullptr) {
-            //SolveBoxes(head);
             BuildPage(head);
             head = head->next;
         }
@@ -298,6 +297,9 @@ public:
         std::cout << "Building page: " << page << std::endl;
         int width = page->masterPage.width;
         int height = page->masterPage.height;
+        if (printSettings.paperWidth < width || printSettings.paperHeight < height) {
+            throw std::invalid_argument("Paper size is smaller than page size");
+        }
         SkCanvas* canvas = pdf->beginPage(printSettings.paperWidth, printSettings.paperHeight);
         auto widthOffset = (printSettings.paperWidth - width) / 2;
         auto heightOffset = (printSettings.paperHeight - height) / 2;
