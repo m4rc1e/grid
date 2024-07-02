@@ -92,7 +92,9 @@ public:
         skia::textlayout::ParagraphStyle& paragraph_style
     ) {
         auto text_style = paragraph_style.getTextStyle();
+        auto strut_style = paragraph_style.getStrutStyle();
         builder.pushStyle(text_style);
+
 
         std::istringstream ss(text); // " " added at end due to delimiter for std::getline
         std::string token;
@@ -253,7 +255,13 @@ public:
             SkFontStyle fontStyle(weight, width, slant);
             text_style.setFontStyle(fontStyle);
             
-            text_style.setTextBaseline(TextBaseline::kAlphabetic);
+            // baseline shift
+            auto ff = SkFontMetrics{};
+            text_style.setFontSize(style.leading);
+            text_style.getFontMetrics(&ff);
+            text_style.setFontSize(style.fontSize);
+            text_style.setBaselineShift(ff.fDescent);
+            
             paragraph_style.setTextStyle(text_style);
             paragraph_style.setStrutStyle(strut_style);
             
@@ -467,6 +475,11 @@ public:
         for (size_t paraIdx = 0; paraIdx < box->paragraphs.size(); paraIdx++) {
             auto paragraph = box->paragraphs[paraIdx];
             auto paragraphStyle = paragraphStyles[paragraph->style];
+            paragraphStyle.setTextHeightBehavior(TextHeightBehavior::kDisableFirstAscent);
+//            auto leadingOffset = paragraphStyle.getStrutStyle().getFontSize() - paragraphStyle.getTextStyle().getFontSize();
+//            if (offset == 0) {
+//                offset = leadingOffset;
+//            }
             TextSetter textSetter(box->width, box->height - offset, paragraphStyle, collisionBoxes);
 
             for (size_t runIdx = 0; runIdx < paragraph->text_runs.size(); runIdx++) {
