@@ -3,6 +3,7 @@
 #include "models.h"
 #include <stdexcept>
 #include <cstring>
+#include <filesystem>
 
 namespace laid {
 
@@ -40,6 +41,9 @@ void parsePage(pugi::xml_node node, std::shared_ptr<laid::Document> doc) {
 }
 
 std::shared_ptr<laid::Document> load_file(const char* filename) {
+    if (!std::filesystem::exists(filename)) {
+        throw std::invalid_argument("File does not exist!");
+    }
     pugi::xml_document xml_doc;
     pugi::xml_parse_result result = xml_doc.load_file(filename);
     auto xml_doc_start = xml_doc.child("document");
@@ -186,7 +190,7 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
                 y = ypos.as_float();
             } else if (gypos.empty() == false) {
                 auto rect = basePage->getRect(1, gypos.as_float());
-                y = rect.startX;
+                y = rect.startY;
             } else {
                 throw std::invalid_argument("Box must have an x or gX attribute!"); 
             }

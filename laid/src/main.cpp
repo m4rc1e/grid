@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 
     auto printSettings = PrintSettings();
 
-    auto myDoc = laid::load_file("../sketches/multi_page_two_col.xml");
+    auto myDoc = laid::load_file("../sketches/baseline_align.xml");
     BuildPDF PDFBuilder(myDoc, "output3.pdf", printSettings, debug);
     PDFBuilder.Build();
     std::cout << "Done!" << std::endl;
