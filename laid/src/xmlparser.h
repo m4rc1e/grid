@@ -40,6 +40,82 @@ void parsePage(pugi::xml_node node, std::shared_ptr<laid::Document> doc) {
     doc->addPage(page);
 }
 
+std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<laid::PageObject> basePage, std::map<std::string, std::shared_ptr<laid::Box>> &boxes, std::map<std::string, std::string> &boxMap) {
+    auto name = box_node.attribute("name").as_string();
+    if (name == "") {
+        throw std::invalid_argument("Box must have a name!");
+    }
+    auto next = box_node.attribute("next").as_string();
+
+    float x, y, width, height;
+    // x pos
+    auto gxpos = box_node.attribute("gX");
+    auto xpos = box_node.attribute("x");
+    if (xpos.empty() == false) {
+        x = xpos.as_float();
+    } else if (gxpos.empty() == false) {
+        auto rect = basePage->getRect(gxpos.as_float(), 1);
+    x = rect.startX;
+    } else {
+        throw std::invalid_argument("Box must have an x or gX attribute!"); 
+    }
+
+    // y pos
+    auto gypos = box_node.attribute("gY");
+    auto ypos = box_node.attribute("y");
+    if (ypos.empty() == false) {
+        y = ypos.as_float();
+    } else if (gypos.empty() == false) {
+        auto rect = basePage->getRect(1, gypos.as_float());
+        y = rect.startY;
+    } else {
+        throw std::invalid_argument("Box must have an y or gY attribute!"); 
+    }
+
+    // width
+    auto gwidth = box_node.attribute("gWidth");
+    auto widthlen = box_node.attribute("width");
+    if (gwidth.empty() == false) {
+        auto start = basePage->getRect(1, 1);
+        auto end = basePage->getRect(gwidth.as_float(), 1);
+        width = end.endX - start.startX;
+    } else if (widthlen.empty() == false) {
+        width = widthlen.as_float();
+    } else {
+        throw std::invalid_argument("Box must have a width or gWidth attribute!"); 
+    }
+
+    // height
+    auto gheight = box_node.attribute("gHeight");
+    auto heightlen = box_node.attribute("height");
+    if (gheight.empty() == false) {
+        auto start = basePage->getRect(1, 1);
+        auto end = basePage->getRect(1, gheight.as_float());
+        height = end.endY - start.startY;
+    } else if (heightlen.empty() == false) {
+        height = heightlen.as_float();
+    } else {
+        throw std::invalid_argument("Box must have a height or gHeight attribute!"); 
+    }
+
+    int zIndex = box_node.attribute("zIndex").as_int();
+    auto box = std::make_shared<laid::Box>(x, y, width, height);
+    box->zIndex = zIndex;
+    boxes[name] = box;
+    boxMap[name] = next;
+    for (pugi::xml_node sub_node: box_node.children()) {
+        if (std::strcmp(sub_node.name(), "para") == 0) {
+            auto paragraph = std::make_shared<laid::Paragraph>();
+            paragraph->style = sub_node.attribute("style").as_string();
+            parseParagraph(sub_node, paragraph);
+            box->addParagraph(paragraph);
+        } else {
+            std::cout << "getting box!"; 
+        }
+    }
+    return box;
+}
+
 std::shared_ptr<laid::Document> load_file(const char* filename) {
     if (!std::filesystem::exists(filename)) {
         throw std::invalid_argument("File does not exist!");
@@ -164,74 +240,7 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
 
         std::shared_ptr<laid::Box> prev;
         for (pugi::xml_node box_node: node.children("box")) {
-            auto name = box_node.attribute("name").as_string();
-            if (name == "") {
-                throw std::invalid_argument("Box must have a name!");
-            }
-            auto next = box_node.attribute("next").as_string();
-            
-            float x, y, width, height;
-            // x pos
-            auto gxpos = box_node.attribute("gX");
-            auto xpos = box_node.attribute("x");
-            if (xpos.empty() == false) {
-                x = xpos.as_float();
-            } else if (gxpos.empty() == false) {
-                auto rect = basePage->getRect(gxpos.as_float(), 1);
-                x = rect.startX;
-            } else {
-                throw std::invalid_argument("Box must have an x or gX attribute!"); 
-            }
-
-            // y pos
-            auto gypos = box_node.attribute("gY");
-            auto ypos = box_node.attribute("y");
-            if (ypos.empty() == false) {
-                y = ypos.as_float();
-            } else if (gypos.empty() == false) {
-                auto rect = basePage->getRect(1, gypos.as_float());
-                y = rect.startY;
-            } else {
-                throw std::invalid_argument("Box must have an x or gX attribute!"); 
-            }
-
-            // width
-            auto gwidth = box_node.attribute("gWidth");
-            auto widthlen = box_node.attribute("width");
-            if (gwidth.empty() == false) {
-                auto start = basePage->getRect(1, 1);
-                auto end = basePage->getRect(gwidth.as_float(), 1);
-                width = end.endX - start.startX;
-            } else if (widthlen.empty() == false) {
-                width = widthlen.as_float();
-            } else {
-                throw std::invalid_argument("Box must have a width or gWidth attribute!"); 
-            }
-
-            // height
-            auto gheight = box_node.attribute("gHeight");
-            auto heightlen = box_node.attribute("height");
-            if (gheight.empty() == false) {
-                auto start = basePage->getRect(1, 1);
-                auto end = basePage->getRect(1, gheight.as_float());
-                height = end.endY - start.startY;
-            } else if (heightlen.empty() == false) {
-                height = heightlen.as_float();
-            } else {
-                throw std::invalid_argument("Box must have a height or gHeight attribute!"); 
-            }
-
-            int zIndex = box_node.attribute("zIndex").as_int();
-            auto box = std::make_shared<laid::Box>(x, y, width, height);
-            box->zIndex = zIndex;
-            boxes[name] = box;
-            boxMap[name] = next;
-            for (pugi::xml_node paragraph_node: box_node.children("para")) {
-                auto paragraph = std::make_shared<laid::Paragraph>();
-                paragraph->style = paragraph_node.attribute("style").as_string();
-                parseParagraph(paragraph_node, paragraph);
-                box->addParagraph(paragraph);
-            }
+            auto box = parseBox(box_node, basePage, boxes, boxMap);
             basePage->addBox(box);
             prev = box;
         }

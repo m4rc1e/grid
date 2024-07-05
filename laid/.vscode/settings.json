@@ -73,6 +73,7 @@
         "stack": "cpp",
         "unordered_set": "cpp",
         "ranges": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "filesystem": "cpp"
     }
 }
