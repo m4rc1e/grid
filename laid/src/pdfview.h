@@ -115,14 +115,18 @@ public:
             }
             // Handle collisions with other Boxes
             auto collidedBox = boxCollision(nextCursor);
-            if (collidedBox) {
+            while (collidedBox) {
                 if (currentCursor.x > nextCursor.x) {
                     std::cout << "col";
                     addPlaceholder(collidedBox->width);
                 } else {
                     addPlaceholder(collidedBox->width - (currentCursor.x - collidedBox->x));
                 }
-                
+                paragraph = builder.Build();
+                paragraph->layout(width);
+                currentCursor = getCursor(paragraph.get());
+                nextCursor = getNextCursor(token, paragraph_style, paragraph.get());
+                collidedBox = boxCollision(nextCursor);
             }
 
             builder.addText(token.data());
@@ -184,7 +188,7 @@ public:
     }
 
     void addPlaceholder(int width) {
-        PlaceholderStyle placeholder1(width, 0, PlaceholderAlignment::kTop, TextBaseline::kAlphabetic, 0);
+        PlaceholderStyle placeholder1(width, 5, PlaceholderAlignment::kTop, TextBaseline::kAlphabetic, 0);
         builder.addPlaceholder(placeholder1);
     }
 
@@ -454,14 +458,14 @@ public:
 
     // Find boxes that collide with the current box and have a zIndex greater than current box
     // offset the box relative to the main box
-    std::vector<laid::Box> collidingBoxes(std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
+    std::vector<laid::Box> collidingBoxes(std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box, int offset) {
         std::vector<laid::Box> collisionBoxes;
         for (auto childBox : page->boxes) {
             if (childBox == box) {
                 continue;
             }
             if (childBox->zIndex > box->zIndex) {
-                auto collideBox = laid::Box(childBox->x - box->x, childBox->y - box->y, childBox->width, childBox->height);
+                auto collideBox = laid::Box(childBox->x - box->x, childBox->y - box->y, childBox->width, childBox->height - offset);
                 collisionBoxes.push_back(collideBox);
             }
 
@@ -470,16 +474,13 @@ public:
     }
 
     void BuildText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
-        auto collisionBoxes = collidingBoxes(page, box);
         int offset = 0;
+        auto collisionBoxes = collidingBoxes(page, box, offset);
         for (size_t paraIdx = 0; paraIdx < box->paragraphs.size(); paraIdx++) {
+            collisionBoxes = collidingBoxes(page, box, offset);
             auto paragraph = box->paragraphs[paraIdx];
             auto paragraphStyle = paragraphStyles[paragraph->style];
             paragraphStyle.setTextHeightBehavior(TextHeightBehavior::kDisableFirstAscent);
-//            auto leadingOffset = paragraphStyle.getStrutStyle().getFontSize() - paragraphStyle.getTextStyle().getFontSize();
-//            if (offset == 0) {
-//                offset = leadingOffset;
-//            }
             TextSetter textSetter(box->width, box->height - offset, paragraphStyle, collisionBoxes);
 
             for (size_t runIdx = 0; runIdx < paragraph->text_runs.size(); runIdx++) {

@@ -17,8 +17,8 @@ int main(int argc, char *argv[]) {
 
     auto printSettings = PrintSettings();
 
-    auto myDoc = laid::load_file("../sketches/baseline_align.xml");
-    BuildPDF PDFBuilder(myDoc, "output3.pdf", printSettings, debug);
+    auto myDoc = laid::load_file("../sketches/demo.xml");
+    BuildPDF PDFBuilder(myDoc, "demo.pdf", printSettings, debug);
     PDFBuilder.Build();
     std::cout << "Done!" << std::endl;
 }
