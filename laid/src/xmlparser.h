@@ -103,15 +103,18 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
     box->zIndex = zIndex;
     boxes[name] = box;
     boxMap[name] = next;
+    int paragraphCount = 0;
     for (pugi::xml_node sub_node: box_node.children()) {
         if (std::strcmp(sub_node.name(), "para") == 0) {
             auto paragraph = std::make_shared<laid::Paragraph>();
             paragraph->style = sub_node.attribute("style").as_string();
             parseParagraph(sub_node, paragraph);
             box->addParagraph(paragraph);
-        } else {
+        } else if (std::strcmp(sub_node.name(), "box") == 0) {
+            box->addChild(paragraphCount, parseBox(sub_node, basePage, boxes, boxMap));
             std::cout << "getting box!"; 
         }
+        paragraphCount++;
     }
     return box;
 }

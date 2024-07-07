@@ -530,6 +530,15 @@ public:
             }
             textSetter.paint(box->x, box->y+offset, canvas);
             offset += textSetter.contentHeight;
+            if (box->children.find(paraIdx) != box->children.end()) {
+                std::cout << "Key exists." << std::endl;
+                for (auto& child : box->children[paraIdx]) {
+                    if (debug == true) {
+                        BuildBoxRect(canvas, child);
+                    }
+                    BuildText(canvas, page, child);
+                }
+            }
         }
     };
 };
