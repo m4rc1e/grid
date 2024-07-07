@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 
     auto printSettings = PrintSettings();
 
-    auto myDoc = laid::load_file("../sketches/siblings.xml");
+    auto myDoc = laid::load_file("../sketches/siblings2.xml");
     BuildPDF PDFBuilder(myDoc, "demo.pdf", printSettings, debug);
     PDFBuilder.Build();
     std::cout << "Done!" << std::endl;

@@ -66,8 +66,12 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
     if (ypos.empty() == false) {
         y = ypos.as_float();
     } else if (gypos.empty() == false) {
-        auto rect = basePage->getRect(1, gypos.as_float());
-        y = rect.startY;
+        if (gypos.as_string() == std::string("*")) {
+            y = -1;
+        } else {
+            auto rect = basePage->getRect(1, gypos.as_float());
+            y = rect.startY;
+        }
     } else {
         throw std::invalid_argument("Box must have an y or gY attribute!"); 
     }
