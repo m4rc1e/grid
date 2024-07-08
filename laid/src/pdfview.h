@@ -518,6 +518,9 @@ public:
                         nextBox->addParagraph(std::make_shared<laid::Paragraph>(para));
                         for (size_t i = paraIdx + 1; i < box->paragraphs.size(); i++) {
                             nextBox->addParagraph(box->paragraphs[i]);
+                            for (int j = 0; j < box->children[i].size(); j++) {
+                                nextBox->addChild(i, box->children[i+paraIdx][j]);
+                            }
                         }
 
                     } else {
