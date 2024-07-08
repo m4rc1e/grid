@@ -461,6 +461,14 @@ public:
     std::vector<laid::Box> collidingBoxes(std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box, int offset) {
         std::vector<laid::Box> collisionBoxes;
         for (auto childBox : page->boxes) {
+            for (auto& [paraIdx, children] : childBox->children) {
+                for (auto& child : children) {
+                    if (child->zIndex > box->zIndex) {
+                        auto collideBox = laid::Box(child->x - box->x, child->y - box->y, child->width, child->height - offset);
+                        collisionBoxes.push_back(collideBox);
+                    }
+                }
+            }
             if (childBox == box) {
                 continue;
             }
