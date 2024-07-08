@@ -30,6 +30,14 @@ class Style {
         }
 };
 
+
+class BoxStyle {
+public:
+    std::string name;
+    std::string color;
+};
+
+
 class Rect {
     public:
         float startX;
@@ -115,9 +123,11 @@ class Box {
         float height;
         int zIndex;
         std::vector<std::shared_ptr<Paragraph>> paragraphs;
+
         std::shared_ptr<Box> next;
         std::shared_ptr<Box> prev;
         std::string image_path;
+        std::string style;
         std::map<int, std::vector<std::shared_ptr<Box>>> children;
 
         Box(float x, float y, float width, float height) : x(x), y(y), width(width), height(height) {}
@@ -258,6 +268,7 @@ class Document {
         // TODO what about CMYK colors?
         std::map<std::string, RGBColor> colors;
         std::map<std::string, Style> paragraph_styles;
+        std::map<std::string, BoxStyle> boxStyles;
         std::map<std::string, MasterPage*> masterPages;
         int page_count;
         std::shared_ptr<Page> pages;
@@ -269,6 +280,10 @@ class Document {
 
         void addStyle(Style paragraphStyle) {
             paragraph_styles[paragraphStyle.name] = paragraphStyle;
+        }
+        
+        void addBoxStyle(BoxStyle boxStyle) {
+            boxStyles[boxStyle.name] = boxStyle;
         }
 
         void addMasterPage(MasterPage& masterPage) {

@@ -104,6 +104,10 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
 
     int zIndex = box_node.attribute("zIndex").as_int();
     auto box = std::make_shared<laid::Box>(x, y, width, height);
+    auto style = box_node.attribute("style");
+    if (style.empty() == false) {
+        box->style = std::string(style.as_string());
+    }
     box->zIndex = zIndex;
     boxes[name] = box;
     boxMap[name] = next;
@@ -216,6 +220,18 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
         }
 
         doc->addStyle(style);
+    }
+
+    // build boxStyles
+    for (pugi::xml_node node: xml_doc_start.child("head").child("boxStyles").children("boxStyle")) {
+        laid::BoxStyle boxStyle;
+        boxStyle.name = std::string(node.attribute("name").as_string());
+        auto color = node.attribute("color").as_string();
+        if (color != "") {
+            boxStyle.color = color;
+        }
+        doc->addBoxStyle(boxStyle);
+        
     }
 
     // maps used to link boxes in the whole document

@@ -219,8 +219,18 @@ public:
     SkPDF::Metadata metadata;
     sk_sp<SkDocument> pdf;
     std::map<std::string, ParagraphStyle> paragraphStyles;
+    std::map<std::string, SkPaint> boxStyles;
     PrintSettings printSettings;
     bool debug;
+
+    void BuildBoxStyles() {
+        for (auto& [name, style] : laidDoc->boxStyles) {
+            SkPaint paint;
+            auto color = laidDoc->colors[style.color];
+            paint.setColor(SkColorSetRGB(color.r, color.g, color.b));
+            boxStyles[name] = paint;
+        }
+    }
 
     void BuildStyles() {
         // build non-inherited styles first
@@ -292,6 +302,7 @@ public:
 
     }
     void Build() {
+        BuildBoxStyles();
         BuildStyles();
         BuildPages();
     }
@@ -303,6 +314,14 @@ public:
             head = head->next;
         }
         pdf->close();
+    }
+    void StyleBox(std::shared_ptr<laid::Box> box, SkCanvas* canvas) {
+        if (box->style != "") {
+            canvas->drawRect(
+                SkRect::MakeXYWH(box->x, box->y, box->width, box->height),
+                boxStyles[box->style]
+            );
+        }
     }
 
     void BuildPage(std::shared_ptr<laid::Page> page) {
@@ -326,6 +345,7 @@ public:
             if (box->image_path.size() > 0) {
                 BuildImage(canvas, box);
             }
+            StyleBox(box, canvas);
             BuildText(canvas, page, box);
             if (debug == true) {
                 BuildBoxRect(canvas, box);
@@ -548,6 +568,7 @@ public:
                     if (debug == true) {
                         BuildBoxRect(canvas, child);
                     }
+                    StyleBox(child, canvas);
                     BuildText(canvas, page, child);
                 }
             }
