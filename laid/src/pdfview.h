@@ -478,6 +478,15 @@ public:
         canvas->drawLine(SkPoint::Make(masterPage.marginLeft, masterPage.marginTop), SkPoint::Make(masterPage.marginLeft, masterPage.height - masterPage.marginBottom), paintMargins);
         canvas->drawLine(SkPoint::Make(masterPage.width - masterPage.marginRight, masterPage.marginTop), SkPoint::Make(masterPage.width - masterPage.marginRight, masterPage.height - masterPage.marginBottom), paintMargins);
         canvas->drawLine(SkPoint::Make(masterPage.marginLeft, masterPage.height - masterPage.marginBottom), SkPoint::Make(masterPage.width - masterPage.marginRight, masterPage.height - masterPage.marginBottom), paintMargins);
+
+        // page
+        SkPaint paintPage;
+        paintPage.setColor(SK_ColorBLACK);
+        paintPage.setStrokeWidth(1.0f);
+        canvas->drawLine(SkPoint::Make(0, 0), SkPoint::Make(masterPage.width, 0), paintPage);
+        canvas->drawLine(SkPoint::Make(0, 0), SkPoint::Make(0, masterPage.height), paintPage);
+        canvas->drawLine(SkPoint::Make(masterPage.width, 0), SkPoint::Make(masterPage.width, masterPage.height), paintPage);
+        canvas->drawLine(SkPoint::Make(0, masterPage.height), SkPoint::Make(masterPage.width, masterPage.height), paintPage);
     }
     void BuildImage(SkCanvas* canvas, std::shared_ptr<laid::Box> box) {
         std::cout << "img:" << box << std::endl;
