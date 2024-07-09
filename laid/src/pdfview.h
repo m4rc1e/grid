@@ -116,17 +116,17 @@ public:
             // Handle collisions with other Boxes
             auto collidedBox = boxCollision(nextCursor);
             while (collidedBox) {
-                if (currentCursor.x > nextCursor.x) {
-                    std::cout << "col";
-                    addPlaceholder(collidedBox->width);
-                } else {
-                    addPlaceholder(collidedBox->width - (currentCursor.x - collidedBox->x));
-                }
                 paragraph = builder.Build();
                 paragraph->layout(width);
                 currentCursor = getCursor(paragraph.get());
                 nextCursor = getNextCursor(token, paragraph_style, paragraph.get());
                 collidedBox = boxCollision(nextCursor);
+                if (currentCursor.x >= nextCursor.x) {
+                    std::cout << "col";
+                    addPlaceholder(collidedBox->width);
+                } else {
+                    addPlaceholder(collidedBox->width - (currentCursor.x - collidedBox->x));
+                }
             }
 
             builder.addText(token.data());
