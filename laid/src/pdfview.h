@@ -308,10 +308,30 @@ public:
     }
 
     void BuildPages() {
+        // TODO bring back print paper sizing
         std::shared_ptr<laid::Page> head = laidDoc->pages;
-        while (head != nullptr) {
-            BuildPage(head);
-            head = head->next;
+        if (printSettings.composition == PrintSettings::Composition::Single) {
+            while (head != nullptr) {
+                auto canvas = pdf->beginPage(printSettings.paperWidth, printSettings.paperHeight);
+                BuildPage(head, canvas);
+                head = head->next;
+                pdf->endPage();
+            }
+        } else if (printSettings.composition == PrintSettings::Composition::Spreads) {
+            while (head != nullptr) {
+                if (head->type == laid::Page::PageType::Single) {
+                    auto canvas = pdf->beginPage(printSettings.paperWidth, printSettings.paperHeight);
+                    BuildPage(head, canvas);
+                    pdf->endPage();
+                } else if (head->type == laid::Page::PageType::Left) {
+                    auto canvas = pdf->beginPage(printSettings.paperWidth, printSettings.paperHeight);
+                    BuildPage(head, canvas);
+                    canvas->translate(head->masterPage.width, 0);
+                    BuildPage(head->next, canvas);
+                    head = head->next->next;
+                    pdf->endPage();
+                }
+            }
         }
         pdf->close();
     }
@@ -324,17 +344,15 @@ public:
         }
     }
 
-    void BuildPage(std::shared_ptr<laid::Page> page) {
-        std::cout << "Building page: " << page << std::endl;
+    SkCanvas* BuildPage(std::shared_ptr<laid::Page> page, SkCanvas* canvas) {
         int width = page->masterPage.width;
         int height = page->masterPage.height;
-        if (printSettings.paperWidth < width || printSettings.paperHeight < height) {
-            throw std::invalid_argument("Paper size is smaller than page size");
-        }
-        SkCanvas* canvas = pdf->beginPage(printSettings.paperWidth, printSettings.paperHeight);
-        auto widthOffset = (printSettings.paperWidth - width) / 2;
-        auto heightOffset = (printSettings.paperHeight - height) / 2;
-        canvas->translate(widthOffset, heightOffset);
+//        if (printSettings.paperWidth < width || printSettings.paperHeight < height) {
+//            throw std::invalid_argument("Paper size is smaller than page size");
+//        }
+//        auto widthOffset = (printSettings.paperWidth - width) / 2;
+//        auto heightOffset = (printSettings.paperHeight - height) / 2;
+//        canvas->translate(widthOffset, heightOffset);
 
         BuildCrops(canvas, page->masterPage);
         if (debug == true) {
@@ -352,7 +370,7 @@ public:
             }
         }
         std::cout << "Ending page: " << page << std::endl;
-        pdf->endPage();
+        return canvas;
     }
 
     void BuildCrops(SkCanvas* canvas, laid::MasterPage masterPage) {
