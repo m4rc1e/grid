@@ -17,6 +17,7 @@ int main(int argc, char *argv[]) {
 
     auto printSettings = PrintSettings();
     printSettings.paperWidth = 2000;
+    printSettings.paperHeight = 2000;
     printSettings.composition = PrintSettings::Composition::Spreads;
 
     auto myDoc = laid::load_file("../sketches/demo.xml");

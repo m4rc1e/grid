@@ -307,12 +307,24 @@ public:
         BuildPages();
     }
 
+    void offsetCanvas(SkCanvas* canvas, float width, float height) {
+        if (printSettings.paperWidth < width || printSettings.paperHeight < height) {
+            throw std::invalid_argument("Paper size is smaller than page size");
+        }
+        auto widthOffset = (printSettings.paperWidth - width) / 2;
+        auto heightOffset = (printSettings.paperHeight - height) / 2;
+        canvas->translate(widthOffset, heightOffset);
+    }
+
     void BuildPages() {
         // TODO bring back print paper sizing
         std::shared_ptr<laid::Page> head = laidDoc->pages;
         if (printSettings.composition == PrintSettings::Composition::Single) {
             while (head != nullptr) {
+                auto width = head->masterPage.width;
+                auto height = head->masterPage.height;
                 auto canvas = pdf->beginPage(printSettings.paperWidth, printSettings.paperHeight);
+                offsetCanvas(canvas, width, height);
                 BuildPage(head, canvas);
                 head = head->next;
                 pdf->endPage();
@@ -320,11 +332,17 @@ public:
         } else if (printSettings.composition == PrintSettings::Composition::Spreads) {
             while (head != nullptr) {
                 if (head->type == laid::Page::PageType::Single) {
+                    auto width = head->masterPage.width;
+                    auto height = head->masterPage.height;
                     auto canvas = pdf->beginPage(printSettings.paperWidth, printSettings.paperHeight);
+                    offsetCanvas(canvas, width, height);
                     BuildPage(head, canvas);
                     pdf->endPage();
                 } else if (head->type == laid::Page::PageType::Left) {
                     auto canvas = pdf->beginPage(printSettings.paperWidth, printSettings.paperHeight);
+                    auto width = head->masterPage.width + head->next->masterPage.width;
+                    auto height = head->masterPage.height;
+                    offsetCanvas(canvas, width, height);
                     BuildPage(head, canvas);
                     canvas->translate(head->masterPage.width, 0);
                     BuildPage(head->next, canvas);
@@ -347,12 +365,6 @@ public:
     SkCanvas* BuildPage(std::shared_ptr<laid::Page> page, SkCanvas* canvas) {
         int width = page->masterPage.width;
         int height = page->masterPage.height;
-//        if (printSettings.paperWidth < width || printSettings.paperHeight < height) {
-//            throw std::invalid_argument("Paper size is smaller than page size");
-//        }
-//        auto widthOffset = (printSettings.paperWidth - width) / 2;
-//        auto heightOffset = (printSettings.paperHeight - height) / 2;
-//        canvas->translate(widthOffset, heightOffset);
 
         BuildCrops(canvas, page->masterPage);
         if (debug == true) {
