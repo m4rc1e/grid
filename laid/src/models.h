@@ -238,6 +238,14 @@ class Spread : public PageObject {
                     continue;
                 }
                 page->addBox(box);
+                for (auto& child : box->children) {
+                    for (auto& childBox : child.second) {
+                        if (childBox->x > leftMaster.width) {
+                            continue;
+                        }
+                        page->addBox(childBox);
+                    }
+                }
             }
             page->overflow = overflow;
             return page;
@@ -256,6 +264,13 @@ class Spread : public PageObject {
                     auto newbox = std::make_shared<Box>(*box);
                     newbox->x -= leftMaster.width;
                     page->addBox(newbox);
+                }
+                for (auto& child : box->children) {
+                    for (auto& childBox : child.second) {
+                        auto newbox = std::make_shared<Box>(*childBox);
+                        newbox->x -= leftMaster.width;
+                        page->addBox(newbox);
+                    }
                 }
             }
             page->overflow = overflow;
