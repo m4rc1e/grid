@@ -324,9 +324,11 @@ public:
                 auto height = head->masterPage.height;
                 auto canvas = pdf->beginPage(printSettings.paperWidth, printSettings.paperHeight);
                 offsetCanvas(canvas, width, height);
-                // We may want to tweak this once when we implement bleed
-                canvas->clipRect(SkRect::MakeXYWH(-7, -7, width+14, height+14));
+                canvas->save();
+                canvas->clipRect(SkRect::MakeXYWH(0, 0, width, height));
                 BuildPage(head, canvas);
+                canvas->restore();
+                // inputs should be width and height
                 BuildCrops(canvas, head->masterPage);
                 head = head->next;
                 pdf->endPage();
