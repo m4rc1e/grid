@@ -323,8 +323,13 @@ public:
                 auto width = head->masterPage.width;
                 auto height = head->masterPage.height;
                 auto canvas = pdf->beginPage(printSettings.paperWidth, printSettings.paperHeight);
+                canvas->save();
                 offsetCanvas(canvas, width, height);
+                // We may want to tweak this once when we implement bleed
+                canvas->clipRect(SkRect::MakeXYWH(0, 0, width, height));
                 BuildPage(head, canvas);
+                canvas->restore();
+                BuildCrops(canvas, head->masterPage);
                 head = head->next;
                 pdf->endPage();
             }
@@ -334,8 +339,12 @@ public:
                     auto width = head->masterPage.width;
                     auto height = head->masterPage.height;
                     auto canvas = pdf->beginPage(printSettings.paperWidth, printSettings.paperHeight);
+                    canvas->save();
                     offsetCanvas(canvas, width, height);
                     BuildPage(head, canvas);
+                    canvas->restore();
+//                    BuildCrops(canvas, head->masterPage);
+                    head = head->next;
                     pdf->endPage();
                 } else if (head->type == laid::Page::PageType::Left) {
                     auto canvas = pdf->beginPage(printSettings.paperWidth, printSettings.paperHeight);
@@ -345,6 +354,7 @@ public:
                     BuildPage(head, canvas);
                     canvas->translate(head->masterPage.width, 0);
                     BuildPage(head->next, canvas);
+                    canvas->restore();
                     head = head->next->next;
                     pdf->endPage();
                 }
@@ -365,7 +375,6 @@ public:
         int width = page->masterPage.width;
         int height = page->masterPage.height;
 
-        BuildCrops(canvas, page->masterPage);
         if (debug == true) {
             BuildGuides(canvas, page->masterPage);
             BuildBaseline(canvas, page->masterPage);
