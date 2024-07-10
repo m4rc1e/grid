@@ -106,13 +106,6 @@ public:
             auto nextCursor = getNextCursor(token, paragraph_style, paragraph.get());
             auto currentLine = int(paragraph->lineNumber());
 
-            // Handle exceeding height of box
-            
-            if (nextCursor.y > height) {
-                std::cout << "overflowing" << '\n';
-                overflowingText += token + " ";
-                continue;
-            }
             // Handle collisions with other Boxes
             auto collidedBox = boxCollision(nextCursor);
             while (collidedBox) {
@@ -127,6 +120,12 @@ public:
                 } else {
                     addPlaceholder(collidedBox->width - (currentCursor.x - collidedBox->x));
                 }
+            }
+            // Handle exceeding height of box
+            if (nextCursor.y > height) {
+                std::cout << "overflowing" << '\n';
+                overflowingText += token + " ";
+                continue;
             }
 
             builder.addText(token.data());
