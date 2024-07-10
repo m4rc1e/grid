@@ -101,6 +101,7 @@ public:
 
         auto maxLines = int(height / text_style.getFontSize());
 
+        bool exhausted = false;
         while (std::getline(ss, token, ' ')) {
             auto currentCursor = getCursor(paragraph.get());
             auto nextCursor = getNextCursor(token, paragraph_style, paragraph.get());
@@ -122,7 +123,8 @@ public:
                 }
             }
             // Handle exceeding height of box
-            if (nextCursor.y > height) {
+            if (nextCursor.y > height || exhausted == true) {
+                exhausted = true;
                 std::cout << "overflowing" << '\n';
                 overflowingText += token + " ";
                 continue;

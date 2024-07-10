@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[]) {
     // This can be refactored into an argument parser class
-    bool debug = false;
+    bool debug = true;
     for (int i = 0; i < argc; i++) {
         std::cout << "Argument " << i << ": " << argv[i] << std::endl;
         if (std::string(argv[i]) == "--debug") {
