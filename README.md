@@ -1,6 +1,6 @@
 # Laid
 
-A layout engine based on swiss grids. The manifesto 
+A text layout engine based on swiss grids. 
 
 ## Roadmap
 
@@ -17,4 +17,4 @@ A layout engine based on swiss grids. The manifesto
 - [x] Spreads
 - [ ] XML preprocesser to handle imports
 - [ ] CMYK support
-- [ ] Print settings
+- [x] Print settings
