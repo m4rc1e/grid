@@ -256,7 +256,7 @@ public:
             TextStyle text_style;
             if (style.color != "") {
                 auto color = laidDoc->colors[style.color];
-                text_style.setColor(SkColorSetRGB(color.r, color.g, color.b));
+                text_style.setColor(SkColorSetARGB(color.a, color.r, color.g, color.b));
             } else {
                 text_style.setColor(SK_ColorBLACK);
             }
@@ -330,8 +330,9 @@ public:
                 canvas->clipRect(SkRect::MakeXYWH(0, 0, width, height));
                 BuildPage(head, canvas);
                 canvas->restore();
-                // inputs should be width and height
-                BuildCrops(canvas, head->masterPage);
+
+                BuildCrops(canvas, head->masterPage.width, head->masterPage.height);
+
                 head = head->next;
                 pdf->endPage();
             }
@@ -346,8 +347,9 @@ public:
                     canvas->clipRect(SkRect::MakeXYWH(0, 0, width, height));
                     BuildPage(head, canvas);
                     canvas->restore();
-                    // inputs should be width and height
-                    BuildCrops(canvas, head->masterPage);
+
+                    BuildCrops(canvas, head->masterPage.width, head->masterPage.height);
+
                     head = head->next;
                     pdf->endPage();
                 } else if (head->type == laid::Page::PageType::Left) {
@@ -366,6 +368,10 @@ public:
                     canvas->clipRect(SkRect::MakeXYWH(0, 0, width, height));
                     BuildPage(head->next, canvas);
                     canvas->restore();
+
+                    // translate canvas back to origin so we can add crops
+                    canvas->translate(-head->masterPage.width, 0);
+                    BuildCrops(canvas, width, height);
 
                     head = head->next->next;
                     pdf->endPage();
@@ -405,7 +411,7 @@ public:
         return canvas;
     }
 
-    void BuildCrops(SkCanvas* canvas, laid::MasterPage masterPage) {
+    void BuildCrops(SkCanvas* canvas, float width, float height) {
         SkPaint paintCrop;
         paintCrop.setColor(SK_ColorBLACK);
         paintCrop.setStrokeWidth(.25f);
@@ -414,14 +420,14 @@ public:
         canvas->drawLine(SkPoint::Make(-3, 0), SkPoint::Make(-10, 0), paintCrop);
         canvas->drawLine(SkPoint::Make(0, -3), SkPoint::Make(0, -10), paintCrop);
         // top right
-        canvas->drawLine(SkPoint::Make(masterPage.width + 3, 0), SkPoint::Make(masterPage.width + 10, 0), paintCrop);
-        canvas->drawLine(SkPoint::Make(masterPage.width, - 3), SkPoint::Make(masterPage.width, - 10), paintCrop);
+        canvas->drawLine(SkPoint::Make(width + 3, 0), SkPoint::Make(width + 10, 0), paintCrop);
+        canvas->drawLine(SkPoint::Make(width, - 3), SkPoint::Make(width, - 10), paintCrop);
         // bottom left
-        canvas->drawLine(SkPoint::Make(-3, masterPage.height), SkPoint::Make(-10, masterPage.height), paintCrop);
-        canvas->drawLine(SkPoint::Make(0, masterPage.height + 3), SkPoint::Make(0, masterPage.height + 10), paintCrop);
+        canvas->drawLine(SkPoint::Make(-3, height), SkPoint::Make(-10, height), paintCrop);
+        canvas->drawLine(SkPoint::Make(0, height + 3), SkPoint::Make(0, height + 10), paintCrop);
         // bottom right
-        canvas->drawLine(SkPoint::Make(masterPage.width + 3, masterPage.height), SkPoint::Make(masterPage.width + 10, masterPage.height), paintCrop);
-        canvas->drawLine(SkPoint::Make(masterPage.width, masterPage.height + 3), SkPoint::Make(masterPage.width, masterPage.height + 10), paintCrop);
+        canvas->drawLine(SkPoint::Make(width + 3, height), SkPoint::Make(width + 10, height), paintCrop);
+        canvas->drawLine(SkPoint::Make(width, height + 3), SkPoint::Make(width, height + 10), paintCrop);
         std::cout << "Done crops" << std::endl;
     }
 

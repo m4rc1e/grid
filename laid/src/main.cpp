@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
     }
 
     auto printSettings = PrintSettings();
-    printSettings.paperWidth = 1190;
+    printSettings.paperWidth = 1300;
     printSettings.paperHeight = 1000;
     printSettings.composition = PrintSettings::Composition::Spreads;
 

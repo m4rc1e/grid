@@ -22,14 +22,15 @@ void parseParagraph(pugi::xml_node node, std::shared_ptr<laid::Paragraph> paragr
 void parseColor(pugi::xml_node node, std::shared_ptr<laid::Document> doc) {
     auto color = laid::RGBColor();
     color.name = node.attribute("name").as_string();
-    auto colString = node.attribute("rgb").as_string();
+    auto colString = node.attribute("rgba").as_string();
         std::istringstream ss(colString);
         char ch; // to discard the '-' character
-        int r, g, b;
-        ss >> r >> ch >> g >> ch >> b;
+        int r, g, b, a;
+        ss >> r >> ch >> g >> ch >> b >> ch >> a;
         color.r = r;
         color.g = g;
         color.b = b;
+        color.a = a;
     doc->addColor(color);
 }
 
