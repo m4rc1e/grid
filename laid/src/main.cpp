@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
     auto printSettings = PrintSettings();
     printSettings.paperWidth = 1190;
     printSettings.paperHeight = 1000;
-    printSettings.composition = PrintSettings::Composition::Single;
+    printSettings.composition = PrintSettings::Composition::Spreads;
 
     auto myDoc = laid::load_file("../sketches/demo.xml");
     BuildPDF PDFBuilder(myDoc, "demo.pdf", printSettings, debug);

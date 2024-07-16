@@ -341,11 +341,13 @@ public:
                     auto width = head->masterPage.width;
                     auto height = head->masterPage.height;
                     auto canvas = pdf->beginPage(printSettings.paperWidth, printSettings.paperHeight);
-                    canvas->save();
                     offsetCanvas(canvas, width, height);
+                    canvas->save();
+                    canvas->clipRect(SkRect::MakeXYWH(0, 0, width, height));
                     BuildPage(head, canvas);
                     canvas->restore();
-//                    BuildCrops(canvas, head->masterPage);
+                    // inputs should be width and height
+                    BuildCrops(canvas, head->masterPage);
                     head = head->next;
                     pdf->endPage();
                 } else if (head->type == laid::Page::PageType::Left) {
@@ -353,10 +355,18 @@ public:
                     auto width = head->masterPage.width + head->next->masterPage.width;
                     auto height = head->masterPage.height;
                     offsetCanvas(canvas, width, height);
+
+                    canvas->save();
+                    canvas->clipRect(SkRect::MakeXYWH(0, 0, width, height));
                     BuildPage(head, canvas);
+                    canvas->restore();
                     canvas->translate(head->masterPage.width, 0);
+
+                    canvas->save();
+                    canvas->clipRect(SkRect::MakeXYWH(0, 0, width, height));
                     BuildPage(head->next, canvas);
                     canvas->restore();
+
                     head = head->next->next;
                     pdf->endPage();
                 }
