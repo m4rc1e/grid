@@ -1,0 +1,26 @@
+<document>
+    <head>
+        <masterPages>
+            <masterPage name="dflt" height="842" width="595" columns="6" rows="6" marginLeft="36" marginRight="36" marginTop="49" marginBottom="49" gap="12" baseline="12"/>
+        </masterPages>
+        <styles>
+            <style name="p" fontSize="10" leading="12" fontName="Inter"/>
+            <style name="b" fontSize="10" leading="12" fontName="Inter" slant="1"/>
+        </styles>
+    </head>
+    <body>
+        <pages>
+            <page masterPage="dflt" overflow="true">
+                <box name="a" gX="3" gY="1" gWidth="4" gHeight="3">
+                    <para style="p">RoboCop</para>
+                    <para style="p">RoboCop is a 1987 American science fiction action film directed by Paul Verhoeven and written by Edward Neumeier and Michael Miner. The film stars Peter Weller, Nancy Allen, Daniel O'Herlihy, Ronny Cox, Kurtwood Smith, and Miguel Ferrer. Set in a crime-ridden Detroit in the near future, RoboCop centers on police officer Alex Murphy (Weller) who is murdered by a gang of criminals but revived by the megacorporation Omni Consumer Products as the cyborg law enforcer RoboCop. Unaware of his former life, RoboCop executes a campaign against crime while coming to terms with the lingering fragments of his humanity.</para>
+                    <box name="b" gX="1" gY="*" gWidth="2" gHeight="1">
+                        <para style="b">Bates, Dan (December 1987a). "On Location With The Cast & Crew of RoboCop". Cinefantastique. Vol. 18, no. 1. Forest Park, Illinois: Fourth Castle Micromedia. pp. 16–25. Retrieved January 20, 2021.</para>
+                    </box>
+                    <para style="p">The film was conceived by Neumeier while working on the set of Blade Runner (1982), and he developed the idea with Miner. Their script was purchased in early 1985 by producer Jon Davison on behalf of Orion Pictures. Finding a director proved difficult; Verhoeven dismissed the script twice because he did not understand its satirical content, until he was convinced of its value by his wife. Filming took place between August and October 1986, mainly in Dallas, Texas. Rob Bottin led the special-effects team in creating practical effects, violent gore and the RoboCop costume.</para>
+                    <para style="p">RoboCop has been critically reevaluated since its release, and it has been hailed as one of the best films of the 1980s and one of the greatest science fiction and action films ever made. The film has been praised for its depiction of a robot affected by the loss of humanity, in contrast to the stoic and emotionless robotic characters of that era. RoboCop has continued to be analyzed for its themes such as the nature of humanity, personal identity, corporate greed and corruption, and is seen as a rebuke of the era's Reaganomics policies. Its success created a franchise: the sequels RoboCop 2 (1990) and RoboCop 3 (1993), children's animated series, live-action television shows, video games, comic books, toys, clothing and other merchandise. A remake was released in 2014.</para>
+                </box>
+            </page>
+        </pages>
+    </body>
+</document>

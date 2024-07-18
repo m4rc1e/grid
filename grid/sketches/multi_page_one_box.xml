@@ -1,0 +1,20 @@
+<document>
+    <head>
+        <masterPages>
+            <masterPage name="dflt" height="400" width="300" columns="4" rows="3"/>
+        </masterPages>
+        <styles>
+            <style name="p" fontName="Inter" fontSize="12" leading="14"/>
+        </styles>
+    </head>
+    <body>
+        <pages>
+            <page masterPage="dflt" overflow="true">
+                <box name="chuck" x="10" y="10" width="280" height="260">
+                    <para style="p">An invite to the Met Gala chaired by Anna Wintour - US Vogue's formidable editor-in-chief - should be the chicest event in the calendar and even more high fashion than the Oscars, with the prestigious New York art museum as its backdrop and a literary inspired theme. JG Ballard's The Garden of Time was the inspiration for this year's event, but celebrities seem to have become confused and dressed for The Garden of Eden instead. Rita Ora, who is no stranger to a naked dress, led the way with the barely-there looks, donning little more than a body stocking with a few strategically placed tassels for the main event, before flashing her nipples at the after party with just a floral arrangement protecting her modesty. Meanwhile, rapper Doja Cat wore a white wet Vetements dress. On her way to the gala she shocked fans by appearing like she was fresh out of the shower with a towel dress wrapped around her body and head.</para>
+                    <para style="p">An invite to the Met Gala chaired by Anna Wintour - US Vogue's formidable editor-in-chief - should be the chicest event in the calendar and even more high fashion than the Oscars, with the prestigious New York art museum as its backdrop and a literary inspired theme. JG Ballard's The Garden of Time was the inspiration for this year's event, but celebrities seem to have become confused and dressed for The Garden of Eden instead. Rita Ora, who is no stranger to a naked dress, led the way with the barely-there looks, donning little more than a body stocking with a few strategically placed tassels for the main event, before flashing her nipples at the after party with just a floral arrangement protecting her modesty. Meanwhile, rapper Doja Cat wore a white wet Vetements dress. On her way to the gala she shocked fans by appearing like she was fresh out of the shower with a towel dress wrapped around her body and head.</para>
+                </box>
+            </page>
+        </pages>
+    </body>
+</document>

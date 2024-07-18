@@ -1,0 +1,25 @@
+<document>
+    <head>
+        <masterPages>
+            <masterPage name="dflt" height="842" width="595" columns="4" rows="6" marginLeft="24" marginRight="24" marginTop="32" marginBottom="54" gap="12" baseline="12"/>
+        </masterPages>
+        <styles>
+            <style name="p" fontSize="10" leading="12" fontName="Courier New"/>
+            <style name="i" fontSize="10" leading="12" fontName="Courier New" slant="1"/>
+            <style name="b" fontSize="10" leading="12" fontName="Courier New" weight="700"/>
+        </styles>
+    </head>
+    <body>
+        <pages>
+            <page masterPage="dflt" overflow="true">
+                <box gX="0" gY="0" gWidth="3" gHeight="3">
+                    <para style="p">Hello world! <char style="b">This is the bold</char>This is back to normal and<char style="i">this is the italic</char>.</para>
+                    <para style="p">Memory leak!</para>
+                    <para style="p">Memory leak!</para>
+                    <para style="p">Memory leak!</para>
+                    <para style="p">Memory leak!</para>
+                </box>
+            </page>
+        </pages>
+    </body>
+</document>

@@ -1,0 +1,22 @@
+<document>
+    <head>
+        <masterPages>
+            <masterPage name="dflt" height="842" width="595" columns="4" rows="6" marginLeft="24" marginRight="24" marginTop="32" marginBottom="54" gap="12" baseline="12"/>
+        </masterPages>
+        <styles>
+            <style name="p" fontSize="10" leading="12" fontName="Courier New"/>
+        </styles>
+    </head>
+    <body>
+        <pages>
+            <page masterPage="dflt" overflow="true">
+                <!-- TODO we need to fix very small paragraphs! They do not overflow correctly! -->
+                <box gX="0" gY="0" gWidth="0" gHeight="0" name="a" next="b">
+                    <para style="p">Hello world! This is going to overflow into the next box. Hello world! This is going to overflow into the next box. Hello world! This is going to overflow into the next box. ello world! This is going to overflow into the next box. Hello world! This is going to overflow into the next box. Hello world! This is going to overflow into the next box. ello world! This is going to overflow into the next box. Hello world! This is going to overflow into the next box. Hello world! This is going to overflow into the next box</para>
+                </box>
+                <box gX="1" gY="0" gWidth="0" gHeight="0" name="cap"><para style="p">This works!</para></box>
+                <box gX="2" gY="0" gWidth="0" gHeight="0" name="b"/>
+            </page>
+        </pages>
+    </body>
+</document>

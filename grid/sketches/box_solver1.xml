@@ -1,0 +1,26 @@
+<document>
+    <head>
+        <masterPages>
+            <masterPage name="dflt" height="920" width="595" columns="4" rows="5" marginLeft="24" marginRight="24" marginTop="36" marginBottom="36" gap="12" baseline="12"/>
+        </masterPages>
+        <styles>
+            <style name="p" fontSize="12" leading="15" fontName="Courier New"/>
+            <style name="h1" fontName="Courier New" fontSize="36"/>
+        </styles>
+    </head>
+    <body>
+        <pages>
+            <page masterPage="dflt" overflow="true">
+                <box name="a" gX="0" gY="0" gWidth="3" gHeight="4">
+                    <para style="p">A sell-off in French stocks and bonds dragged down European-wide indices as investors reacted to political instability and the possibility of a far-right government. By Monday afternoon, the country’s Cac 40 stock index had fallen 1.9 per cent to its lowest since February, with all but one of its 40 member stocks in negative territory. French banks, which hold substantial government debt and could be targeted for windfall taxes, were among the worst performers. Le Pen’s Rassemblement National secured 31.4 per cent of the vote in Sunday’s EU poll, compared with 14.6 per cent for the French president’s centrist alliance, a stinging blow to Macron. He only narrowly avoided a humiliating third place behind the centre left, which took 13.9 per cent of the vote. “For me, who always considers that a united, strong, independent Europe is good for France, this is a situation which I cannot countenance,” Macron said. “I have decided to give you back the choice of our parliamentary future with a vote.” The dissolution is an extraordinary gamble by Macron, who has already lost his parliamentary majority after winning a second term as president two years ago. His alliance could be crushed, which would force him to appoint a prime minister from another party, leaving him with little power over domestic affairs with three years left as president. In the aftermath of his decision to call a snap election, investors sold French government debt, with the yield on the benchmark 10-year bond, which moves inversely to price, up 0.14 percentage points to 3.25 per cent. On the stock exchange, BNP Paribas was down 5.4 per cent, Société Générale fell 7.5 per cent and Crédit Agricole dropped 4.4 per cent. Insurer Axa fell 3.1 per cent while asset manager Amundi was down 2.5 per cent. As reverberations were felt throughout Europe, the region-wide Stoxx Europe 600 lost 0.6 per cent, Germany’s Dax fell 0.6 per cent and London’s FTSE 100 dropped 0.4 per cent. Benchmark Italian bond yields, a closely watched barometer of Eurozone political risks, rose 0.14 percentage points to 4.09 per cent. The euro was down 0.6 per cent against the US dollar at $1.0737. “There’s a ‘shoot first, think later’ mentality in markets . . . but investors have to price a higher risk premium,” said Emmanuel Cau, head of European equity strategy at Barclays. The RN’s advance in France came alongside advances in the EU elections by hard-right parties across the bloc, which between them secured around a quarter of the seats in the European parliament, up from around a fifth. In Germany, the three parties in Chancellor Olaf Scholz’s coalition were all overtaken by the far-right Alternative for Germany (AfD), which came in second behind the conservative CDU-CSU opposition. Ultraconservative and nationalist parties also won or made significant gains in Austria, Cyprus, Greece and the Netherlands. The results were a blow to the EU’s centrist parties, which lost their majority in the parliament for the first time since the 1970s. The centre-right European People’s party, which includes the CDU-CSU, lost 20 seats, while the centre</para>
+                </box>
+                <box name="b" gX="1" gY="1" gWidth="1" gHeight="0" zIndex="1">
+                    <para style="h1">Goodness gracious me!</para>
+                </box>
+                <box name="c" gX="1" gY="3" gWidth="1" gHeight="0" zIndex="1">
+                    <para style="h1">And another!</para>
+                </box>
+            </page>
+        </pages>
+    </body>
+</document>

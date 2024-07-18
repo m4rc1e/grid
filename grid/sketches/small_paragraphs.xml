@@ -1,0 +1,57 @@
+<document>
+    <head>
+        <masterPages>
+            <masterPage name="dflt" height="842" width="595" columns="4" rows="6" marginLeft="24" marginRight="24" marginTop="32" marginBottom="54" gap="12" baseline="12"/>
+        </masterPages>
+        <styles>
+            <stylename="p" fontSize="10" leading="12" fontName="Courier New"/>
+            <style name="b" fontSize="10" leading="12" fontName="Courier New" weight="700"/>
+        </styles>
+    </head>
+    <body>
+        <pages>
+            <page masterPage="dflt">
+                <box gX="0" gY="0" gWidth="0" gHeight="0" name="a" next="b">
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello <char style="b">world!</char></para>
+                    <para style="p">Hello world!</para>
+                </box>
+                <box gX="2" gY="0" gWidth="0" gHeight="0" name="b" next="c"/>
+            </page>
+            <page masterPage="dflt" overflow="true">
+                <box gX="0" gY="0" gWidth="0" gHeight="0" name="c">
+            </page>
+        </pages>
+    </body>
+</document>

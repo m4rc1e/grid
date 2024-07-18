@@ -1,0 +1,36 @@
+<document>
+    <head>
+        <masterPages>
+            <masterPage name="dflt" height="842" width="595" columns="3" rows="2" marginLeft="24" marginRight="24" marginTop="32" marginBottom="54" gap="24" baseline="14"/>
+        </masterPages>
+        <styles>
+            <style name="p" fontSize="12" leading="14" fontName="Inter"/>
+            <style name="p1" fontSize="6" leading="14" fontName="Alegreya"/>
+            <style name="p2" fontSize="3" leading="14" fontName="Courier New"/>
+        </styles>
+    </head>
+    <body>
+        <pages>
+            <page masterPage="dflt" overflow="true">
+                <box name="a" gX="1" gY="1" gWidth="1" gHeight="1">
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world!</para>
+                    <para style="p">Hello world! I'm guessing this can go onto the next line as well.</para>
+                </box>
+                <box name="b" gX="2" gY="1" gWidth="1" gHeight="1">
+                    <para style="p1">Hello world!</para>
+                    <para style="p1">Hello world!</para>
+                    <para style="p1">Hello world!</para>
+                    <para style="p1">Hello world! I'm guessing this can go onto the next line as well.</para>
+                </box>
+                <box name="c" gX="3" gY="1" gWidth="1" gHeight="1">
+                    <para style="p2">Hello world!</para>
+                    <para style="p2">Hello world!</para>
+                    <para style="p2">Hello world!</para>
+                    <para style="p2">Hello world! I'm guessing this can go onto the next line as well.</para>
+                </box>
+            </page>
+        </pages>
+    </body>
+</document>

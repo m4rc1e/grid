@@ -1,0 +1,30 @@
+<document>
+    <head>
+        <masterPages>
+            <masterPage name="dflt" height="400" width="300" columns="4" rows="4"/>
+        </masterPages>
+        <styles>
+            <style name="p" fontName="Inter" fontSize="20" leading="24"/>
+        </styles>
+    </head>
+    <body>
+        <pages>
+            <page masterPage="dflt" overflow="true">
+                <box name="a" x="10" y="10" width="140" height="380" next="b">
+                    <para style="p">An invite to the Met Gala chaired by Anna Wintour - US Vogue's formidable editor-in-chief - should be the chicest event in the calendar and even more high fashion than the Oscars, with the prestigious New York art museum as its backdrop and a literary inspired theme.</para>
+                    <para style="p">An invite to the Met Gala chaired by Anna Wintour - US Vogue's formidable editor-in-chief - should be the chicest event in the calendar and even more high fashion than the Oscars, with the prestigious New York art museum as its backdrop and a literary inspired theme.</para>
+                    <para style="p">An invite to the Met Gala chaired by Anna Wintour - US Vogue's formidable editor-in-chief - should be the chicest event in the calendar and even more high fashion than the Oscars, with the prestigious New York art museum as its backdrop and a literary inspired theme.</para>
+                    <para style="p">An invite to the Met Gala chaired by Anna Wintour - US Vogue's formidable editor-in-chief - should be the chicest event in the calendar and even more high fashion than the Oscars, with the prestigious New York art museum as its backdrop and a literary inspired theme.</para>
+                    <para style="p">An invite to the Met Gala chaired by Anna Wintour - US Vogue's formidable editor-in-chief - should be the chicest event in the calendar and even more high fashion than the Oscars, with the prestigious New York art museum as its backdrop and a literary inspired theme.</para>
+                    <para style="p">An invite to the Met Gala chaired by Anna Wintour - US Vogue's formidable editor-in-chief - should be the chicest event in the calendar and even more high fashion than the Oscars, with the prestigious New York art museum as its backdrop and a literary inspired theme.</para>
+                    <para style="p">An invite to the Met Gala chaired by Anna Wintour - US Vogue's formidable editor-in-chief - should be the chicest event in the calendar and even more high fashion than the Oscars, with the prestigious New York art museum as its backdrop and a literary inspired theme.</para>
+                    <para style="p">An invite to the Met Gala chaired by Anna Wintour - US Vogue's formidable editor-in-chief - should be the chicest event in the calendar and even more high fashion than the Oscars, with the prestigious New York art museum as its backdrop and a literary inspired theme.</para>
+                    <para style="p">An invite to the Met Gala chaired by Anna Wintour - US Vogue's formidable editor-in-chief - should be the chicest event in the calendar and even more high fashion than the Oscars, with the prestigious New York art museum as its backdrop and a literary inspired theme.</para>
+                    <para style="p">An invite to the Met Gala chaired by Anna Wintour - US Vogue's formidable editor-in-chief - should be the chicest event in the calendar and even more high fashion than the Oscars, with the prestigious New York art museum as its backdrop and a literary inspired theme.</para>
+                </box>
+                <box name="b" x="150" y="10" width="140" height="380">
+                </box>
+            </page>
+        </pages>
+    </body>
+</document>

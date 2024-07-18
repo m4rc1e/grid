@@ -1,0 +1,24 @@
+<document>
+    <head>
+        <masterPages>
+            <masterPage name="dflt" height="842" width="595" columns="4" rows="6" marginLeft="24" marginRight="24" marginTop="32" marginBottom="54" gap="12" baseline="12"/>
+        </masterPages>
+        <styles>
+            <style name="p" fontSize="10" leading="12" fontName="Courier New" swatch="red"/>
+        </styles>
+        <swatches>
+            <swatch rgb="255,0,0" name="red"/>
+        </swatches>
+    </head>
+    <body>
+        <pages>
+            <spread leftMaster="dflt" rightMaster="dflt" overflow="true">
+                <box name="a" gX="1" gY="1" gWidth="1" gHeight="1" next="b">
+                    <para style="p">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin quis scelerisque lectus, sit amet efficitur nibh. Phasellus lacinia sapien at ipsum eleifend tempus. Nam elementum orci sed dapibus tempus. Vivamus sodales, turpis sed aliquet hendrerit, magna erat euismod enim, eget vulputate est quam sit amet quam. Aenean facilisis fringilla iaculis. Duis augue orci, finibus ut arcu dignissim, porta vestibulum leo. Donec porttitor est et felis molestie imperdiet. Duis at enim malesuada lorem varius faucibus. Proin non nulla sed arcu volutpat iaculis. Mauris lacinia massa nulla, quis facilisis urna laoreet sit amet. Aenean commodo, odio id pharetra dignissim, turpis lacus blandit metus, id efficitur nisi nunc id purus. Ut condimentum, turpis ut pretium interdum, quam nunc ornare nisl, non laoreet ex lacus nec mi. Cras pulvinar et nisi vitae dictum. Vestibulum eu lectus vitae ligula maximus fermentum. Proin ac condimentum purus. Sed tempus eros vitae dignissim congue.</para>
+                </box>
+                <box name="b" gX="5" gY="1" gWidth="1" gHeight="1">
+                </box>
+            </spread>
+        </pages>
+    </body>
+</document>

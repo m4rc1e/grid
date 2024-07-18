@@ -1,0 +1,40 @@
+<document>
+    <head>
+        <masterPages>
+            <masterPage name="dflt" height="842" width="595" columns="6" rows="6" marginLeft="24" marginRight="24" marginTop="32" marginBottom="32" gap="12" baseline="12"/>
+        </masterPages>
+        <styles>
+            <style name="h1" fontSize="20" leading="24" fontName="Inter"/>
+            <style name="p" fontSize="10" leading="12" fontName="Inter"/>
+        </styles>
+        <boxStyles>
+            <boxStyle name="placeholder" color="light-grey"/>
+        </boxStyles>
+        <colors>
+            <color rgba="0,0,255" name="red"/>
+            <color rgba="240,240,240,100" name="light-grey"/>
+        </colors>
+
+    </head>
+    <body>
+        <pages>
+            <spread leftMaster="dflt" rightMaster="dflt" overflow="true">
+                <box name="a" gX="1" gY="1" gWidth="2" gHeight="6" next="b">
+                    <box name="title" gX="1" gY="1" gWidth="2" gHeight="6" zIndex="1"><para style="h1">BILBAO</para></box>
+                    <box name="img" gX="3" gY="1" gWidth="8" gHeight="4" zIndex="1" style="placeholder" ></box>
+                    <para style="p">5. Bilbao is a city in northern Spain, the largest city in the province of Biscay and in the Basque Country as a whole. It is also the largest city proper in northern Spain. Bilbao is the tenth largest city in Spain, with a population of more than 347,000 as of 2023.[9] The Bilbao metropolitan area has 1,037,847 inhabitants,[10][11][12] making it the most populous metropolitan area in northern Spain; with a population of 875,552,[13] the comarca of Greater Bilbao is the fifth-largest urban area in Spain. Bilbao is also the main urban area in what is defined as the Greater Basque region.</para>
+                    <para style="p">Bilbao is located in the north-central part of Spain, some 16 kilometres (10 mi) south of the Bay of Biscay, where the economic social development is located, where the estuary of Bilbao is formed. Its main urban core is surrounded by two small mountain ranges with an average elevation of 400 metres (1,300 ft).[14] Its climate is shaped by the Bay of Biscay low-pressure systems and mild air, moderating summer temperatures by Iberian standards, with low sunshine and high rainfall. The annual temperature range is low for its latitude.</para>
+                    <para style="p">After its foundation in the late 13th century by Diego López V de Haro, head of the powerful Haro family, Bilbao was one of the commercial hubs of the Basque Country that enjoyed significant importance in the Crown of Castile. This was due to its thriving port activity based on the export of wool and iron commodities extracted from the Biscayan quarries to all over Europe.</para>
+                    <para style="p">Throughout the nineteenth century and the beginning of the twentieth, Bilbao experienced heavy industrialisation, making it the center of the second-most industrialised region of Spain, behind Barcelona.[15][16] At the same time an extraordinary population explosion prompted the annexation of several adjacent municipalities. Nowadays, Bilbao is a vigorous service city that is experiencing an ongoing social, economic, and aesthetic revitalisation process, started by the iconic Bilbao Guggenheim Museum,[15][17][18][19] and continued by infrastructure investments, such as the airport terminal, the rapid transit system, the tram line, the Azkuna Zentroa, and the currently under development Abandoibarra and Zorrozaurre renewal projects.[20]</para>
+                    <para style="p">Bilbao is also home to football team Athletic Club, a significant symbol for Basque nationalism[21] due to its promotion of only Basque players and being one of the most successful clubs in Spanish football history.</para>
+                    <para style="p">On 19 May 2010, the city of Bilbao was recognised with the Lee Kuan Yew World City Prize, awarded by the city state of Singapore.[22] Considered the Nobel Prize for urbanism, it was handed out on 29 June 2010. On 7 January 2013, its mayor, Iñaki Azkuna, received the 2012 World Mayor Prize awarded every two years by the British foundation The City Mayors Foundation, in recognition of the urban transformation experienced by the Biscayan capital since the 1990s.[23][24] On 8 November 2017, Bilbao was chosen the Best European City 2018 at The Urbanism Awards 2018, awarded by the international organisation The Academy of Urbanism.[25]</para>
+                </box>
+                <box name="b" gX="3" gY="1" gWidth="2" gHeight="6" next="c"></box>
+                <box name="c" gX="5" gY="1" gWidth="2" gHeight="6" next="d"></box>
+                <box name="d" gX="7" gY="1" gWidth="2" gHeight="6" next="e"></box>
+                <box name="e" gX="9" gY="1" gWidth="2" gHeight="6" next="f"></box>
+                <box name="f" gX="11" gY="1" gWidth="2" gHeight="6"></box>
+            </spread>
+        </pages>
+    </body>
+</document>

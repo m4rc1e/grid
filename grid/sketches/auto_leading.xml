@@ -1,0 +1,19 @@
+<document>
+    <head>
+        <masterPages>
+            <masterPage name="dflt" height="400" width="300" columns="4" rows="4"/>
+        </masterPages>
+        <styles>
+            <style name="p" fontSize="22"/>
+        </styles>
+    </head>
+    <body>
+        <pages>
+            <page masterPage="dflt" overflow="true">
+                <box x="30" y="20" width="260" height="360">
+                    <text style="p">A Heros welcome is coming for you in the future!</text>
+                </box>
+            </page>
+        </pages>
+    </body>
+</document>

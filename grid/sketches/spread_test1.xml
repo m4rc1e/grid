@@ -1,0 +1,26 @@
+<document>
+    <head>
+        <masterPages>
+            <masterPage name="dflt" height="842" width="595" columns="4" rows="6" marginLeft="24" marginRight="24" marginTop="32" marginBottom="54" gap="12" baseline="12"/>
+        </masterPages>
+        <styles>
+            <style name="p" fontSize="10" leading="12" fontName="Courier New" swatch="red"/>
+        </styles>
+        <swatches>
+            <swatch rgb="0,0,255" name="red"/>
+        </swatches>
+
+    </head>
+    <body>
+        <pages>
+            <page masterPage="dflt" overflow="true">
+                <box name="a" x="0" y="0" width="300" height="300">
+                    <para style="p">Hello world! This is actually working alright. I think a shift is the right thing to do</para>
+                </box>
+                <box name="b" x="500" gY="0" width="300" height="300">
+                    <para style="p">Hello world! This is actually working alright. I think a shift is the right thing to do</para>
+                </box>
+            </page>
+        </pages>
+    </body>
+</document>

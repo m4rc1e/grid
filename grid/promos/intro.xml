@@ -1,0 +1,36 @@
+<document>
+    <head>
+        <masterPages>
+            <masterPage name="dflt" height="540" width="540" columns="4" rows="4" marginLeft="48" marginRight="48" marginTop="42" marginBottom="42" gap="24" baseline="24"/>
+        </masterPages>
+        <styles>
+            <style name="h2" fontSize="72" leading="72" fontName="Inter" weight="900" color="white"/>
+            <style name="h3" fontSize="46" leading="48" fontName="Inter" weight="700" color="white"/>
+            <style name="h4" fontSize="20" leading="24" fontName="Inter" weight="400" color="white"/>
+        </styles>
+        <boxStyles>
+            <boxStyle name="background" color="red"/>
+        </boxStyles>
+        <colors>
+            <color rgba="255,255,255,255" name="white"/>
+            <color rgba="255,0,0,255" name="red"/>
+        </colors>
+
+    </head>
+    <body>
+        <pages>
+            <page masterPage="dflt" overflow="true">
+                <box name="background" x="0" y="0" width="540" height="540" style="background"/>
+                <box name="a" gX="1" gY="1" gWidth="4" gHeight="1">
+                    <para style="h2">GRID</para>
+                </box>
+                <box name="b" gX="1" gY="2" gWidth="4" gHeight="2">
+                    <para style="h3">A TEXT LAYOUT ENGINE BASED ON SWISS GRIDS</para>
+                </box>
+                <box name="c" gX="1" gY="4" gWidth="4" gHeight="1">
+                    <para style="h4">OPEN BETA ARRIVING Q1 2025</para>
+                </box>
+            </page>
+        </pages>
+    </body>
+</document>

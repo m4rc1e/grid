@@ -1,0 +1,22 @@
+<document>
+    <head>
+        <masterPages>
+            <masterPage name="dflt" height="842" width="595" columns="4" rows="6" marginLeft="24" marginRight="24" marginTop="32" marginBottom="54" gap="12" baseline="12"/>
+        </masterPages>
+        <styles>
+            <style name="p" fontSize="200" leading="220" fontName="Courier New" swatch="red"/>
+        </styles>
+        <swatches>
+            <swatch rgb="255,0,0" name="red"/>
+        </swatches>
+    </head>
+    <body>
+        <pages>
+            <spread leftMaster="dflt" rightMaster="dflt">
+                <box name="a" gX="0" gY="0" gWidth="7" gHeight="5">
+                    <para style="p">Millwall F.C</para>
+                </box> 
+            </spread>
+        </pages>
+    </body>
+</document>

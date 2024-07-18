@@ -1,0 +1,41 @@
+<document>
+    <head>
+        <masterPages>
+            <masterPage name="dflt" height="445" width="300" columns="4" rows="4" marginLeft="24" marginRight="24" marginTop="36" marginBottom="36" gap="12" baseline="6"/>
+        </masterPages>
+        <styles>
+            <style name="h1" fontSize="20" leading="24" fontFamily="Inter"/>
+            <style name="p" fontSize="10" leading="12" fontFamily="Inter"/>
+            <style name="c" fontSize="5" leading="6" fontFamily="Inter"/>
+        </styles>
+    </head>
+    <body>
+        <pages>
+            <page masterPage="dflt" overflow="true">
+                <box gX="0" gY="0" gWidth="3" gHeight="1">
+                    <text style="h1">A Hero's welcome is coming for you in the future!</text>
+                </box>
+                <box gX="0" gY="1" gWidth="1" gHeight="1" overflowNext="true">
+<text style="p">Business leaders have warned the prime minister that the government’s migration policies risk weakening the UK university sector, undermining a key reason for companies to invest in the country. 
+    In a letter to Rishi Sunak, bosses at groups including miners Anglo American and Rio Tinto and industrial conglomerate Siemens, said they were “deeply concerned” by widening funding gaps and declining international student applications that were “a result of government policy”.
+    They said this risked “undermining the positive impact that international students have on our skills base, future workforce, and international influence”, as well as reducing the funding available for research and industry collaboration.
+    The intervention by business leaders came as ministers were urged not to abolish the graduate visa programme by the independent Migration Advisory Committee, which advises the government on migration, in its review of the proposal.
+    The government has been considering whether to axe the scheme, which allows foreign students to live and work in the UK for up to two years after graduation, amid fears it is being misused as a backdoor entry route and pressure from the right flank of the Conservative party.
+    Reducing overseas student numbers would cause “substantial financial difficulty” for universities, potentially causing some to “fail”, the committee said on Tuesday.
+    However, Brian Bell, the committee’s chair, added on Wednesday that there was limited “compelling” evidence that people who use the UK’s graduate visa route raise the skills level of the domestic workforce.
+    In their letter, executives including Stuart Chambers, chair of FTSE 100 miner Anglo American, currently at the centre of a £34bn takeover battle, said: “We choose to invest in the UK because of the talent, skills and innovative ideas that can be found here.
+</text>
+</box>
+<box gX="2" gY="1" gWidth="1" gHeight="2" overflowNext="false"></box>
+<box gX="0" gY="3" gWidth="0" gHeight="0" overflowNext="true">
+    <text style="c">In their letter, executives including Stuart Chambers, chair of FTSE 100 miner Anglo American, currently at the centre of a £34bn takeover battle, said: “We choose to invest in the UK because of the talent, skills and innovative ideas that can be found here.
+    However, Brian Bell, the committee’s chair, added on Wednesday that there was limited “compelling” evidence that people who use the UK’s graduate visa route raise the skills level of the domestic workforce.
+    Reducing overseas student numbers would cause “substantial financial difficulty” for universities, potentially causing some to “fail”, the committee said on Tuesday.
+    </text>
+</box>
+<box gX="1" gY="3" gWidth="0" gHeight="0" overflowNext="true"></box>
+
+            </page>
+        </pages>
+    </body>
+</document>

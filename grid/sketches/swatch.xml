@@ -1,0 +1,23 @@
+<document>
+    <head>
+        <masterPages>
+            <masterPage name="dflt" height="842" width="595" columns="4" rows="6" marginLeft="24" marginRight="24" marginTop="32" marginBottom="54" gap="12" baseline="12"/>
+        </masterPages>
+        <styles>
+            <style name="p" fontSize="10" leading="12" fontName="Courier New" color="red"/>
+        </styles>
+        <colors>
+            <color rgb="0,0,255" name="red"/>
+        </colors>
+
+    </head>
+    <body>
+        <pages>
+            <page masterPage="dflt" overflow="true">
+                <box name="a" gX="1" gY="1" gWidth="2" gHeight="2">
+                    <para style="p">Hello world!</para>
+                </box>
+            </page>
+        </pages>
+    </body>
+</document>
