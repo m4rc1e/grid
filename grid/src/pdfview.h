@@ -123,7 +123,7 @@ public:
                 }
             }
             // Handle exceeding height of box
-            if (nextCursor.y > height || exhausted == true) {
+            if (nextCursor.y > height || exhausted == true || height < strut_style.getFontSize()) {
                 exhausted = true;
                 std::cout << "overflowing" << '\n';
                 overflowingText += token + " ";
@@ -154,7 +154,7 @@ public:
         auto wordParagraph = wordBuilder.Build();
         wordParagraph->layout(width);
         auto wordCursor = getCursor(wordParagraph.get());
-        if (cursor.x + wordCursor.x >= width) {
+        if (cursor.x + wordCursor.x + 10 >= width) {
             return CursorPos{wordCursor.x, cursor.y + 12};
         }
         return CursorPos{cursor.x + wordCursor.x, cursor.y};
