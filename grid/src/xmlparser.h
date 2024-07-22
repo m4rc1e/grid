@@ -1,3 +1,110 @@
+/*
+<!-- Root element -->
+<document> 
+  <!-- Just like html, we include metadata in the head element, such as masterpages, colors etc -->
+  <head> 
+    
+    <masterpages>
+      <!-- Master Page Element:
+      Attributes:
+        name: The name of the masterpage. References in Page and Spread elements (required)
+        height: Height in pt (required)
+        width: Width in pt (required)
+        margins: comma seperated positions for left,right,up,down
+        cols: Amount of grid columns
+        rows: Amount of grid rows
+        gutter: Space in pts between grid rows and cols
+      -->
+      <masterpage name="dflt" height="842" width="595" cols="4" rows="4" margins=30,30,30,30/>
+    </masterpages>
+    
+    <colors>
+      <!-- Color Element:
+      Attributes:
+        name: The name of the color. Is references in style and boxstyle elements (required)
+        rgba: Red, green, blue alpha values. Value range 0-255 (required)
+     -->
+     <color name="white" rgba="255, 255, 255, 255"/>
+    </colors>
+    
+    <styles>
+      <!-- Style Element:
+      Attributes:
+        name: Style Name (required)
+        inherit: Inherit from another style. Properties defined in this style will override the inherited style.
+        fontname: Font Name
+        fontsize: Font Size (required)
+        leading: Leading
+        weight: Font Weight (100-900) (default 400)
+        width: Font Width (1-9) (default 5)
+        slant: Font Slant (0-1) (default 0)
+        color: Font Color (default builtin black)
+      -->
+      <style name="p" fontname="Inter" fontsize="10" leading="12"/>
+    </styles>
+    
+    <!-- Boxes have their own style element -->
+    <boxstyles>
+      <!-- Box Style Element:
+      Attributes:
+        name: Box style name (required)
+        color: Font Color (default None)
+      -->
+    </boxstyles>
+    
+  </head>
+
+  <body> <!-- Looks familiar. Body element contains the actual content for our document -->
+    <!-- Page Element:
+    Attributes:
+      masterpage: Master Page Element name (required)
+      overflow: if true, create a duplicate page with the overflowing content (default false)
+    -->
+    <page masterpage="dflt" overflow="true">
+      
+      <!-- Box Element:
+      Attributes:
+        x: Starting x position of box in pt (Required if gx not set)
+        y: Starting y position of box in pt (Required if gy not set)
+	      gx: Starting x grid position of box (If both "gx" and "x" are set, "x" takes presedence)
+        gy: Starting y grid position of box (If both "gy" and "y" are set, "y" takes presedence)
+        
+        width: Width of box in pt (Required if "cols" not set)
+        height: Height of box in pt (Required if "rows not set)
+        cols: Width of box in grid columns (Required if "width" not set)
+        rows: Height of box in grid rows (Required if "height" not set)
+        
+        zindex: if value greater than 0, make colliding boxes flow around this box (default 0)
+        
+        style: Box Style name (default none)
+        -->
+        <box gx="1" gy="1" cols="4" rows="4">
+        
+          <!-- Para Element:
+          Attributes:
+            style: Name of style (required)
+          
+          Notes:
+            This element can include 
+          -->
+          <para style="p">Hello World</para>
+        </box>
+    </page>
+      
+      <!-- Spread Element:
+      Attributes:
+        leftmaster: Left master page (Required)
+        rightmaster: Right master page (Required)
+      -->
+      <spread leftmaster="dflt" rightmaster="dflt">
+        <box gx="1" gy="1" cols="4" rows="4">
+          <para style="p">Hello World</para>
+        </box>
+      </spread>
+  </body>
+</document>
+*/
+
 #include <iostream>
 #include "pugixml.hpp"
 #include "models.h"
