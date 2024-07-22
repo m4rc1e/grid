@@ -114,12 +114,89 @@
 
 namespace laid {
 
+std::unordered_set<std::string> masterPageAttribs = {
+    "name",
+    "height",
+    "width",
+    "cols",
+    "rows",
+    "baseline",
+    "marginleft",
+    "marginright",
+    "margintop",
+    "marginbottom",
+    "gap"
+};
+
+std::unordered_set<std::string> colorAttribs = {
+    "name",
+    "rgba"
+};
+
+std::unordered_set<std::string> styleAttribs = {
+    "name",
+    "inherit",
+    "fontname",
+    "fontsize",
+    "leading",
+    "weight",
+    "width",
+    "slant",
+    "color"
+};
+
+std::unordered_set<std::string> boxStyleAttribs = {
+    "name",
+    "color"
+};
+
+std::unordered_set<std::string> pageAttribs = {
+    "masterpage",
+    "overflow"
+};
+
+std::unordered_set<std::string> spreadAttribs = {
+    "leftmaster",
+    "rightmaster",
+    "overflow"
+};
+
+std::unordered_set<std::string> boxAttribs = {
+    "name",
+    "next",
+    "x",
+    "y",
+    "gx",
+    "gy",
+    "width",
+    "gwidth",
+    "height",
+    "gheight",
+    "zindex",
+    "style"
+};
+
+std::unordered_set<std::string> paraAttribs = {
+    "style"
+};
+
+
+bool unkownAttribs(pugi::xml_node node, std::unordered_set<std::string> attribs) {
+    auto node_name = node.name();
+    for (pugi::xml_attribute attr: node.attributes()) {
+        if (attribs.find(attr.name()) == attribs.end()) {;
+            throw std::invalid_argument("Unknown attribute in '" + std::string(node_name) + "' element called '" + std::string(attr.name()) + "'");
+        }
+    }
+    return false;
+}
 
 void parseParagraph(pugi::xml_node node, std::shared_ptr<laid::Paragraph> paragraph) {
     pugi::xpath_node_set nodes = node.select_nodes(".//text()");
     for (pugi::xpath_node_set::const_iterator it = nodes.begin(); it != nodes.end(); ++it)
     {
         pugi::xml_node node = it->node();
+        unkownAttribs(node, paraAttribs);
         auto text = node.text().as_string();
         std::string style = node.parent().attribute("style").as_string();
         paragraph->addText(text, style);
@@ -127,6 +204,7 @@ void parseParagraph(pugi::xml_node node, std::shared_ptr<laid::Paragraph> paragr
 }
 
 void parseColor(pugi::xml_node node, std::shared_ptr<laid::Document> doc) {
+    unkownAttribs(node, colorAttribs);
     auto color = laid::RGBColor();
     color.name = node.attribute("name").as_string();
     auto colString = node.attribute("rgba").as_string();
@@ -142,6 +220,7 @@ void parseColor(pugi::xml_node node, std::shared_ptr<laid::Document> doc) {
 }
 
 void parsePage(pugi::xml_node node, std::shared_ptr<laid::Document> doc) {
+    unkownAttribs(node, pageAttribs);
     auto masterName = node.attribute("masterpage").as_string();
     auto page = std::make_shared<laid::Page>(*doc->masterPages[masterName]);
     page->overflow = node.attribute("overflow").as_bool();
@@ -149,6 +228,7 @@ void parsePage(pugi::xml_node node, std::shared_ptr<laid::Document> doc) {
 }
 
 std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<laid::PageObject> basePage, std::map<std::string, std::shared_ptr<laid::Box>> &boxes, std::map<std::string, std::string> &boxMap) {
+    unkownAttribs(box_node, boxAttribs);
     auto name = box_node.attribute("name").as_string();
     if (name == "") {
         throw std::invalid_argument("Box must have a name!");
@@ -271,6 +351,7 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
     }
     // build styles
     for (pugi::xml_node node: xml_doc_start.child("head").child("styles").children("style")) {
+        unkownAttribs(node, styleAttribs);
         laid::Style style;
         style.name = std::string(node.attribute("name").as_string());
         if (style.name == "") {
@@ -334,6 +415,7 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
 
     // build boxStyles
     for (pugi::xml_node node: xml_doc_start.child("head").child("boxstyles").children("boxstyle")) {
+        unkownAttribs(node, boxStyleAttribs);
         laid::BoxStyle boxStyle;
         boxStyle.name = std::string(node.attribute("name").as_string());
         auto color = node.attribute("color").as_string();
@@ -353,12 +435,14 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
     for (pugi::xml_node node: xml_doc_start.child("body").child("pages").children()) {
         auto basePage = std::make_shared<laid::PageObject>();
         if (std::strcmp(node.name(), "page") == 0) {
+            unkownAttribs(node, pageAttribs);
             auto masterName = std::string(node.attribute("masterpage").as_string());
             auto page = std::make_shared<laid::Page>(*doc->masterPages[masterName]);
             page->overflow = node.attribute("overflow").as_bool();
             // Set other Page-specific properties
             basePage = page; // Assuming basePage is meant to hold any PageObject
         } else if (std::strcmp(node.name(), "spread") == 0) {
+            unkownAttribs(node, spreadAttribs);
             isSpread = true;
             auto leftMaster = std::string(node.attribute("leftmaster").as_string());
             auto rightMaster = std::string(node.attribute("rightmaster").as_string());
