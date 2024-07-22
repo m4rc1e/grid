@@ -35,7 +35,7 @@ void parseColor(pugi::xml_node node, std::shared_ptr<laid::Document> doc) {
 }
 
 void parsePage(pugi::xml_node node, std::shared_ptr<laid::Document> doc) {
-    auto masterName = node.attribute("masterPage").as_string();
+    auto masterName = node.attribute("masterpage").as_string();
     auto page = std::make_shared<laid::Page>(*doc->masterPages[masterName]);
     page->overflow = node.attribute("overflow").as_bool();
     doc->addPage(page);
@@ -50,7 +50,7 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
 
     float x, y, width, height;
     // x pos
-    auto gxpos = box_node.attribute("gX");
+    auto gxpos = box_node.attribute("gx");
     auto xpos = box_node.attribute("x");
     if (xpos.empty() == false) {
         x = xpos.as_float();
@@ -58,11 +58,11 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
         auto rect = basePage->getRect(gxpos.as_float(), 1);
     x = rect.startX;
     } else {
-        throw std::invalid_argument("Box must have an x or gX attribute!"); 
+        throw std::invalid_argument("Box must have a 'x' or 'gx' attribute!"); 
     }
 
     // y pos
-    auto gypos = box_node.attribute("gY");
+    auto gypos = box_node.attribute("gy");
     auto ypos = box_node.attribute("y");
     if (ypos.empty() == false) {
         y = ypos.as_float();
@@ -74,11 +74,11 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
             y = rect.startY;
         }
     } else {
-        throw std::invalid_argument("Box must have an y or gY attribute!"); 
+        throw std::invalid_argument("Box must have an 'y' or 'gy' attribute!"); 
     }
 
     // width
-    auto gwidth = box_node.attribute("gWidth");
+    auto gwidth = box_node.attribute("gwidth");
     auto widthlen = box_node.attribute("width");
     if (gwidth.empty() == false) {
         auto start = basePage->getRect(1, 1);
@@ -87,11 +87,11 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
     } else if (widthlen.empty() == false) {
         width = widthlen.as_float();
     } else {
-        throw std::invalid_argument("Box must have a width or gWidth attribute!"); 
+        throw std::invalid_argument("Box must have a 'width' or 'gwidth' attribute!"); 
     }
 
     // height
-    auto gheight = box_node.attribute("gHeight");
+    auto gheight = box_node.attribute("gheight");
     auto heightlen = box_node.attribute("height");
     if (gheight.empty() == false) {
         auto start = basePage->getRect(1, 1);
@@ -100,10 +100,10 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
     } else if (heightlen.empty() == false) {
         height = heightlen.as_float();
     } else {
-        throw std::invalid_argument("Box must have a height or gHeight attribute!"); 
+        throw std::invalid_argument("Box must have a 'height' or 'gheight' attribute!"); 
     }
 
-    int zIndex = box_node.attribute("zIndex").as_int();
+    int zIndex = box_node.attribute("zindex").as_int();
     auto box = std::make_shared<laid::Box>(x, y, width, height);
     auto style = box_node.attribute("style");
     if (style.empty() == false) {
@@ -138,7 +138,7 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
     auto doc = std::make_shared<laid::Document>();
 
     // build master pages
-    for (pugi::xml_node node: xml_doc_start.child("head").child("masterPages").children("masterPage")) {
+    for (pugi::xml_node node: xml_doc_start.child("head").child("masterpages").children("masterpage")) {
         laid::MasterPage masterPage;
         masterPage.name = std::string(node.attribute("name").as_string());
         if (masterPage.name == "") {
@@ -149,10 +149,10 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
         masterPage.cols = node.attribute("columns").as_int();
         masterPage.rows = node.attribute("rows").as_int();
         masterPage.baseline = node.attribute("baseline").as_int();
-        masterPage.marginLeft = node.attribute("marginLeft").as_int();
-        masterPage.marginRight = node.attribute("marginRight").as_int();
-        masterPage.marginTop = node.attribute("marginTop").as_int();
-        masterPage.marginBottom = node.attribute("marginBottom").as_int();
+        masterPage.marginLeft = node.attribute("marginleft").as_int();
+        masterPage.marginRight = node.attribute("marginright").as_int();
+        masterPage.marginTop = node.attribute("margintop").as_int();
+        masterPage.marginBottom = node.attribute("marginbottom").as_int();
         masterPage.gap = node.attribute("gap").as_int();
 
         doc->addMasterPage(masterPage);
@@ -173,11 +173,11 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
         if (inherit != "") {
             style.inherit = inherit;
         }
-        style.fontName = std::string(node.attribute("fontName").as_string());
+        style.fontName = std::string(node.attribute("fontname").as_string());
         if (style.fontName == "") {
             style.fontName = "Arial";
         }
-        style.fontSize = node.attribute("fontSize").as_int();
+        style.fontSize = node.attribute("fontsize").as_int();
         if (style.fontSize == 0) {
             style.fontSize = 10;
         }
@@ -226,7 +226,7 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
     }
 
     // build boxStyles
-    for (pugi::xml_node node: xml_doc_start.child("head").child("boxStyles").children("boxStyle")) {
+    for (pugi::xml_node node: xml_doc_start.child("head").child("boxstyles").children("boxstyle")) {
         laid::BoxStyle boxStyle;
         boxStyle.name = std::string(node.attribute("name").as_string());
         auto color = node.attribute("color").as_string();
@@ -246,15 +246,15 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
     for (pugi::xml_node node: xml_doc_start.child("body").child("pages").children()) {
         auto basePage = std::make_shared<laid::PageObject>();
         if (std::strcmp(node.name(), "page") == 0) {
-            auto masterName = std::string(node.attribute("masterPage").as_string());
+            auto masterName = std::string(node.attribute("masterpage").as_string());
             auto page = std::make_shared<laid::Page>(*doc->masterPages[masterName]);
             page->overflow = node.attribute("overflow").as_bool();
             // Set other Page-specific properties
             basePage = page; // Assuming basePage is meant to hold any PageObject
         } else if (std::strcmp(node.name(), "spread") == 0) {
             isSpread = true;
-            auto leftMaster = std::string(node.attribute("leftMaster").as_string());
-            auto rightMaster = std::string(node.attribute("rightMaster").as_string());
+            auto leftMaster = std::string(node.attribute("leftmaster").as_string());
+            auto rightMaster = std::string(node.attribute("rightmaster").as_string());
             auto spread = std::make_shared<laid::Spread>(
                 *doc->masterPages[leftMaster],
                 *doc->masterPages[rightMaster]
