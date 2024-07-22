@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
     printSettings.composition = PrintSettings::Composition::Single;
 
     auto myDoc = laid::load_file("../promos/winnie_the_poo/book.xml");
-    BuildPDF PDFBuilder(myDoc, "poo2.pdf", printSettings, debug);
+    BuildPDF PDFBuilder(myDoc, "poo3.pdf", printSettings, debug);
     PDFBuilder.Build();
     std::cout << "Done!" << std::endl;
 }
