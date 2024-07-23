@@ -8,6 +8,10 @@ const char* VERSION = "0.0.1";
 
 int main(int argc, char *argv[]) {
     // This can be refactored into an argument parser class
+    if (argc < 3) {
+        std::cout << "Usage: laid <input file> <output file> [--debug]" << std::endl;
+        return 1;
+    }
     bool debug = false;
     for (int i = 0; i < argc; i++) {
         if (std::string(argv[i]) == "--debug") {
