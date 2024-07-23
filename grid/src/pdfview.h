@@ -203,7 +203,7 @@ private:
 
 class BuildPDF {
 public:
-    BuildPDF(std::shared_ptr<laid::Document> laidDoc, const char* out, PrintSettings printSettings, bool debug) : laidDoc(laidDoc), stream(out), printSettings(printSettings), debug(debug) {
+    BuildPDF(std::shared_ptr<laid::Document> laidDoc, const char* out, bool debug) : laidDoc(laidDoc), stream(out), debug(debug) {
         setupFontCollection();
         laidDoc = laidDoc;
         fontCollection->setDefaultFontManager(SkFontMgr::RefDefault());
@@ -221,7 +221,6 @@ public:
     sk_sp<SkDocument> pdf;
     std::map<std::string, ParagraphStyle> paragraphStyles;
     std::map<std::string, SkPaint> boxStyles;
-    PrintSettings printSettings;
     bool debug;
 
     void BuildBoxStyles() {
@@ -309,22 +308,22 @@ public:
     }
 
     void offsetCanvas(SkCanvas* canvas, float width, float height) {
-        if (printSettings.paperWidth < width || printSettings.paperHeight < height) {
+        if (laidDoc->printSettings.paperWidth < width || laidDoc->printSettings.paperHeight < height) {
             throw std::invalid_argument("Paper size is smaller than page size");
         }
-        auto widthOffset = (printSettings.paperWidth - width) / 2;
-        auto heightOffset = (printSettings.paperHeight - height) / 2;
+        auto widthOffset = (laidDoc->printSettings.paperWidth - width) / 2;
+        auto heightOffset = (laidDoc->printSettings.paperHeight - height) / 2;
         canvas->translate(widthOffset, heightOffset);
     }
 
     void BuildPages() {
         // TODO bring back print paper sizing
         std::shared_ptr<laid::Page> head = laidDoc->pages;
-        if (printSettings.composition == PrintSettings::Composition::Single) {
+        if (laidDoc->printSettings.composition == laid::PrintSettings::Composition::Single) {
             while (head != nullptr) {
                 auto width = head->masterPage.width;
                 auto height = head->masterPage.height;
-                auto canvas = pdf->beginPage(printSettings.paperWidth, printSettings.paperHeight);
+                auto canvas = pdf->beginPage(laidDoc->printSettings.paperWidth, laidDoc->printSettings.paperHeight);
                 offsetCanvas(canvas, width, height);
                 canvas->save();
                 canvas->clipRect(SkRect::MakeXYWH(0, 0, width, height));
@@ -336,12 +335,12 @@ public:
                 head = head->next;
                 pdf->endPage();
             }
-        } else if (printSettings.composition == PrintSettings::Composition::Spreads) {
+        } else if (laidDoc->printSettings.composition == laid::PrintSettings::Composition::Spreads) {
             while (head != nullptr) {
                 if (head->type == laid::Page::PageType::Single) {
                     auto width = head->masterPage.width;
                     auto height = head->masterPage.height;
-                    auto canvas = pdf->beginPage(printSettings.paperWidth, printSettings.paperHeight);
+                    auto canvas = pdf->beginPage(laidDoc->printSettings.paperWidth, laidDoc->printSettings.paperHeight);
                     offsetCanvas(canvas, width, height);
                     canvas->save();
                     canvas->clipRect(SkRect::MakeXYWH(0, 0, width, height));
@@ -353,7 +352,7 @@ public:
                     head = head->next;
                     pdf->endPage();
                 } else if (head->type == laid::Page::PageType::Left) {
-                    auto canvas = pdf->beginPage(printSettings.paperWidth, printSettings.paperHeight);
+                    auto canvas = pdf->beginPage(laidDoc->printSettings.paperWidth, laidDoc->printSettings.paperHeight);
                     auto width = head->masterPage.width + head->next->masterPage.width;
                     auto height = head->masterPage.height;
                     offsetCanvas(canvas, width, height);

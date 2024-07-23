@@ -28,13 +28,8 @@ int main(int argc, char *argv[]) {
 
 
 
-    auto printSettings = PrintSettings();
-    printSettings.paperWidth = 540;
-    printSettings.paperHeight = 700;
-    printSettings.composition = PrintSettings::Composition::Single;
-
     auto myDoc = laid::load_file(inputFile);
-    BuildPDF PDFBuilder(myDoc, outputFile, printSettings, debug);
+    BuildPDF PDFBuilder(myDoc, outputFile, debug);
     PDFBuilder.Build();
     std::cout << "Done!" << std::endl;
 }

@@ -8,6 +8,7 @@
 #include <tuple>
 #include <iostream>
 #include <sstream>
+#include "print.h"
 
 
 namespace laid {
@@ -289,6 +290,7 @@ class Document {
         int page_count;
         std::shared_ptr<Page> pages;
         std::shared_ptr<Page> lastPage;
+        laid::PrintSettings printSettings;
 
         void addColor(RGBColor& color) {
             colors[color.name] = color;

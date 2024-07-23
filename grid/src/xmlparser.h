@@ -108,6 +108,7 @@
 #include <iostream>
 #include "pugixml.hpp"
 #include "models.h"
+#include "print.h"
 #include <stdexcept>
 #include <cstring>
 #include <filesystem>
@@ -326,6 +327,22 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
     return box;
 }
 
+laid::PrintSettings parsePrintSettings(pugi::xml_node print_node) {
+    auto printSettings = laid::PrintSettings{};
+    auto composition = print_node.attribute("composition").as_string();
+    if (composition == "spreads") {
+        printSettings.composition = laid::PrintSettings::Composition::Spreads;
+    } else if (composition == "saddlestitchspreads") {
+        printSettings.composition = laid::PrintSettings::Composition::SaddleStitchSpreads;
+    } else {
+        printSettings.composition = laid::PrintSettings::Composition::Single;
+    }
+    printSettings.paperWidth = print_node.attribute("paperwidth").as_float();
+    printSettings.paperHeight = print_node.attribute("paperheight").as_float();
+    printSettings.cropMarks = print_node.attribute("cropmarks").as_bool();
+    return printSettings;
+}
+
 std::shared_ptr<laid::Document> load_file(const char* filename) {
     if (!std::filesystem::exists(filename)) {
         throw std::invalid_argument("File does not exist!");
@@ -335,6 +352,11 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
     auto xml_doc_start = xml_doc.child("document");
     auto doc = std::make_shared<laid::Document>();
 
+    // build print settings
+    auto print_node = xml_doc_start.child("head").child("printsettings");
+    if (print_node.empty() == false) {
+        doc->printSettings = parsePrintSettings(print_node);
+    }
     // build master pages
     for (pugi::xml_node node: xml_doc_start.child("head").child("masterpages").children("masterpage")) {
         laid::MasterPage masterPage;

@@ -4,6 +4,8 @@
 
 // We should be thinking about saddle stiching as well.
 // Currently, only perfect binding works
+
+namespace laid {
 struct PrintSettings {
     // A4 by default. Maybe it should be US Letter
     enum Composition {
@@ -17,4 +19,5 @@ struct PrintSettings {
     Composition composition = Single;
 };
 
+}; // namespace laid
 #endif
