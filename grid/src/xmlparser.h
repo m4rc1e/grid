@@ -183,18 +183,17 @@ std::unordered_set<std::string> paraAttribs = {
 };
 
 
-bool unkownAttribs(pugi::xml_node node, std::unordered_set<std::string> attribs) {
+void unkownAttribs(pugi::xml_node node, std::unordered_set<std::string> attribs) {
     auto node_name = node.name();
     for (pugi::xml_attribute attr: node.attributes()) {
         if (attribs.find(attr.name()) == attribs.end()) {;
             throw std::invalid_argument("Unknown attribute in '" + std::string(node_name) + "' element called '" + std::string(attr.name()) + "'");
         }
     }
-    return false;
 }
 
 
-bool parseMargins(const char* input) {
+void parseMargins(const char* input) {
     // Updated pattern to ensure numbers are always positive
     std::regex pattern("^(\\d+),(\\d+),(\\d+),(\\d+)$");
     
