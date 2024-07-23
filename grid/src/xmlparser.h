@@ -111,6 +111,8 @@
 #include <stdexcept>
 #include <cstring>
 #include <filesystem>
+#include <regex>
+
 
 namespace laid {
 
@@ -189,6 +191,16 @@ bool unkownAttribs(pugi::xml_node node, std::unordered_set<std::string> attribs)
         }
     }
     return false;
+}
+
+
+bool parseMargins(const char* input) {
+    // Updated pattern to ensure numbers are always positive
+    std::regex pattern("^(\\d+),(\\d+),(\\d+),(\\d+)$");
+    
+    if (std::regex_match(input, pattern) == false) {
+        throw std::invalid_argument(std::string("Invalid margins format, \"") + input + "\". Must be comma separated integers (left,right,top,bottom) e.g \"32,32,48,48\"");
+    }
 }
 
 void parseParagraph(pugi::xml_node node, std::shared_ptr<laid::Paragraph> paragraph) {
@@ -336,10 +348,24 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
         masterPage.cols = node.attribute("columns").as_int();
         masterPage.rows = node.attribute("rows").as_int();
         masterPage.baseline = node.attribute("baseline").as_int();
-        masterPage.marginLeft = node.attribute("marginleft").as_int();
-        masterPage.marginRight = node.attribute("marginright").as_int();
-        masterPage.marginTop = node.attribute("margintop").as_int();
-        masterPage.marginBottom = node.attribute("marginbottom").as_int();
+        
+        auto margins = node.attribute("margins").as_string();
+        if (margins != "") {
+            std::istringstream ss(margins);
+            parseMargins(margins);
+            int left, right, top, bottom;
+            char ch; // to discard the ',' character
+            ss >> left >> ch >> right >> ch >> top >> ch >> bottom;
+            masterPage.marginLeft = left;
+            masterPage.marginRight = right;
+            masterPage.marginTop = top;
+            masterPage.marginBottom = bottom;
+        } else {
+            masterPage.marginLeft = node.attribute("marginleft").as_int();
+            masterPage.marginRight = node.attribute("marginright").as_int();
+            masterPage.marginTop = node.attribute("margintop").as_int();
+            masterPage.marginBottom = node.attribute("marginbottom").as_int();
+        }
         masterPage.gap = node.attribute("gap").as_int();
 
         doc->addMasterPage(masterPage);
