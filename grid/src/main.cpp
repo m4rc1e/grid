@@ -8,7 +8,7 @@ const char* VERSION = "0.0.1";
 
 int main(int argc, char *argv[]) {
     // This can be refactored into an argument parser class
-    bool debug = true;
+    bool debug = false;
     for (int i = 0; i < argc; i++) {
         if (std::string(argv[i]) == "--debug") {
             debug = true;
@@ -19,13 +19,18 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    auto inputFile = argv[1];
+    auto outputFile = argv[2];
+
+
+
     auto printSettings = PrintSettings();
     printSettings.paperWidth = 540;
     printSettings.paperHeight = 700;
     printSettings.composition = PrintSettings::Composition::Single;
 
-    auto myDoc = laid::load_file("../promos/winnie_the_poo/book.xml");
-    BuildPDF PDFBuilder(myDoc, "poo3.pdf", printSettings, debug);
+    auto myDoc = laid::load_file(inputFile);
+    BuildPDF PDFBuilder(myDoc, outputFile, printSettings, debug);
     PDFBuilder.Build();
     std::cout << "Done!" << std::endl;
 }

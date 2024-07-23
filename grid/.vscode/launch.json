@@ -4,5 +4,34 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        {
+            "name": "Launch C++ Program with LLDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${fileDirname}/${fileBasenameNoExtension}", // Specify the path to your compiled executable
+            "args": [
+                "/Users/marcfoley/Documents/grid/grid/promos/winnie_the_poo/book.xml",
+                "./bookie.pdf", 
+                "--debug"
+            ], // Add your CLI arguments here
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for lldb",
+                    "text": "type summary add --expand --python-function lldb.macosx.heap.CFString_SummaryProvider NSString",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Enable pretty-printing for lldb",
+                    "text": "type category enable gnu-libstdc++",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "C/C++: clang++ build active file" // Ensure you have a build task defined in tasks.json
+        }
     ]
 }
