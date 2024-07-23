@@ -3,7 +3,14 @@
 <document> 
   <!-- Just like html, we include metadata in the head element, such as masterpages, colors etc -->
   <head> 
-    
+    <!-- Print Settings Element (Optional):
+    Attributes:
+      paperwidth: Width of paper in pts (required)
+      paperheight: Height of paper in pts (required)
+      crops: If true, include crop marks (default false)
+      composition: Composition type. Can be 'single', 'spreads', 'saddlestitchspreads' (default single)
+    -->
+    <printsettings paperwidth="595" paperheight="842" crops="true" composition="single"/>
     <masterpages>
       <!-- Master Page Element:
       Attributes:
@@ -24,7 +31,7 @@
         name: The name of the color. Is references in style and boxstyle elements (required)
         rgba: Red, green, blue alpha values. Value range 0-255 (required)
      -->
-     <color name="white" rgba="255, 255, 255, 255"/>
+     <color name="white" rgba="255,255,255,255"/>
     </colors>
     
     <styles>
