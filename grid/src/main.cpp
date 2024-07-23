@@ -26,8 +26,6 @@ int main(int argc, char *argv[]) {
     auto inputFile = argv[1];
     auto outputFile = argv[2];
 
-
-
     auto myDoc = laid::load_file(inputFile);
     BuildPDF PDFBuilder(myDoc, outputFile, debug);
     PDFBuilder.Build();

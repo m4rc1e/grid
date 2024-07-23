@@ -330,14 +330,17 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
 laid::PrintSettings parsePrintSettings(pugi::xml_node print_node) {
     auto printSettings = laid::PrintSettings{};
     auto composition = print_node.attribute("composition").as_string();
-    if (composition == "spreads") {
+    if (strcmp(composition, "spreads") == 0) {
         printSettings.composition = laid::PrintSettings::Composition::Spreads;
-    } else if (composition == "saddlestitchspreads") {
+    } else if (strcmp(composition, "saddlestitchspreads") == 0) {
         printSettings.composition = laid::PrintSettings::Composition::SaddleStitchSpreads;
-    } else {
+    } else if (std::string(composition) == "single") {
         printSettings.composition = laid::PrintSettings::Composition::Single;
+    } else {
+        throw std::invalid_argument(std::string("Invalid composition type! \"") + composition + "\" Must be one of 'single', 'spreads'");
     }
     printSettings.paperWidth = print_node.attribute("paperwidth").as_float();
+
     printSettings.paperHeight = print_node.attribute("paperheight").as_float();
     printSettings.cropMarks = print_node.attribute("cropmarks").as_bool();
     return printSettings;

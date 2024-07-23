@@ -1,6 +1,6 @@
 <document>
     <head>
-        <printsettings paperwidth="595" paperheight="842" crops="true" composition="single"/>
+        <printsettings paperwidth="595" paperheight="842" crops="true" composition="singlez"/>
         <masterpages>
             <masterpage name="dflt" height="360" width="320" columns="2" rows="4" margins="48,48,36,48" gap="12" baseline="12"/>
         </masterpages>
