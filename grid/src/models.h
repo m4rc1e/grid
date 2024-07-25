@@ -124,6 +124,12 @@ class Box {
         float width;
         float height;
         int zIndex;
+        enum class VertAlignChoices {
+            Top,
+            Middle,
+            Bottom
+        };
+        VertAlignChoices vertAlign = VertAlignChoices::Top;
         std::vector<std::shared_ptr<Paragraph>> paragraphs;
 
         std::shared_ptr<Box> next;

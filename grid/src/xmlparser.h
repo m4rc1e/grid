@@ -184,7 +184,8 @@ std::unordered_set<std::string> boxAttribs = {
     "height",
     "rows",
     "zindex",
-    "style"
+    "style",
+    "vertalign",
 };
 
 std::unordered_set<std::string> paraAttribs = {
@@ -315,6 +316,18 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
     auto style = box_node.attribute("style");
     if (style.empty() == false) {
         box->style = std::string(style.as_string());
+    }
+    auto vertalign = box_node.attribute("vertalign");
+    if (vertalign.empty() == false) {
+        if (vertalign.as_string() == std::string("top")) {
+            box->vertAlign = laid::Box::VertAlignChoices::Top;
+        } else if (vertalign.as_string() == std::string("middle")) {
+            box->vertAlign = laid::Box::VertAlignChoices::Middle;
+        } else if (vertalign.as_string() == std::string("bottom")) {
+            box->vertAlign = laid::Box::VertAlignChoices::Bottom;
+        } else {
+            throw std::invalid_argument("Invalid vertical alignment! Must be one of 'top', 'middle', 'bottom'");
+        }
     }
     box->zIndex = zIndex;
     boxes[name] = box;

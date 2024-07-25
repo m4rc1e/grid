@@ -79,6 +79,8 @@ public:
     }
     int width;
     int height;
+    float paintX;
+    float paintY;
     float contentHeight;
     std::string overflowingText;
     std::vector<laid::Box> boxes;
@@ -160,8 +162,12 @@ public:
         return CursorPos{cursor.x + wordCursor.x, cursor.y};
     }
 
-    void paint(float x, float y, SkCanvas* canvas) {
-        paragraph->paint(canvas, x, y);
+    void paintCoords(float x, float y) {
+        paintX = x;
+        paintY = y;
+    }
+    void paint(SkCanvas* canvas) {
+        paragraph->paint(canvas, paintX, paintY);
     }
 
     CursorPos getCursor(Paragraph* paragraph) {
@@ -569,17 +575,18 @@ public:
     void BuildText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
         int offset = 0;
         auto collisionBoxes = collidingBoxes(page, box, offset);
+        std::vector<TextSetter*> textSetters;
         for (size_t paraIdx = 0; paraIdx < box->paragraphs.size(); paraIdx++) {
             collisionBoxes = collidingBoxes(page, box, offset);
             auto paragraph = box->paragraphs[paraIdx];
             auto paragraphStyle = paragraphStyles[paragraph->style];
             paragraphStyle.setTextHeightBehavior(TextHeightBehavior::kDisableFirstAscent);
-            TextSetter textSetter(box->width, box->height - offset, paragraphStyle, collisionBoxes);
+            TextSetter* textSetter = new TextSetter(box->width, box->height - offset, paragraphStyle, collisionBoxes);
 
             for (size_t runIdx = 0; runIdx < paragraph->text_runs.size(); runIdx++) {
                 auto& text_run = paragraph->text_runs[runIdx];
-                textSetter.SetText(text_run.text, paragraphStyles[text_run.style]);
-                if (textSetter.hasOverflowingText()) {
+                textSetter->SetText(text_run.text, paragraphStyles[text_run.style]);
+                if (textSetter->hasOverflowingText()) {
 
                     // if there isn't a next box and the page is overflowing, add another page
                     if (box->next == nullptr && page->overflow == true) {
@@ -598,7 +605,7 @@ public:
                     if (box->next != nullptr) {
                         auto nextBox = box->next;
                         auto overflow_run = laid::TextRun{
-                            textSetter.overflowingText,
+                            textSetter->overflowingText,
                             text_run.style
                         };
                         auto para = laid::Paragraph{
@@ -618,10 +625,10 @@ public:
 
                     } else {
                         std::cout << "overflowing text" << '\n';
-                        std::cout << textSetter.overflowingText << '\n';
+                        std::cout << textSetter->overflowingText << '\n';
                     }
-                    textSetter.paint(box->x, box->y+offset, canvas);
-                    return;
+                    // textSetter.paint(box->x, box->y+offset, canvas);
+                    // return;
                 }
             }
             if (box->children.find(paraIdx) != box->children.end()) {
@@ -637,8 +644,21 @@ public:
                     BuildText(canvas, page, child);
                 }
             }
-            textSetter.paint(box->x, box->y+offset, canvas);
-            offset += textSetter.contentHeight;
+            textSetter->paintCoords(box->x, box->y+offset);
+            textSetters.push_back(textSetter);
+            // textSetter.paint(box->x, box->y+offset, canvas);
+            offset += textSetter->contentHeight;
+        }
+
+        // Finally paint boxes based on box vertalignment
+        for (auto& setter : textSetters) {
+            if (box->vertAlign == laid::Box::VertAlignChoices::Middle) {
+                setter->paintY = setter->paintY + (box->height - offset) / 2;
+            } else if (box->vertAlign == laid::Box::VertAlignChoices::Bottom) {
+                setter->paintY = setter->paintY + box->height - offset;
+            }
+            setter->paint(canvas);
+            delete setter;
         }
     };
 };
