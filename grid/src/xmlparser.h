@@ -131,6 +131,7 @@ std::unordered_set<std::string> masterPageAttribs = {
     "cols",
     "rows",
     "baseline",
+    "margins",
     "marginleft",
     "marginright",
     "margintop",
@@ -179,9 +180,9 @@ std::unordered_set<std::string> boxAttribs = {
     "gx",
     "gy",
     "width",
-    "gwidth",
+    "cols",
     "height",
-    "gheight",
+    "rows",
     "zindex",
     "style"
 };
@@ -284,7 +285,7 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
     }
 
     // width
-    auto gwidth = box_node.attribute("gwidth");
+    auto gwidth = box_node.attribute("cols");
     auto widthlen = box_node.attribute("width");
     if (gwidth.empty() == false) {
         auto start = basePage->getRect(1, 1);
@@ -293,11 +294,11 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
     } else if (widthlen.empty() == false) {
         width = widthlen.as_float();
     } else {
-        throw std::invalid_argument("Box must have a 'width' or 'gwidth' attribute!"); 
+        throw std::invalid_argument("Box must have a 'width' or 'cols' attribute!"); 
     }
 
     // height
-    auto gheight = box_node.attribute("gheight");
+    auto gheight = box_node.attribute("rows");
     auto heightlen = box_node.attribute("height");
     if (gheight.empty() == false) {
         auto start = basePage->getRect(1, 1);
@@ -306,7 +307,7 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
     } else if (heightlen.empty() == false) {
         height = heightlen.as_float();
     } else {
-        throw std::invalid_argument("Box must have a 'height' or 'gheight' attribute!"); 
+        throw std::invalid_argument("Box must have a 'height' or 'rows' attribute!"); 
     }
 
     int zIndex = box_node.attribute("zindex").as_int();
@@ -369,6 +370,7 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
     }
     // build master pages
     for (pugi::xml_node node: xml_doc_start.child("head").child("masterpages").children("masterpage")) {
+        unkownAttribs(node, masterPageAttribs);
         laid::MasterPage masterPage;
         masterPage.name = std::string(node.attribute("name").as_string());
         if (masterPage.name == "") {
@@ -376,7 +378,7 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
         }
         masterPage.height = node.attribute("height").as_int();
         masterPage.width = node.attribute("width").as_int();
-        masterPage.cols = node.attribute("columns").as_int();
+        masterPage.cols = node.attribute("cols").as_int();
         masterPage.rows = node.attribute("rows").as_int();
         masterPage.baseline = node.attribute("baseline").as_int();
         
