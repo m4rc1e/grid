@@ -137,8 +137,14 @@ class Box {
         std::string image_path;
         std::string style;
         std::map<int, std::vector<std::shared_ptr<Box>>> children;
+        std::vector<float> tabs;
 
-        Box(float x, float y, float width, float height) : x(x), y(y), width(width), height(height) {}
+        Box(float x, float y, float width, float height) : x(x), y(y), width(width), height(height) {
+            // could use a const for default tab width
+            for (int i = 1; i < width / 30; i++) {
+                tabs.push_back(i * 30);
+            }
+        }
 
         void addParagraph(std::shared_ptr<Paragraph> paragraph) {
             paragraphs.push_back(paragraph);
@@ -150,6 +156,25 @@ class Box {
 
         void addNext(std::shared_ptr<Box> box) {
             next = box;
+        }
+
+        float nextTab(float x) {
+            for (auto& tab : tabs) {
+                if (tab > x) {
+                    return tab;
+                }
+            }
+            return x;
+        }
+
+        void addTabs(std::vector<float> newTabs) {
+            if (newTabs.size() <= tabs.size()) {
+                for (int i = 0; i < newTabs.size(); i++) {
+                    tabs[i] = newTabs[i];
+                }
+            return;
+            }
+            tabs = newTabs;
         }
 
         std::shared_ptr<Box> getFirst() {

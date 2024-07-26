@@ -186,6 +186,7 @@ std::unordered_set<std::string> boxAttribs = {
     "zindex",
     "style",
     "vertalign",
+    "tabs",
 };
 
 std::unordered_set<std::string> paraAttribs = {
@@ -223,6 +224,17 @@ void parseParagraph(pugi::xml_node node, std::shared_ptr<laid::Paragraph> paragr
         paragraph->addText(text, style);
     }
 }
+
+std::vector<float> parseTabs(const char* input) {
+    std::vector<float> tabs;
+    std::istringstream ss(input);
+    std::string token;
+    while(std::getline(ss, token, ',')) {
+        tabs.push_back(std::stoi(token));
+    }
+    return tabs;
+}
+
 
 void parseColor(pugi::xml_node node, std::shared_ptr<laid::Document> doc) {
     unkownAttribs(node, colorAttribs);
@@ -328,6 +340,12 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
         } else {
             throw std::invalid_argument("Invalid vertical alignment! Must be one of 'top', 'middle', 'bottom'");
         }
+    }
+
+    auto tabs = box_node.attribute("tabs");
+    if (tabs.empty() == false) {
+        auto parsedTabs = parseTabs(tabs.as_string());
+        box->addTabs(parsedTabs);
     }
     box->zIndex = zIndex;
     boxes[name] = box;

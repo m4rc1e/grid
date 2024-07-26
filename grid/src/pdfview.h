@@ -91,8 +91,8 @@ public:
 
     void SetText(
         std::string text,
-        skia::textlayout::ParagraphStyle& paragraph_style
-    ) {
+        skia::textlayout::ParagraphStyle& paragraph_style,
+        std::shared_ptr<laid::Box> box) {
         auto text_style = paragraph_style.getTextStyle();
         auto strut_style = paragraph_style.getStrutStyle();
         builder.pushStyle(text_style);
@@ -132,8 +132,27 @@ public:
                 continue;
             }
 
-            builder.addText(token.data());
-            builder.addText(" ");
+            // handle tabs
+            if (token.find("\t") != std::string::npos) {
+                std::istringstream iss(token);
+                std::string leftWord, tab, rightWord;
+                std::getline(iss, leftWord, '\t');
+                std::getline(iss, rightWord, '\t');
+                builder.addText(leftWord.data());
+                paragraph = builder.Build();
+                paragraph->layout(width);
+                currentCursor = getCursor(paragraph.get());
+                auto tabWidth = box->nextTab(currentCursor.x) - currentCursor.x;
+                addPlaceholder(tabWidth);
+                paragraph = builder.Build();
+                paragraph->layout(width);
+                currentCursor = getCursor(paragraph.get());
+                builder.addText(rightWord.data());
+                builder.addText(" ");
+            } else {
+                builder.addText(token.data());
+                builder.addText(" ");
+            }
             paragraph = builder.Build();
             paragraph->layout(width);
             contentHeight = paragraph->getHeight();
@@ -585,7 +604,7 @@ public:
 
             for (size_t runIdx = 0; runIdx < paragraph->text_runs.size(); runIdx++) {
                 auto& text_run = paragraph->text_runs[runIdx];
-                textSetter->SetText(text_run.text, paragraphStyles[text_run.style]);
+                textSetter->SetText(text_run.text, paragraphStyles[text_run.style], box);
                 if (textSetter->hasOverflowingText()) {
 
                     // if there isn't a next box and the page is overflowing, add another page
