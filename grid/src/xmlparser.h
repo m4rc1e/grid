@@ -153,7 +153,9 @@ std::unordered_set<std::string> styleAttribs = {
     "weight",
     "width",
     "slant",
-    "color"
+    "color",
+    "spacebefore",
+    "spaceafter",
 };
 
 std::unordered_set<std::string> boxStyleAttribs = {
@@ -499,6 +501,11 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
         if (color != "") {
             style.color = color;
         }
+
+        auto spaceBefore = node.attribute("spacebefore").as_float();
+        auto spaceAfter = node.attribute("spaceafter").as_float();
+        style.spaceBefore = spaceBefore;
+        style.spaceAfter = spaceAfter;
 
         doc->addStyle(style);
     }

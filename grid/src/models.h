@@ -25,6 +25,8 @@ class Style {
         int slant;
         int fontSize;
         int leading;
+        float spaceBefore;
+        float spaceAfter;
 
         int fontSizeFromLeading(int leading) {
             return leading * 0.8333;

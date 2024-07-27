@@ -604,6 +604,7 @@ public:
 
             for (size_t runIdx = 0; runIdx < paragraph->text_runs.size(); runIdx++) {
                 auto& text_run = paragraph->text_runs[runIdx];
+                offset += laidDoc->paragraph_styles[paragraph->style].spaceBefore;
                 textSetter->SetText(text_run.text, paragraphStyles[text_run.style], box);
                 if (textSetter->hasOverflowingText()) {
 
@@ -667,6 +668,7 @@ public:
             textSetters.push_back(textSetter);
             // textSetter.paint(box->x, box->y+offset, canvas);
             offset += textSetter->contentHeight;
+            offset += laidDoc->paragraph_styles[paragraph->style].spaceAfter;
         }
 
         // Finally paint boxes based on box vertalignment
