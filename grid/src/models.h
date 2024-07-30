@@ -14,12 +14,15 @@
 namespace laid {
 
 
+
 class Style {
     public:
         std::string name;
         std::string fontName;
         std::string inherit;
         std::string color;
+        std::string ruleAbove;
+        std::string ruleBelow;
         int weight;
         int width;
         int slant;
@@ -31,6 +34,16 @@ class Style {
         int fontSizeFromLeading(int leading) {
             return leading * 0.8333;
         }
+};
+
+
+class StrokeStyle {
+    public:
+        std::string name;
+        std::string color;
+        float yOffset;
+        float xOffset;
+        float thickness;
 };
 
 
@@ -319,6 +332,7 @@ class Document {
         std::map<std::string, RGBColor> colors;
         std::map<std::string, Style> paragraph_styles;
         std::map<std::string, BoxStyle> boxStyles;
+        std::map<std::string, StrokeStyle> strokeStyles;
         std::map<std::string, MasterPage*> masterPages;
         int page_count;
         std::shared_ptr<Page> pages;
@@ -335,6 +349,10 @@ class Document {
         
         void addBoxStyle(BoxStyle boxStyle) {
             boxStyles[boxStyle.name] = boxStyle;
+        }
+
+        void addStrokeStyle(StrokeStyle strokeStyle) {
+            strokeStyles[strokeStyle.name] = strokeStyle;
         }
 
         void addMasterPage(MasterPage& masterPage) {

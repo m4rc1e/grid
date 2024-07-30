@@ -20,6 +20,7 @@
 #include "include/core/SkString.h"
 #include "include/core/SkTypeface.h"
 #include "include/core/SkTypes.h"
+#include "include/core/SkPath.h"
 #include "include/encode/SkPngEncoder.h"
 #include "modules/skparagraph/include/DartTypes.h"
 #include "modules/skparagraph/include/FontCollection.h"
@@ -246,6 +247,7 @@ public:
     sk_sp<SkDocument> pdf;
     std::map<std::string, ParagraphStyle> paragraphStyles;
     std::map<std::string, SkPaint> boxStyles;
+    std::map<std::string, SkPaint> strokeStyles;
     bool debug;
 
     void BuildBoxStyles() {
@@ -254,6 +256,17 @@ public:
             auto color = laidDoc->colors[style.color];
             paint.setColor(SkColorSetRGB(color.r, color.g, color.b));
             boxStyles[name] = paint;
+        }
+    }
+
+    void BuildStrokeStyles() {
+        for (auto& [name, style] : laidDoc->strokeStyles) {
+            SkPaint paint;
+            auto color = laidDoc->colors[style.color];
+            paint.setColor(SkColorSetRGB(color.r, color.g, color.b));
+            paint.setStrokeWidth(style.thickness);
+            paint.setStyle(SkPaint::kStroke_Style);
+            strokeStyles[name] = paint;
         }
     }
 
@@ -306,6 +319,7 @@ public:
             
             paragraphStyles[name] = paragraph_style;
         }
+
         // build inheritable styles
         for (auto& [name, style] : laidDoc->paragraph_styles) {
             if (style.inherit.size() == 0) {
@@ -327,6 +341,7 @@ public:
 
     }
     void Build() {
+        BuildStrokeStyles();
         BuildBoxStyles();
         BuildStyles();
         BuildPages();
@@ -591,6 +606,10 @@ public:
         return collisionBoxes;
     }
 
+    void BuildRule(SkCanvas* canvas, SkPaint paint, float x1, float y1, float x2, float y2) {
+        canvas->drawLine(SkPoint::Make(x1, y1), SkPoint::Make(x2, y2), paint);
+    }
+
     void BuildText(SkCanvas* canvas, std::shared_ptr<laid::Page> page, std::shared_ptr<laid::Box> box) {
         int offset = 0;
         auto collisionBoxes = collidingBoxes(page, box, offset);
@@ -598,13 +617,30 @@ public:
         for (size_t paraIdx = 0; paraIdx < box->paragraphs.size(); paraIdx++) {
             collisionBoxes = collidingBoxes(page, box, offset);
             auto paragraph = box->paragraphs[paraIdx];
+            auto laidStyle = laidDoc->paragraph_styles[paragraph->style];
             auto paragraphStyle = paragraphStyles[paragraph->style];
+
             paragraphStyle.setTextHeightBehavior(TextHeightBehavior::kDisableFirstAscent);
             TextSetter* textSetter = new TextSetter(box->width, box->height - offset, paragraphStyle, collisionBoxes);
+            
+            // space before padding
+            offset += laidDoc->paragraph_styles[paragraph->style].spaceBefore;
+
+            // rule above
+            auto strokeStyleAbove = laidDoc->strokeStyles[laidStyle.ruleAbove];
+            if (strokeStyleAbove.name != "") {
+                BuildRule(
+                    canvas,
+                    strokeStyles[strokeStyleAbove.name],
+                    box->x,
+                    box->y+offset+strokeStyleAbove.yOffset,
+                    box->x+box->width,
+                    box->y+offset+strokeStyleAbove.yOffset
+                );
+            }
 
             for (size_t runIdx = 0; runIdx < paragraph->text_runs.size(); runIdx++) {
                 auto& text_run = paragraph->text_runs[runIdx];
-                offset += laidDoc->paragraph_styles[paragraph->style].spaceBefore;
                 textSetter->SetText(text_run.text, paragraphStyles[text_run.style], box);
                 if (textSetter->hasOverflowingText()) {
 
@@ -667,6 +703,18 @@ public:
             textSetter->paintCoords(box->x, box->y+offset);
             textSetters.push_back(textSetter);
             // textSetter.paint(box->x, box->y+offset, canvas);
+            // rule below
+            auto strokeStyleBelow = laidDoc->strokeStyles[laidStyle.ruleBelow];
+            if (strokeStyleBelow.name != "") {
+                BuildRule(
+                    canvas,
+                    strokeStyles[strokeStyleBelow.name],
+                    box->x,
+                    box->y+offset+strokeStyleAbove.yOffset,
+                    box->x+box->width,
+                    box->y+offset+strokeStyleAbove.yOffset
+                );
+            }
             offset += textSetter->contentHeight;
             offset += laidDoc->paragraph_styles[paragraph->style].spaceAfter;
         }

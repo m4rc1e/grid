@@ -156,11 +156,21 @@ std::unordered_set<std::string> styleAttribs = {
     "color",
     "spacebefore",
     "spaceafter",
+    "ruleabove",
+    "rulebelow",
 };
 
 std::unordered_set<std::string> boxStyleAttribs = {
     "name",
     "color"
+};
+
+std::unordered_set<std::string> strokeStyleAttribs = {
+    "name",
+    "color",
+    "yoffset",
+    "xoffset",
+    "thickness",
 };
 
 std::unordered_set<std::string> pageAttribs = {
@@ -502,10 +512,11 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
             style.color = color;
         }
 
-        auto spaceBefore = node.attribute("spacebefore").as_float();
-        auto spaceAfter = node.attribute("spaceafter").as_float();
-        style.spaceBefore = spaceBefore;
-        style.spaceAfter = spaceAfter;
+        style.spaceBefore = node.attribute("spacebefore").as_float(); 
+        style.spaceAfter = node.attribute("spaceafter").as_float();
+
+        style.ruleAbove = node.attribute("ruleabove").as_string();
+        style.ruleBelow = node.attribute("rulebelow").as_string();
 
         doc->addStyle(style);
     }
@@ -520,6 +531,32 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
             boxStyle.color = color;
         }
         doc->addBoxStyle(boxStyle);
+        
+    }
+
+    // build strokeStyles
+    for (pugi::xml_node node: xml_doc_start.child("head").child("strokestyles").children("strokestyle")) {
+        unkownAttribs(node, strokeStyleAttribs);
+        laid::StrokeStyle strokeStyle;
+        auto name = std::string(node.attribute("name").as_string());
+        if (name == "") {
+            throw std::invalid_argument("StrokeStyle must have a name!");
+        }
+        strokeStyle.name = name;
+        auto color = node.attribute("color").as_string();
+        if (color != "") {
+            strokeStyle.color = color;
+        }
+
+        auto xOffset = node.attribute("xoffset").as_float();
+        auto yOffset = node.attribute("yoffset").as_float();
+        strokeStyle.xOffset = xOffset;
+        strokeStyle.yOffset = yOffset;
+
+        auto thickness = node.attribute("thickness").as_float();
+        strokeStyle.thickness = thickness;
+
+        doc->addStrokeStyle(strokeStyle);
         
     }
 
