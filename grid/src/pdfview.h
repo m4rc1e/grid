@@ -432,6 +432,11 @@ public:
         int width = page->masterPage.width;
         int height = page->masterPage.height;
 
+        // Add master page boxes to page boxes
+        for(auto &box: page->masterPage.boxes) {
+            page->boxes.push_back(box);
+        }
+
         for(auto& box : page->boxes) {
             if (box->image_path.size() > 0) {
                 BuildImage(canvas, box);
@@ -444,7 +449,7 @@ public:
         }
         if (debug == true) {
             BuildGuides(canvas, page->masterPage);
-            BuildBaseline(canvas, page->masterPage);
+            //BuildBaseline(canvas, page->masterPage);
         }
         std::cout << "Ending page: " << page << std::endl;
         return canvas;

@@ -62,48 +62,6 @@ class Rect {
         float endY;
 };
 
-class MasterPage {
-    public:
-        std::string name;
-        float width;
-        float height;
-        int cols;
-        int rows;
-        float gap;
-        float marginTop;
-        float marginBottom;
-        float marginLeft;
-        float marginRight;
-        float baseline;
-    
-        Rect getRect(int col, int row) {
-            // columns
-            auto workingWidth = width - marginLeft - marginRight - (gap*(cols-1));
-            auto colWidth = (workingWidth / cols);
-            float startX, endX;
-            if (col == 0) {
-                startX = marginLeft;
-                endX = startX + colWidth;
-            } else {
-                startX = marginLeft + ((colWidth * col)) + (gap*col);
-                endX = startX + colWidth;
-            }
-            // rows
-            auto workingHeight = height - marginTop - marginBottom - (gap*(rows-1));
-            auto rowHeight = workingHeight / rows;
-            float startY, endY;
-            if (row == 0) {
-                startY = marginTop;
-                endY = startY + rowHeight;
-            } else {
-                startY = marginTop + (rowHeight * row) + (gap*row);
-                endY = startY + rowHeight;
-            }
-            return Rect{startX, startY, endX, endY};
-        }
-
-};
-
 
 class TextRun {
     public:
@@ -209,6 +167,55 @@ class Box {
 };
 
 
+class MasterPage {
+    public:
+        std::string name;
+        float width;
+        float height;
+        int cols;
+        int rows;
+        float gap;
+        float marginTop;
+        float marginBottom;
+        float marginLeft;
+        float marginRight;
+        float baseline;
+        std::vector<std::shared_ptr<Box>> boxes;
+
+        void addBox(std::shared_ptr<Box> box) {
+            boxes.push_back(box);
+        }
+    
+        Rect getRect(int col, int row) {
+            // columns
+            auto workingWidth = width - marginLeft - marginRight - (gap*(cols-1));
+            auto colWidth = (workingWidth / cols);
+            float startX, endX;
+            if (col == 0) {
+                startX = marginLeft;
+                endX = startX + colWidth;
+            } else {
+                startX = marginLeft + ((colWidth * col)) + (gap*col);
+                endX = startX + colWidth;
+            }
+            // rows
+            auto workingHeight = height - marginTop - marginBottom - (gap*(rows-1));
+            auto rowHeight = workingHeight / rows;
+            float startY, endY;
+            if (row == 0) {
+                startY = marginTop;
+                endY = startY + rowHeight;
+            } else {
+                startY = marginTop + (rowHeight * row) + (gap*row);
+                endY = startY + rowHeight;
+            }
+            return Rect{startX, startY, endX, endY};
+        }
+
+};
+
+
+
 class PageObject {
     public:
         std::vector<std::shared_ptr<Box>> boxes;
@@ -239,6 +246,7 @@ class Page : public PageObject {
         std::shared_ptr<Page> prev;
         int boxIdx = 0;
         PageType type = PageType::Single;
+        std::map<std::string, std::string> variables;
 
         void addBox(std::shared_ptr<Box>& box) {
             boxes.push_back(box);
@@ -333,7 +341,7 @@ class Document {
         std::map<std::string, Style> paragraph_styles;
         std::map<std::string, BoxStyle> boxStyles;
         std::map<std::string, StrokeStyle> strokeStyles;
-        std::map<std::string, MasterPage*> masterPages;
+        std::map<std::string, std::shared_ptr<MasterPage>> masterPages;
         int page_count;
         std::shared_ptr<Page> pages;
         std::shared_ptr<Page> lastPage;
@@ -355,8 +363,8 @@ class Document {
             strokeStyles[strokeStyle.name] = strokeStyle;
         }
 
-        void addMasterPage(MasterPage& masterPage) {
-            masterPages[masterPage.name] = &masterPage;
+        void addMasterPage(std::shared_ptr<MasterPage> masterPage) {
+            masterPages[masterPage->name] = masterPage;
         }
 
         void addPage(std::shared_ptr<Page> page) {

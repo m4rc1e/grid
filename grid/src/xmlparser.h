@@ -406,6 +406,12 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
     auto xml_doc_start = xml_doc.child("document");
     auto doc = std::make_shared<laid::Document>();
 
+
+    // maps used to link boxes in the whole document
+    std::map<std::string, std::shared_ptr<laid::Box>> boxes;
+    std::map<std::string, std::string> boxMap;
+
+
     // build print settings
     auto print_node = xml_doc_start.child("head").child("printsettings");
     if (print_node.empty() == false) {
@@ -414,16 +420,16 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
     // build master pages
     for (pugi::xml_node node: xml_doc_start.child("head").child("masterpages").children("masterpage")) {
         unkownAttribs(node, masterPageAttribs);
-        laid::MasterPage masterPage;
-        masterPage.name = std::string(node.attribute("name").as_string());
-        if (masterPage.name == "") {
+        auto masterPage = std::make_shared<laid::MasterPage>();
+        masterPage->name = std::string(node.attribute("name").as_string());
+        if (masterPage->name == "") {
             throw std::invalid_argument("Master page must have a name!");
         }
-        masterPage.height = node.attribute("height").as_int();
-        masterPage.width = node.attribute("width").as_int();
-        masterPage.cols = node.attribute("cols").as_int();
-        masterPage.rows = node.attribute("rows").as_int();
-        masterPage.baseline = node.attribute("baseline").as_int();
+        masterPage->height = node.attribute("height").as_int();
+        masterPage->width = node.attribute("width").as_int();
+        masterPage->cols = node.attribute("cols").as_int();
+        masterPage->rows = node.attribute("rows").as_int();
+        masterPage->baseline = node.attribute("baseline").as_int();
         
         auto margins = node.attribute("margins").as_string();
         if (margins != "") {
@@ -432,18 +438,21 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
             int left, right, top, bottom;
             char ch; // to discard the ',' character
             ss >> left >> ch >> right >> ch >> top >> ch >> bottom;
-            masterPage.marginLeft = left;
-            masterPage.marginRight = right;
-            masterPage.marginTop = top;
-            masterPage.marginBottom = bottom;
+            masterPage->marginLeft = left;
+            masterPage->marginRight = right;
+            masterPage->marginTop = top;
+            masterPage->marginBottom = bottom;
         } else {
-            masterPage.marginLeft = node.attribute("marginleft").as_int();
-            masterPage.marginRight = node.attribute("marginright").as_int();
-            masterPage.marginTop = node.attribute("margintop").as_int();
-            masterPage.marginBottom = node.attribute("marginbottom").as_int();
+            masterPage->marginLeft = node.attribute("marginleft").as_int();
+            masterPage->marginRight = node.attribute("marginright").as_int();
+            masterPage->marginTop = node.attribute("margintop").as_int();
+            masterPage->marginBottom = node.attribute("marginbottom").as_int();
         }
-        masterPage.gap = node.attribute("gap").as_int();
-
+        masterPage->gap = node.attribute("gap").as_int();
+        for (pugi::xml_node box_node: node.children("box")) {
+            auto box = parseBox(box_node, std::make_shared<laid::PageObject>(), boxes, boxMap);
+            masterPage->addBox(box);
+        }
         doc->addMasterPage(masterPage);
     }
 
@@ -559,10 +568,6 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
         doc->addStrokeStyle(strokeStyle);
         
     }
-
-    // maps used to link boxes in the whole document
-    std::map<std::string, std::shared_ptr<laid::Box>> boxes;
-    std::map<std::string, std::string> boxMap;
 
     // build pages
     bool isSpread = false;
