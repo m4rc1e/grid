@@ -118,6 +118,33 @@ class Box {
                 tabs.push_back(i * 30);
             }
         }
+        // Copy constructor for deep copy
+        Box(const Box& other)
+            : x(other.x), y(other.y), width(other.width), height(other.height),
+            vertAlign(other.vertAlign), image_path(other.image_path), style(other.style), tabs(other.tabs) {
+
+            // Deep copy of paragraphs
+            for (const auto& paragraph : other.paragraphs) {
+                paragraphs.push_back(std::make_shared<Paragraph>(*paragraph));
+            }
+
+            // Deep copy of next and prev
+            if (other.next) {
+                next = std::make_shared<Box>(*other.next);
+            }
+            if (other.prev) {
+                prev = std::make_shared<Box>(*other.prev);
+            }
+
+            // Deep copy of children
+            for (const auto& [key, childVector] : other.children) {
+                std::vector<std::shared_ptr<Box>> copiedChildVector;
+                for (const auto& child : childVector) {
+                    copiedChildVector.push_back(std::make_shared<Box>(*child));
+                }
+                children[key] = copiedChildVector;
+            }
+        }
 
         void addParagraph(std::shared_ptr<Paragraph> paragraph) {
             paragraphs.push_back(paragraph);
@@ -247,6 +274,7 @@ class Page : public PageObject {
         int boxIdx = 0;
         PageType type = PageType::Single;
         std::map<std::string, std::string> variables;
+        int number;
 
         void addBox(std::shared_ptr<Box>& box) {
             boxes.push_back(box);

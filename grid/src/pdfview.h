@@ -359,6 +359,7 @@ public:
     void BuildPages() {
         // TODO bring back print paper sizing
         std::shared_ptr<laid::Page> head = laidDoc->pages;
+        auto currentPage = 0;
         if (laidDoc->printSettings.composition == laid::PrintSettings::Composition::Single) {
             while (head != nullptr) {
                 auto width = head->masterPage.width;
@@ -367,6 +368,7 @@ public:
                 offsetCanvas(canvas, width, height);
                 canvas->save();
                 canvas->clipRect(SkRect::MakeXYWH(0, 0, width, height));
+                head->number = currentPage;
                 BuildPage(head, canvas);
                 canvas->restore();
 
@@ -374,6 +376,7 @@ public:
 
                 head = head->next;
                 pdf->endPage();
+                currentPage++;
             }
         } else if (laidDoc->printSettings.composition == laid::PrintSettings::Composition::Spreads) {
             while (head != nullptr) {
@@ -384,6 +387,7 @@ public:
                     offsetCanvas(canvas, width, height);
                     canvas->save();
                     canvas->clipRect(SkRect::MakeXYWH(0, 0, width, height));
+                    head->number = currentPage;
                     BuildPage(head, canvas);
                     canvas->restore();
 
@@ -391,6 +395,7 @@ public:
 
                     head = head->next;
                     pdf->endPage();
+                    currentPage++;
                 } else if (head->type == laid::Page::PageType::Left) {
                     auto canvas = pdf->beginPage(laidDoc->printSettings.paperWidth, laidDoc->printSettings.paperHeight);
                     auto width = head->masterPage.width + head->next->masterPage.width;
@@ -399,12 +404,15 @@ public:
 
                     canvas->save();
                     canvas->clipRect(SkRect::MakeXYWH(0, 0, width, height));
+                    head->number = currentPage;
                     BuildPage(head, canvas);
                     canvas->restore();
                     canvas->translate(head->masterPage.width, 0);
+                    currentPage++;
 
                     canvas->save();
                     canvas->clipRect(SkRect::MakeXYWH(0, 0, width, height));
+                    head->next->number = currentPage;
                     BuildPage(head->next, canvas);
                     canvas->restore();
 
@@ -414,6 +422,7 @@ public:
 
                     head = head->next->next;
                     pdf->endPage();
+                    currentPage++;
                 }
             }
         }
@@ -428,16 +437,33 @@ public:
         }
     }
 
+    void interpolateVariables(std::shared_ptr<laid::Box> box, std::shared_ptr<laid::Page> page) {
+        for (auto& para: box->paragraphs) {
+            for (auto& run: para->text_runs) {
+                auto text = run.text;
+
+                // interpolate page numbers. TODO make this its own func
+                auto foundPageNum = text.find("{{ page_number }}");
+                if (foundPageNum != std::string::npos) {
+                    text.replace(foundPageNum, 17, std::to_string(page->number));
+                    run.text = text;
+                }
+            }
+        }
+    }
+
     SkCanvas* BuildPage(std::shared_ptr<laid::Page> page, SkCanvas* canvas) {
         int width = page->masterPage.width;
         int height = page->masterPage.height;
 
         // Add master page boxes to page boxes
-        for(auto &box: page->masterPage.boxes) {
-            page->boxes.push_back(box);
+        for(const auto& box: page->masterPage.boxes) {
+            auto clone = std::make_shared<laid::Box>(*box);
+            page->boxes.push_back(clone);
         }
 
-        for(auto& box : page->boxes) {
+        for(auto box : page->boxes) {
+            interpolateVariables(box, page);
             if (box->image_path.size() > 0) {
                 BuildImage(canvas, box);
             }
