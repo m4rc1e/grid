@@ -714,8 +714,17 @@ public:
                         std::cout << "overflowing text" << '\n';
                         std::cout << textSetter->overflowingText << '\n';
                     }
-                    // textSetter.paint(box->x, box->y+offset, canvas);
-                    // return;
+                    // Finally paint boxes based on box vertalignment
+                    for (auto& setter : textSetters) {
+                        if (box->vertAlign == laid::Box::VertAlignChoices::Middle) {
+                            setter->paintY = setter->paintY + (box->height - offset) / 2;
+                        } else if (box->vertAlign == laid::Box::VertAlignChoices::Bottom) {
+                            setter->paintY = setter->paintY + box->height - offset;
+                        }
+                        setter->paint(canvas);
+                        delete setter;
+                    }
+                    return;
                 }
             }
             if (box->children.find(paraIdx) != box->children.end()) {

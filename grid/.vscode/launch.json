@@ -6,7 +6,7 @@
     "configurations": [
         {
             "name": "Launch C++ Program with LLDB",
-            "type": "cppdbg",
+            "type": "lldb",
             "request": "launch",
             "program": "${fileDirname}/${fileBasenameNoExtension}", // Specify the path to your compiled executable
             "args": [
