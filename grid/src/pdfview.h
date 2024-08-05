@@ -185,73 +185,71 @@ public:
         canvas->translate(widthOffset, heightOffset);
     }
 
+    void BuildSinglePage(std::shared_ptr<laid::Page> head, int currentPage) {
+        auto width = head->masterPage.width;
+        auto height = head->masterPage.height;
+        auto canvas = pdf->beginPage(laidDoc->printSettings.paperWidth, laidDoc->printSettings.paperHeight);
+        offsetCanvas(canvas, width, height);
+        canvas->save();
+        canvas->clipRect(SkRect::MakeXYWH(0, 0, width, height));
+        head->number = currentPage;
+        BuildPage(head, canvas);
+        canvas->restore();
+
+        if (laidDoc->printSettings.cropMarks == true) {
+            BuildCrops(canvas, head->masterPage.width, head->masterPage.height);
+        }
+
+        pdf->endPage();
+    }
+
+    void BuildSpread(std::shared_ptr<laid::Page> head, int currentPage) {
+        auto canvas = pdf->beginPage(laidDoc->printSettings.paperWidth, laidDoc->printSettings.paperHeight);
+        auto width = head->masterPage.width + head->next->masterPage.width;
+        auto height = head->masterPage.height;
+        offsetCanvas(canvas, width, height);
+
+        canvas->save();
+        canvas->clipRect(SkRect::MakeXYWH(0, 0, width, height));
+        head->number = currentPage;
+        BuildPage(head, canvas);
+        canvas->restore();
+        canvas->translate(head->masterPage.width, 0);
+        currentPage++;
+
+        canvas->save();
+        canvas->clipRect(SkRect::MakeXYWH(0, 0, width, height));
+        head->next->number = currentPage;
+        BuildPage(head->next, canvas);
+        canvas->restore();
+
+        // translate canvas back to origin so we can add crops
+        canvas->translate(-head->masterPage.width, 0);
+        if (laidDoc->printSettings.cropMarks == true) {
+            BuildCrops(canvas, width, height);
+        }
+        pdf->endPage();
+    }
+
     void BuildPages() {
         // TODO bring back print paper sizing
         std::shared_ptr<laid::Page> head = laidDoc->pages;
         auto currentPage = 0;
         if (laidDoc->printSettings.composition == laid::PrintSettings::Composition::Single) {
             while (head != nullptr) {
-                auto width = head->masterPage.width;
-                auto height = head->masterPage.height;
-                auto canvas = pdf->beginPage(laidDoc->printSettings.paperWidth, laidDoc->printSettings.paperHeight);
-                offsetCanvas(canvas, width, height);
-                canvas->save();
-                canvas->clipRect(SkRect::MakeXYWH(0, 0, width, height));
-                head->number = currentPage;
-                BuildPage(head, canvas);
-                canvas->restore();
-
-                BuildCrops(canvas, head->masterPage.width, head->masterPage.height);
-
+                BuildSinglePage(head, currentPage);
                 head = head->next;
-                pdf->endPage();
                 currentPage++;
             }
         } else if (laidDoc->printSettings.composition == laid::PrintSettings::Composition::Spreads) {
             while (head != nullptr) {
                 if (head->type == laid::Page::PageType::Single) {
-                    auto width = head->masterPage.width;
-                    auto height = head->masterPage.height;
-                    auto canvas = pdf->beginPage(laidDoc->printSettings.paperWidth, laidDoc->printSettings.paperHeight);
-                    offsetCanvas(canvas, width, height);
-                    canvas->save();
-                    canvas->clipRect(SkRect::MakeXYWH(0, 0, width, height));
-                    head->number = currentPage;
-                    BuildPage(head, canvas);
-                    canvas->restore();
-
-                    BuildCrops(canvas, head->masterPage.width, head->masterPage.height);
-
+                    BuildSinglePage(head, currentPage);
                     head = head->next;
-                    pdf->endPage();
-                    currentPage++;
                 } else if (head->type == laid::Page::PageType::Left) {
-                    auto canvas = pdf->beginPage(laidDoc->printSettings.paperWidth, laidDoc->printSettings.paperHeight);
-                    auto width = head->masterPage.width + head->next->masterPage.width;
-                    auto height = head->masterPage.height;
-                    offsetCanvas(canvas, width, height);
-
-                    canvas->save();
-                    canvas->clipRect(SkRect::MakeXYWH(0, 0, width, height));
-                    head->number = currentPage;
-                    BuildPage(head, canvas);
-                    canvas->restore();
-                    canvas->translate(head->masterPage.width, 0);
-                    currentPage++;
-
-                    canvas->save();
-                    canvas->clipRect(SkRect::MakeXYWH(0, 0, width, height));
-                    head->next->number = currentPage;
-                    BuildPage(head->next, canvas);
-                    canvas->restore();
-
-                    // translate canvas back to origin so we can add crops
-                    canvas->translate(-head->masterPage.width, 0);
-                    BuildCrops(canvas, width, height);
-
+                    BuildSpread(head, currentPage);
                     head = head->next->next;
-                    pdf->endPage();
-                    currentPage++;
+                    currentPage += 2;
                 }
             }
         }
