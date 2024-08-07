@@ -274,6 +274,7 @@ class Page : public PageObject {
         int boxIdx = 0;
         PageType type = PageType::Single;
         std::map<std::string, std::string> variables;
+        std::string name;
         int number;
 
         void addBox(std::shared_ptr<Box>& box) {
@@ -296,6 +297,8 @@ class Spread : public PageObject {
         MasterPage rightMaster;
         std::vector<std::shared_ptr<Box>> boxes;
         bool overflow;
+        std::string leftName;
+        std::string rightName;
 
         Rect getRect(int col, int row) {
             if (col <= 0 || col > leftMaster.cols + rightMaster.cols || row <= 0 || row > leftMaster.rows + rightMaster.rows) {
@@ -332,6 +335,7 @@ class Spread : public PageObject {
                 }
             }
             page->overflow = overflow;
+            page->name = leftName;
             return page;
         }
 
@@ -358,6 +362,7 @@ class Spread : public PageObject {
                 }
             }
             page->overflow = overflow;
+            page->name = rightName;
             return page;
         }
 };
@@ -375,6 +380,7 @@ class Document {
         std::shared_ptr<Page> lastPage;
         laid::PrintSettings printSettings;
         std::map<std::string, int> pageLinks;
+        std::map<std::string, int> boxLinks;
 
         void addColor(RGBColor& color) {
             colors[color.name] = color;
@@ -419,6 +425,7 @@ class Document {
         std::shared_ptr<Page> overflowPage(std::shared_ptr<Page> page) {
             auto newPage = std::make_shared<Page>(page->masterPage);
             newPage->overflow = true;
+            newPage->name = page->name;
             
             auto boxMap = std::map<std::shared_ptr<laid::Box>, std::shared_ptr<laid::Box>>();
             
@@ -461,6 +468,7 @@ class Document {
             auto newLeftPage = std::make_shared<Page>(leftPage->masterPage);
             newLeftPage->overflow = true;
             newLeftPage->type = Page::PageType::Left;
+            newLeftPage->name = leftPage->name;
             for (auto& box : leftBoxes) {
                 auto newbox = std::make_shared<Box>(box->x, box->y, box->width, box->height);
                 boxMap[box] = newbox;
@@ -471,6 +479,7 @@ class Document {
             auto newRightPage = std::make_shared<Page>(rightPage->masterPage);
             newRightPage->overflow = true;
             newRightPage->type = Page::PageType::Right;
+            newRightPage->name = rightPage->name;
             for (auto& box : rightBoxes) {
                 auto newbox = std::make_shared<Box>(box->x, box->y, box->width, box->height);
                 boxMap[box] = newbox;

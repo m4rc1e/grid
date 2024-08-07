@@ -276,6 +276,12 @@ public:
                     text.replace(foundPageNum, 17, std::to_string(page->number));
                     run.text = text;
                 }
+
+                auto foundPageName = text.find("{{ page_name }}");
+                if (foundPageName != std::string::npos) {
+                    text.replace(foundPageName, 15, page->name);
+                    run.text = text;
+                }
             }
         }
     }
@@ -283,6 +289,11 @@ public:
     SkCanvas* BuildPage(std::shared_ptr<laid::Page> page, SkCanvas* canvas) {
         int width = page->masterPage.width;
         int height = page->masterPage.height;
+        
+        // add page link if page name isn't already linked
+        if (page->name != "" && laidDoc->pageLinks.find(page->name) == laidDoc->pageLinks.end()) {
+            laidDoc->pageLinks[page->name] = page->number;
+        }
 
         // Add master page boxes to page boxes
         for(const auto& box: page->masterPage.boxes) {

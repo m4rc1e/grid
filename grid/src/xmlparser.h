@@ -175,13 +175,15 @@ std::unordered_set<std::string> strokeStyleAttribs = {
 
 std::unordered_set<std::string> pageAttribs = {
     "masterpage",
-    "overflow"
+    "overflow",
+    "name",
 };
 
 std::unordered_set<std::string> spreadAttribs = {
     "leftmaster",
     "rightmaster",
-    "overflow"
+    "overflow",
+    "name",
 };
 
 std::unordered_set<std::string> boxAttribs = {
@@ -578,6 +580,7 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
             auto masterName = std::string(node.attribute("masterpage").as_string());
             auto page = std::make_shared<laid::Page>(*doc->masterPages[masterName]);
             page->overflow = node.attribute("overflow").as_bool();
+            page->name = node.attribute("name").as_string();
             // Set other Page-specific properties
             basePage = page; // Assuming basePage is meant to hold any PageObject
         } else if (std::strcmp(node.name(), "spread") == 0) {
@@ -590,6 +593,8 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
                 *doc->masterPages[rightMaster]
             );
             spread->overflow = node.attribute("overflow").as_bool();
+            spread->leftName = node.attribute("leftname").as_string();
+            spread->rightName = node.attribute("rightname").as_string();
             // Set other Spread-specific properties
             basePage = spread; // Assuming basePage is meant to hold any PageObject
         }
