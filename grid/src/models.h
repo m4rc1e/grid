@@ -374,6 +374,7 @@ class Document {
         std::shared_ptr<Page> pages;
         std::shared_ptr<Page> lastPage;
         laid::PrintSettings printSettings;
+        std::map<std::string, int> pageLinks;
 
         void addColor(RGBColor& color) {
             colors[color.name] = color;

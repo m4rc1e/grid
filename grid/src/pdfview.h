@@ -254,6 +254,7 @@ public:
             }
         }
         pdf->close();
+        laidDoc->page_count = currentPage;
     }
     void StyleBox(std::shared_ptr<laid::Box> box, SkCanvas* canvas) {
         if (box->style != "") {
