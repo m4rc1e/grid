@@ -184,6 +184,7 @@ public:
 
         secondPass = true;
         pdf = SkPDF::MakeDocument(&stream, metadata);
+        secondPassDoc->pageLinks = laidDoc->pageLinks;
         laidDoc = secondPassDoc;
         BuildPages();
         std::cout << "EE" << std::endl;
@@ -278,36 +279,32 @@ public:
         }
     }
 
-    void interpolateVariables(std::shared_ptr<laid::Box> box, std::shared_ptr<laid::Page> page) {
-        for (auto& para: box->paragraphs) {
-            for (auto& run: para->text_runs) {
-                auto text = run.text;
+    void interpolateVariables(laid::TextRun* run, std::shared_ptr<laid::Page> page) {
+        auto text = run->text;
 
-                // interpolate page numbers. TODO make this its own func
-                auto foundPageNum = text.find("{{ page_number }}");
-                if (foundPageNum != std::string::npos) {
-                    text.replace(foundPageNum, 17, std::to_string(page->number));
-                    run.text = text;
-                }
+        // interpolate page numbers. TODO make this its own func
+        auto foundPageNum = text.find("{{ page_number }}");
+        if (foundPageNum != std::string::npos) {
+            text.replace(foundPageNum, 17, std::to_string(page->number));
+            run->text = text;
+        }
 
-                // interpolate page names. Same structure as above so if we add another let's refactor
-                auto foundPageName = text.find("{{ page_name }}");
-                if (foundPageName != std::string::npos) {
-                    text.replace(foundPageName, 15, page->name);
-                    run.text = text;
-                }
+        // interpolate page names. Same structure as above so if we add another let's refactor
+        auto foundPageName = text.find("{{ page_name }}");
+        if (foundPageName != std::string::npos) {
+            text.replace(foundPageName, 15, page->name);
+            run->text = text;
+        }
 
-                // interpolate page links
-                if (secondPass == false) {
-                    continue;
-                }
-                auto foundPageLink = text.find("{{ Story_number }}");
-                if (foundPageLink != std::string::npos) {
-                    auto link = laidDoc->pageLinks[std::string("The Story")];
-                    text.replace(foundPageLink, 17, std::to_string(link));
-                    run.text = text;
-                }
-            }
+        // interpolate page links
+        if (secondPass == false) {
+            return;
+        }
+        auto foundPageLink = text.find("{{ Story_number }}");
+        if (foundPageLink != std::string::npos) {
+            auto link = laidDoc->pageLinks[std::string("The Story")];
+            text.replace(foundPageLink, 18, std::to_string(link));
+            run->text = text;
         }
     }
 
@@ -327,7 +324,6 @@ public:
         }
 
         for(auto box : page->boxes) {
-            interpolateVariables(box, page);
             if (box->image_path.size() > 0) {
                 BuildImage(canvas, box);
             }
@@ -439,7 +435,9 @@ public:
             }
 
             for (size_t runIdx = 0; runIdx < paragraph->text_runs.size(); runIdx++) {
-                auto& text_run = paragraph->text_runs[runIdx];
+                auto text_run = paragraph->text_runs[runIdx];
+
+                interpolateVariables(&text_run, page);
                 textSetter->SetText(text_run.text, paragraphStyles[text_run.style], box);
                 if (textSetter->hasOverflowingText()) {
 
