@@ -209,6 +209,32 @@ class MasterPage {
         float baseline;
         std::vector<std::shared_ptr<Box>> boxes;
 
+        MasterPage() {}
+
+        // Copy constructor
+        MasterPage(const MasterPage& other)
+            : name(other.name),
+            width(other.width),
+            height(other.height),
+            cols(other.cols),
+            rows(other.rows),
+            gap(other.gap),
+            marginTop(other.marginTop),
+            marginBottom(other.marginBottom),
+            marginLeft(other.marginLeft),
+            marginRight(other.marginRight),
+            baseline(other.baseline),
+            boxes(other.boxes) {
+            // Deep copy for boxes if necessary
+            for (size_t i = 0; i < other.boxes.size(); ++i) {
+                if (other.boxes[i] != nullptr) {
+                    this->boxes[i] = std::make_shared<Box>(*other.boxes[i]);
+                } else {
+                    this->boxes[i] = nullptr;
+                }
+            }
+        }
+
         void addBox(std::shared_ptr<Box> box) {
             boxes.push_back(box);
         }
@@ -263,9 +289,6 @@ class Page : public PageObject {
             Left,
             Right
         };
-        Page(MasterPage& masterPage) {
-            this->masterPage = masterPage;
-        }
         MasterPage masterPage;
         std::vector<std::shared_ptr<Box>> boxes;
         bool overflow;
@@ -276,6 +299,41 @@ class Page : public PageObject {
         std::map<std::string, std::string> variables;
         std::string name;
         int number;
+
+        Page() {}
+
+        Page(MasterPage& masterPage) {
+            this->masterPage = masterPage;
+        }
+
+        // Copy constructor
+        Page(const Page& other)
+            : masterPage(other.masterPage),
+            overflow(other.overflow),
+            boxIdx(other.boxIdx),
+            type(other.type),
+            variables(other.variables),
+            name(other.name),
+            number(other.number) {
+            // Deep copy for next and prev pointers
+            if (other.next != nullptr) {
+                this->next = std::make_shared<Page>(*other.next);
+            } else {
+                this->next = nullptr;
+            }
+
+            // deep copy boxes
+            for (const auto& box : other.boxes) {
+                this->boxes.push_back(std::make_shared<Box>(*box));
+            }
+
+            if (other.prev != nullptr) {
+                this->prev = std::make_shared<Page>(*other.prev);
+            } else {
+                this->prev = nullptr;
+            }
+            this->overflow = other.overflow;
+        }
 
         void addBox(std::shared_ptr<Box>& box) {
             boxes.push_back(box);
@@ -381,6 +439,26 @@ class Document {
         laid::PrintSettings printSettings;
         std::map<std::string, int> pageLinks;
         std::map<std::string, int> boxLinks;
+
+        Document() {}
+        // Copy constructor
+        Document(const Document& other) 
+            : page_count(other.page_count), strokeStyles(other.strokeStyles), masterPages(other.masterPages) {
+            
+            // Deep copy the linked list of pages
+            if (other.pages != nullptr) {
+                this->pages = std::make_shared<Page>(*other.pages);
+                auto current = this->pages;
+                auto otherCurrent = other.pages->next;
+                while (otherCurrent != nullptr) {
+                    current->next = std::make_shared<Page>(*otherCurrent);
+                    current = current->next;
+                    otherCurrent = otherCurrent->next;
+                }
+            } else {
+                this->pages = nullptr;
+            }
+        }
 
         void addColor(RGBColor& color) {
             colors[color.name] = color;

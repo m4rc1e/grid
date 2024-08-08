@@ -20,6 +20,12 @@
     </head>
     <body>
         <pages>
+            <page name="Index" masterpage="dflt" overflow="false">
+                <box name="main" gx="2" gy="2" cols="1" rows="4">
+                    <para style="p">Title . . . {{ Title_number }}</para>
+                    <para style="p">Story . . . {{ Story_number }}</para>
+                </box>
+            </page>
             <page name="Title" masterpage="dflt" overflow="true">
                 <box name="main" gx="2" gy="2" cols="1" rows="4">
                     <para style="p">WINNIE-THE-POOH</para>

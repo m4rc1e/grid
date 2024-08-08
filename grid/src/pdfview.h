@@ -66,6 +66,8 @@ public:
         metadata.fCreator = "Example";
         metadata.fCreation = {0, 2019, 1, 4, 31, 12, 34, 56};
         metadata.fModified = {0, 2019, 1, 4, 31, 12, 34, 56};
+        secondPassDoc = std::make_shared<laid::Document>(*laidDoc);
+        std::cout << "Building PDF" << std::endl;
     };
 
     std::shared_ptr<laid::Document> laidDoc;
@@ -78,6 +80,11 @@ public:
     std::map<std::string, SkPaint> strokeStyles;
     bool debug;
     DebugGuides debugGuides;
+    // on the second pass, we'll rebuild the doc and populate variables
+    // that we uncovered on the first pass. This is quite inefficient but
+    // it is simple.
+    bool secondPass = false;
+    std::shared_ptr<laid::Document> secondPassDoc;
 
     void BuildBoxStyles() {
         for (auto& [name, style] : laidDoc->boxStyles) {
@@ -174,6 +181,12 @@ public:
         BuildBoxStyles();
         BuildStyles();
         BuildPages();
+
+        secondPass = true;
+        pdf = SkPDF::MakeDocument(&stream, metadata);
+        laidDoc = secondPassDoc;
+        BuildPages();
+        std::cout << "EE" << std::endl;
     }
 
     void offsetCanvas(SkCanvas* canvas, float width, float height) {
@@ -277,9 +290,21 @@ public:
                     run.text = text;
                 }
 
+                // interpolate page names. Same structure as above so if we add another let's refactor
                 auto foundPageName = text.find("{{ page_name }}");
                 if (foundPageName != std::string::npos) {
                     text.replace(foundPageName, 15, page->name);
+                    run.text = text;
+                }
+
+                // interpolate page links
+                if (secondPass == false) {
+                    continue;
+                }
+                auto foundPageLink = text.find("{{ Story_number }}");
+                if (foundPageLink != std::string::npos) {
+                    auto link = laidDoc->pageLinks[std::string("The Story")];
+                    text.replace(foundPageLink, 17, std::to_string(link));
                     run.text = text;
                 }
             }
