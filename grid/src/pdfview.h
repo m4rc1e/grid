@@ -49,7 +49,7 @@
 
 #include <iostream>
 #include <sstream>
-
+#include <regex>
 
 using namespace skia::textlayout;
 
@@ -283,14 +283,14 @@ public:
         auto text = run->text;
 
         // interpolate page numbers. TODO make this its own func
-        auto foundPageNum = text.find("{{ page_number }}");
+        auto foundPageNum = text.find("{{ page.number }}");
         if (foundPageNum != std::string::npos) {
             text.replace(foundPageNum, 17, std::to_string(page->number));
             run->text = text;
         }
 
         // interpolate page names. Same structure as above so if we add another let's refactor
-        auto foundPageName = text.find("{{ page_name }}");
+        auto foundPageName = text.find("{{ page.name }}");
         if (foundPageName != std::string::npos) {
             text.replace(foundPageName, 15, page->name);
             run->text = text;
@@ -300,11 +300,21 @@ public:
         if (secondPass == false) {
             return;
         }
-        auto foundPageLink = text.find("{{ Story_number }}");
-        if (foundPageLink != std::string::npos) {
-            auto link = laidDoc->pageLinks[std::string("The Story")];
-            text.replace(foundPageLink, 18, std::to_string(link));
-            run->text = text;
+
+        std::regex pattern(R"(\{\{\s*(\w+)\.(\w+)\.(\w+)\s*\}\})");
+        std::smatch match;
+
+        // parse numbers
+        if (std::regex_search(text, match, pattern)) {
+            if (match[2] == "page" && match[3] == "number") {
+                if (laidDoc->pageLinks.find(match[1]) == laidDoc->pageLinks.end()) {
+                    std::cout << "Page link not found: " << match[1] << std::endl;
+                } else {
+                    auto link = laidDoc->pageLinks[match[1]];
+                    text.replace(match.position(), match.length(), std::to_string(link));
+                    run->text = text;
+                }
+            }
         }
     }
 

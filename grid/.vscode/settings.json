@@ -75,6 +75,7 @@
         "ranges": "cpp",
         "valarray": "cpp",
         "filesystem": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "regex": "cpp"
     }
 }
