@@ -21,9 +21,9 @@
     <body>
         <pages>
             <page name="Index" masterpage="dflt" overflow="false">
-                <box name="main" gx="2" gy="2" cols="1" rows="4">
-                    <para style="p">Title . . . {{ Title.page.number }}</para>
-                    <para style="p">Story . . . {{ Story.page.number }}</para>
+                <box name="main" gx="2" gy="2" cols="1" rows="4" tabs="10,20,30,40,50,60">
+                    <para style="p">Title	.	.	.	{{ Title.page.number }}</para>
+                    <para style="p">Story	.	.	.	{{ Story.page.number }}</para>
                 </box>
             </page>
             <page name="Title" masterpage="dflt" overflow="true">

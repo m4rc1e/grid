@@ -133,19 +133,15 @@ public:
             if (token.find("\t") != std::string::npos) {
                 std::istringstream iss(token);
                 std::string leftWord, tab, rightWord;
-                std::getline(iss, leftWord, '\t');
-                std::getline(iss, rightWord, '\t');
-                builder.addText(leftWord.data());
-                paragraph = builder.Build();
-                paragraph->layout(width);
-                currentCursor = getCursor(paragraph.get());
-                auto tabWidth = box->nextTab(currentCursor.x) - currentCursor.x;
-                addPlaceholder(tabWidth);
-                paragraph = builder.Build();
-                paragraph->layout(width);
-                currentCursor = getCursor(paragraph.get());
-                builder.addText(rightWord.data());
-                builder.addText(" ");
+                std::string subToken;
+                while (std::getline(iss, subToken, '\t')) {
+                    builder.addText(subToken.data());
+                    paragraph = builder.Build();
+                    paragraph->layout(width);
+                    currentCursor = getCursor(paragraph.get());
+                    auto tabWidth = box->nextTab(currentCursor.x) - currentCursor.x;
+                    addPlaceholder(tabWidth);
+                }
             } else {
                 builder.addText(token.data());
                 builder.addText(" ");
