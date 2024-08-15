@@ -496,7 +496,9 @@ class Document {
         void addSpread(std::shared_ptr<Spread> spread) {
             auto leftPage = spread->leftPage();
             auto rightPage = spread->rightPage();
-            rightPage->prev = leftPage;
+            // This seems to cause a cycle in the LL. May need to investigate further
+            // We really need to add tests to stomp out this stuff
+            //rightPage->prev = leftPage;
             addPage(leftPage);
             addPage(rightPage);
         }

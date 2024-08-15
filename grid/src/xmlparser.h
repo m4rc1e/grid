@@ -201,6 +201,7 @@ std::unordered_set<std::string> boxAttribs = {
     "style",
     "vertalign",
     "tabs",
+    "img",
 };
 
 std::unordered_set<std::string> paraAttribs = {
@@ -281,6 +282,7 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
         throw std::invalid_argument("Box must have a name!");
     }
     auto next = box_node.attribute("next").as_string();
+    
 
     float x, y, width, height;
     // x pos
@@ -340,6 +342,7 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
     int zIndex = box_node.attribute("zindex").as_int();
     auto box = std::make_shared<laid::Box>(x, y, width, height);
     auto style = box_node.attribute("style");
+    box->image_path = box_node.attribute("img").as_string();
     if (style.empty() == false) {
         box->style = std::string(style.as_string());
     }
