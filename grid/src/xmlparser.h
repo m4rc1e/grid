@@ -114,6 +114,7 @@
 
 #include <iostream>
 #include "pugixml.hpp"
+#include "preprocess.h"
 #include "models.h"
 #include "print.h"
 #include <stdexcept>
@@ -403,11 +404,11 @@ laid::PrintSettings parsePrintSettings(pugi::xml_node print_node) {
 }
 
 std::shared_ptr<laid::Document> load_file(const char* filename) {
+
     if (!std::filesystem::exists(filename)) {
         throw std::invalid_argument("File does not exist!");
     }
-    pugi::xml_document xml_doc;
-    pugi::xml_parse_result result = xml_doc.load_file(filename);
+    auto xml_doc = preprocessXML(filename);
     auto xml_doc_start = xml_doc.child("document");
     auto doc = std::make_shared<laid::Document>();
 
