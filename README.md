@@ -15,6 +15,6 @@ A text layout engine based on swiss grids.
 - [x] Collisions
 - [x] Swatches
 - [x] Spreads
-- [ ] XML preprocesser to handle imports
+- [x] XML preprocesser to handle imports
 - [ ] CMYK support
 - [x] Print settings
