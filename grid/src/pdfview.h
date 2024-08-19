@@ -447,7 +447,7 @@ public:
             TextSetter* textSetter = new TextSetter(box->width, box->height - offset, paragraphStyle, collisionBoxes);
             
             // space before padding
-            offset += laidDoc->paragraph_styles[paragraph->style].spaceBefore;
+            offset += laidStyle.spaceBefore;
 
             // rule above
             auto strokeStyleAbove = laidDoc->strokeStyles[laidStyle.ruleAbove];
@@ -508,7 +508,7 @@ public:
                         std::cout << "overflowing text" << '\n';
                         std::cout << textSetter->overflowingText << '\n';
                     }
-                    // Finally paint boxes based on box vertalignment
+                    // Finally paint boxes based on box vert alignment
                     for (auto& setter : textSetters) {
                         if (box->vertAlign == laid::Box::VertAlignChoices::Middle) {
                             setter->paintY = setter->paintY + (box->height - offset) / 2;
@@ -537,7 +537,7 @@ public:
                 );
             }
             offset += textSetter->contentHeight;
-            offset += laidDoc->paragraph_styles[paragraph->style].spaceAfter;
+            offset += laidStyle.spaceAfter;
         }
 
         // Finally paint boxes based on box vertalignment

@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${fileDirname}/${fileBasenameNoExtension}", // Specify the path to your compiled executable
             "args": [
-                "/Users/marcfoley/Documents/grid/grid/promos/the_standard/invoice.xml",
+                "/Users/marcfoley/Documents/grid/grid/promos/the_standard/gap.xml",
                 "./bookie.pdf", 
                 "--debug"
             ], // Add your CLI arguments here
