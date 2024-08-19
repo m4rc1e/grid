@@ -63,6 +63,13 @@ class Rect {
 };
 
 
+class Point {
+    public:
+        int x;
+        int y;
+};
+
+
 class TextRun {
     public:
         std::string text;
@@ -239,6 +246,17 @@ class MasterPage {
             boxes.push_back(box);
         }
     
+        Point nearestGPoint(float x, float y) {
+            auto workingWidth = width - marginLeft - marginRight - (gap*(cols-1));
+            auto colWidth = (workingWidth / cols);
+            auto resX = int(x / colWidth);
+
+            auto workingHeight = height - marginTop - marginBottom - (gap*(rows-1));
+            auto rowHeight = int(workingHeight / rows);
+            auto resY = int(y / rowHeight);
+            return Point{resX, resY - 1};
+        }
+
         Rect getRect(int col, int row) {
             // columns
             auto workingWidth = width - marginLeft - marginRight - (gap*(cols-1));

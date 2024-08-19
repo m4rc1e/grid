@@ -421,6 +421,24 @@ public:
         std::vector<TextSetter*> textSetters;
         for (size_t paraIdx = 0; paraIdx < box->paragraphs.size(); paraIdx++) {
             collisionBoxes = collidingBoxes(page, box, offset);
+            if (box->children.find(paraIdx) != box->children.end()) {
+                std::cout << "Key exists: " << paraIdx << std::endl;
+                for (auto& child : box->children[paraIdx]) {
+                    if (child->y == -1) {
+                        child->y = box->y + offset;
+                    } else if (child->y == -2) {
+                        auto currY = box->y + offset;
+                        auto pt = page->masterPage.nearestGPoint(box->x, currY);
+                        auto pt2 = page->masterPage.getRect(pt.x, pt.y);
+                        child->y = pt2.startY;
+                    }
+                    if (debug == true) {
+                        debugGuides.BuildBoxRect(canvas, child);
+                    }
+                    StyleBox(child, canvas);
+                    BuildText(canvas, page, child);
+                }
+            }
             auto paragraph = box->paragraphs[paraIdx];
             auto laidStyle = laidDoc->paragraph_styles[paragraph->style];
             auto paragraphStyle = paragraphStyles[paragraph->style];
@@ -501,19 +519,6 @@ public:
                         delete setter;
                     }
                     return;
-                }
-            }
-            if (box->children.find(paraIdx) != box->children.end()) {
-                std::cout << "Key exists." << std::endl;
-                for (auto& child : box->children[paraIdx]) {
-                    if (child->y == -1) {
-                        child->y = box->y + offset;
-                    }
-                    if (debug == true) {
-                        debugGuides.BuildBoxRect(canvas, child);
-                    }
-                    StyleBox(child, canvas);
-                    BuildText(canvas, page, child);
                 }
             }
             textSetter->paintCoords(box->x, box->y+offset);

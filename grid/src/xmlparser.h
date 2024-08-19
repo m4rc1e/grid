@@ -302,10 +302,14 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
     auto gypos = box_node.attribute("gy");
     auto ypos = box_node.attribute("y");
     if (ypos.empty() == false) {
-        y = ypos.as_float();
+        if (ypos.as_string() == std::string("*")) {
+            y = -1;
+        } else {
+            y = ypos.as_float();
+        }
     } else if (gypos.empty() == false) {
         if (gypos.as_string() == std::string("*")) {
-            y = -1;
+            y = -2;
         } else {
             auto rect = basePage->getRect(1, gypos.as_float());
             y = rect.startY;
@@ -375,11 +379,11 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
             paragraph->style = sub_node.attribute("style").as_string();
             parseParagraph(sub_node, paragraph);
             box->addParagraph(paragraph);
+            paragraphCount++;
         } else if (std::strcmp(sub_node.name(), "box") == 0) {
             box->addChild(paragraphCount, parseBox(sub_node, basePage, boxes, boxMap));
             std::cout << "getting box!"; 
         }
-        paragraphCount++;
     }
     return box;
 }
