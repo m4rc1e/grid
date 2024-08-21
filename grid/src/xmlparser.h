@@ -374,7 +374,7 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
     boxMap[name] = next;
     int paragraphCount = 0;
     for (pugi::xml_node sub_node: box_node.children()) {
-        if (std::strcmp(sub_node.name(), "para") == 0) {
+        if (std::strcmp(sub_node.name(), "p") == 0) {
             auto paragraph = std::make_shared<laid::Paragraph>();
             paragraph->style = sub_node.attribute("style").as_string();
             parseParagraph(sub_node, paragraph);
@@ -395,10 +395,8 @@ laid::PrintSettings parsePrintSettings(pugi::xml_node print_node) {
         printSettings.composition = laid::PrintSettings::Composition::Spreads;
     } else if (strcmp(composition, "saddlestitchspreads") == 0) {
         printSettings.composition = laid::PrintSettings::Composition::SaddleStitchSpreads;
-    } else if (std::string(composition) == "single") {
-        printSettings.composition = laid::PrintSettings::Composition::Single;
     } else {
-        throw std::invalid_argument(std::string("Invalid composition type! \"") + composition + "\" Must be one of 'single', 'spreads'");
+        printSettings.composition = laid::PrintSettings::Composition::Single;
     }
     printSettings.paperWidth = print_node.attribute("paperwidth").as_float();
 

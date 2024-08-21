@@ -77,5 +77,14 @@
         "filesystem": "cpp",
         "iomanip": "cpp",
         "regex": "cpp"
+    },
+    "emeraldwalk.runonsave": {
+        "commands": [
+            {
+                "match": "\\.gridml$",
+                "isAsync": true,
+                "cmd": "./grid ${file} ${file}.pdf"
+            }
+        ]
     }
 }
