@@ -7,14 +7,13 @@
 
 namespace laid {
 struct PrintSettings {
-    // A4 by default. Maybe it should be US Letter
     enum Composition {
         Single,
         Spreads,
         SaddleStitchSpreads,
     };
-    float paperWidth = 595;
-    float paperHeight = 842;
+    float paperWidth;
+    float paperHeight;
     bool cropMarks = false;
     Composition composition = Single;
 };

@@ -246,7 +246,12 @@ public:
     }
 
     void BuildPages() {
-        // TODO bring back print paper sizing
+        // print settings config
+        if (laidDoc->printSettings.paperHeight == 0) {
+            std::cout << "Paper dimensions not set, using master page dimensions" << std::endl;
+            laidDoc->printSettings.paperHeight = laidDoc->pages->masterPage.height;
+            laidDoc->printSettings.paperWidth = laidDoc->pages->masterPage.width;
+        }
         std::shared_ptr<laid::Page> head = laidDoc->pages;
         auto currentPage = 0;
         if (laidDoc->printSettings.composition == laid::PrintSettings::Composition::Single) {
