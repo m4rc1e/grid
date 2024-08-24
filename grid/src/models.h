@@ -115,6 +115,7 @@ class Box {
         std::shared_ptr<Box> next;
         std::shared_ptr<Box> prev;
         std::string image_path;
+        std::string boxStyle;
         std::string style;
         std::map<int, std::vector<std::shared_ptr<Box>>> children;
         std::vector<float> tabs;
@@ -128,7 +129,7 @@ class Box {
         // Copy constructor for deep copy
         Box(const Box& other)
             : x(other.x), y(other.y), width(other.width), height(other.height),
-            vertAlign(other.vertAlign), image_path(other.image_path), style(other.style), tabs(other.tabs) {
+            vertAlign(other.vertAlign), image_path(other.image_path), boxStyle(other.boxStyle), style(other.style), tabs(other.tabs) {
 
             // Deep copy of paragraphs
             for (const auto& paragraph : other.paragraphs) {

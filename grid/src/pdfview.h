@@ -271,10 +271,10 @@ public:
         laidDoc->page_count = currentPage;
     }
     void StyleBox(std::shared_ptr<laid::Box> box, SkCanvas* canvas) {
-        if (box->style != "") {
+        if (box->boxStyle != "") {
             canvas->drawRect(
                 SkRect::MakeXYWH(box->x, box->y, box->width, box->height),
-                boxStyles[box->style]
+                boxStyles[box->boxStyle]
             );
         }
     }
@@ -419,6 +419,7 @@ public:
         int offset = 0;
         auto collisionBoxes = collidingBoxes(page, box, offset);
         std::vector<TextSetter*> textSetters;
+        auto styleName = box->style;
         for (size_t paraIdx = 0; paraIdx < box->paragraphs.size(); paraIdx++) {
             collisionBoxes = collidingBoxes(page, box, offset);
             if (box->children.find(paraIdx) != box->children.end()) {
@@ -440,6 +441,9 @@ public:
                 }
             }
             auto paragraph = box->paragraphs[paraIdx];
+            if (paragraph->style == "") {
+                paragraph->style = styleName;
+            }
             auto laidStyle = laidDoc->paragraph_styles[paragraph->style];
             auto paragraphStyle = paragraphStyles[paragraph->style];
 
@@ -466,6 +470,10 @@ public:
                 auto text_run = paragraph->text_runs[runIdx];
 
                 interpolateVariables(&text_run, page);
+                if (text_run.style == "") {
+                    text_run.style = styleName;
+                }
+
                 textSetter->SetText(text_run.text, paragraphStyles[text_run.style], box);
                 if (textSetter->hasOverflowingText()) {
 

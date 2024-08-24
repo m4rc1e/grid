@@ -199,6 +199,7 @@ std::unordered_set<std::string> boxAttribs = {
     "height",
     "rows",
     "zindex",
+    "boxstyle",
     "style",
     "vertalign",
     "tabs",
@@ -346,11 +347,15 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
 
     int zIndex = box_node.attribute("zindex").as_int();
     auto box = std::make_shared<laid::Box>(x, y, width, height);
+    auto boxStyle = box_node.attribute("boxstyle");
+    if (boxStyle.empty() == false) {
+        box->boxStyle = std::string(boxStyle.as_string());
+    }
     auto style = box_node.attribute("style");
-    box->image_path = box_node.attribute("img").as_string();
     if (style.empty() == false) {
         box->style = std::string(style.as_string());
     }
+    box->image_path = box_node.attribute("img").as_string();
     auto vertalign = box_node.attribute("vertalign");
     if (vertalign.empty() == false) {
         if (vertalign.as_string() == std::string("top")) {
