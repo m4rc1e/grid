@@ -46,6 +46,12 @@
         width: Font Width (1-9) (default 5)
         slant: Font Slant (0-1) (default 0)
         color: Font Color (default builtin black)
+
+        spacebefore: space before each paragraph (default 0)
+        spaceafter: space after each paragraph (default 0)
+
+        ruleabove: 
+        rulebelow:
       -->
       <style name="p" fontname="Inter" fontsize="10" leading="12"/>
     </styles>
@@ -55,9 +61,22 @@
       <!-- Box Style Element:
       Attributes:
         name: Box style name (required)
-        color: Font Color (default None)
+        color: Color (default None)
       -->
     </boxstyles>
+    
+    <!-- Stroke Styles have their own style element -->
+    <strokestyles>
+      <!-- Stroke Style Element:
+      Attributes:
+        name: Stroke style name (required)
+        color: Color (default None)
+        yoffset: offset from y position
+        xoffset: offset from x position
+        thickness: stroke thickness
+      -->
+    </strokestyles>
+            
     
   </head>
 
@@ -83,7 +102,10 @@
         
         zindex: if value greater than 0, make colliding boxes flow around this box (default 0)
         
-        style: Box Style name (default none)
+        boxstyle: Box Style name (default none)
+        style: font style name (default none)
+
+        tabs: list of tab stops in pt e.g 30,60,90,120,150,180 (default none)
         -->
         <box gx="1" gy="1" cols="4" rows="4">
         
