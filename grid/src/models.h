@@ -136,13 +136,13 @@ class Box {
                 paragraphs.push_back(std::make_shared<Paragraph>(*paragraph));
             }
 
-            // Deep copy of next and prev
-            if (other.next) {
-                next = std::make_shared<Box>(*other.next);
-            }
-            if (other.prev) {
-                prev = std::make_shared<Box>(*other.prev);
-            }
+//            // Deep copy of next and prev
+//            if (other.next) {
+//                next = std::make_shared<Box>(*other.next);
+//            }
+//            if (other.prev) {
+//                prev = std::make_shared<Box>(*other.prev);
+//            }
 
             // Deep copy of children
             for (const auto& [key, childVector] : other.children) {
@@ -477,6 +477,24 @@ class Document {
                 }
             } else {
                 this->pages = nullptr;
+            }
+            // link copied boxes
+            auto nextMap = std::map<std::shared_ptr<laid::Box>, std::shared_ptr<laid::Box>>();
+            auto boxMap = std::map<std::shared_ptr<laid::Box>, std::shared_ptr<laid::Box>>();
+            auto otherCurrent = other.pages;
+            auto current = this->pages;
+            while (otherCurrent != nullptr) {
+                for (size_t i=0; i<otherCurrent->boxes.size(); i++) {
+                    nextMap[otherCurrent->boxes[i]] = otherCurrent->boxes[i]->next;
+                    boxMap[otherCurrent->boxes[i]] = current->boxes[i];
+                }
+                current = current->next;
+                otherCurrent = otherCurrent->next;
+            }
+            for (auto& [key, value] : boxMap) {
+                if (nextMap[key] != nullptr) {
+                    value->next = boxMap[nextMap[key]];
+                }
             }
         }
 
