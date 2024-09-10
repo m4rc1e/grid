@@ -301,6 +301,15 @@ public:
             run->text = text;
         }
 
+        // Add user variables
+        for (auto& [key, value] : laidDoc->userVariables) {
+            auto found = text.find("{{ " + key + " }}");
+            if (found != std::string::npos) {
+                text.replace(found, key.size() + 6, value);
+                run->text = text;
+            }
+        }
+
         // interpolate page links
         if (secondPass == false) {
             return;

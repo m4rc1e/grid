@@ -458,11 +458,12 @@ class Document {
         laid::PrintSettings printSettings;
         std::map<std::string, int> pageLinks;
         std::map<std::string, int> boxLinks;
+        std::map<std::string, std::string> userVariables;
 
         Document() {}
         // Copy constructor
         Document(const Document& other) 
-            : page_count(other.page_count), paragraph_styles(other.paragraph_styles), strokeStyles(other.strokeStyles), masterPages(other.masterPages), printSettings(other.printSettings) {
+            : page_count(other.page_count), paragraph_styles(other.paragraph_styles), strokeStyles(other.strokeStyles), masterPages(other.masterPages), printSettings(other.printSettings), userVariables(other.userVariables) {
             
             // Deep copy the linked list of pages
             if (other.pages != nullptr) {
@@ -619,6 +620,11 @@ class Document {
                 tail->prev = newRightPage;
             }
         }
+    void addVariables(std::map<std::string, std::string>& variables) {
+        for (const auto& [key, value] : variables) {
+            userVariables[key] = value;
+        }
+    }
 };
 
 } // namespace laid
