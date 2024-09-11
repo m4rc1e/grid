@@ -182,12 +182,12 @@ public:
         BuildStyles();
         BuildPages();
 
-//        secondPass = true;
-//        pdf = SkPDF::MakeDocument(&stream, metadata);
-//        secondPassDoc->pageLinks = laidDoc->pageLinks;
-//        laidDoc = secondPassDoc;
-//        BuildPages();
-//        std::cout << "EE" << std::endl;
+        secondPass = true;
+        pdf = SkPDF::MakeDocument(&stream, metadata);
+        secondPassDoc->pageLinks = laidDoc->pageLinks;
+        laidDoc = secondPassDoc;
+        BuildPages();
+        std::cout << "EE" << std::endl;
     }
 
     void offsetCanvas(SkCanvas* canvas, float width, float height) {
@@ -532,6 +532,8 @@ public:
                     }
                     // THIS IS ALL WRONG
                     // Finally paint boxes based on box vert alignment
+                    textSetter->paintCoords(box->x, box->y+offset);
+                    textSetters.push_back(textSetter);
                     for (auto& setter : textSetters) {
                         if (box->vertAlign == laid::Box::VertAlignChoices::Middle) {
                             setter->paintY = setter->paintY + (box->height - offset) / 2;
