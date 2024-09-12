@@ -428,7 +428,7 @@ laid::PrintSettings parsePrintSettings(pugi::xml_node print_node) {
     printSettings.paperWidth = print_node.attribute("paperwidth").as_float();
 
     printSettings.paperHeight = print_node.attribute("paperheight").as_float();
-    printSettings.cropMarks = print_node.attribute("cropmarks").as_bool();
+    printSettings.cropMarks = print_node.attribute("crops").as_bool();
     return printSettings;
 }
 
@@ -456,14 +456,21 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
     for (pugi::xml_node node: xml_doc_start.child("head").child("masterpages").children("masterpage")) {
         unkownAttribs(node, masterPageAttribs);
         auto masterPage = std::make_shared<laid::MasterPage>();
-        masterPage->name = std::string(node.attribute("name").as_string());
-        if (masterPage->name == "") {
+        auto masterName = node.attribute("name");
+        if (masterName.empty() == true) {
             throw std::invalid_argument("Master page must have a name!");
+        }
+        masterPage->name = masterName.as_string();
+        auto cols = node.attribute("cols");
+        auto rows = node.attribute("rows");
+
+        if (cols.empty() == true || rows.empty() == true) {
+            throw std::invalid_argument("Master page must have 'cols' and 'rows' attributes!");
         }
         masterPage->height = node.attribute("height").as_int();
         masterPage->width = node.attribute("width").as_int();
-        masterPage->cols = node.attribute("cols").as_int();
-        masterPage->rows = node.attribute("rows").as_int();
+        masterPage->cols = cols.as_int();
+        masterPage->rows = rows.as_int();
         masterPage->baseline = node.attribute("baseline").as_int();
         
         auto margins = node.attribute("margins").as_string();
@@ -610,8 +617,11 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
         auto basePage = std::make_shared<laid::PageObject>();
         if (std::strcmp(node.name(), "page") == 0) {
             unkownAttribs(node, pageAttribs);
-            auto masterName = std::string(node.attribute("masterpage").as_string());
-            auto page = std::make_shared<laid::Page>(*doc->masterPages[masterName]);
+            auto masterName = node.attribute("masterpage");
+            if (masterName.empty() == true) {
+                throw std::invalid_argument("Page must have a masterpage attribute!");
+            }
+            auto page = std::make_shared<laid::Page>(*doc->masterPages[masterName.as_string()]);
             page->overflow = node.attribute("overflow").as_bool();
             page->name = node.attribute("name").as_string();
             // Set other Page-specific properties
@@ -619,11 +629,18 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
         } else if (std::strcmp(node.name(), "spread") == 0) {
             unkownAttribs(node, spreadAttribs);
             isSpread = true;
-            auto leftMaster = std::string(node.attribute("leftmaster").as_string());
-            auto rightMaster = std::string(node.attribute("rightmaster").as_string());
+            auto leftMaster = node.attribute("leftmaster");
+            if (leftMaster.empty() == true) {
+                throw std::invalid_argument("Spread must have a leftmaster attribute!");
+            }
+            
+            auto rightMaster = node.attribute("rightmaster");
+            if (rightMaster.empty() == true) {
+                throw std::invalid_argument("Spread must have a rightmaster attribute!");
+            }
             auto spread = std::make_shared<laid::Spread>(
-                *doc->masterPages[leftMaster],
-                *doc->masterPages[rightMaster]
+                *doc->masterPages[leftMaster.as_string()],
+                *doc->masterPages[rightMaster.as_string()]
             );
             spread->overflow = node.attribute("overflow").as_bool();
             spread->leftName = node.attribute("leftname").as_string();

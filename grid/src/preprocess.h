@@ -1,17 +1,22 @@
 #include "pugixml.hpp"
 #include <iostream>
+#include <filesystem>
 
 
 struct doc_flatten: pugi::xml_tree_walker
 {
-    doc_flatten(pugi::xml_document& doc): flattened(doc) {
+    doc_flatten(pugi::xml_document& doc, const char* root_doc): flattened(doc), root_doc(root_doc) {
     }
     pugi::xml_document& flattened;
+    const char* root_doc;
     virtual bool for_each(pugi::xml_node& node) {
         if (std::strcmp(node.name(), "import") == 0) {
             const char* file_path = node.attribute("file").value();
+            auto parent_path = std::filesystem::path(root_doc).parent_path();
+            auto to_path = std::filesystem::path(file_path);
+            auto full_path = parent_path / to_path;
             pugi::xml_document import_doc;
-            pugi::xml_parse_result result = import_doc.load_file(file_path);
+            pugi::xml_parse_result result = import_doc.load_file(full_path.c_str());
 
             if (result) {
                 for (pugi::xml_node import_node = import_doc.document_element().first_child(); import_node; import_node = import_node.next_sibling()) {
@@ -36,7 +41,7 @@ pugi::xml_document preprocessXML(const char* input_file) {
         throw std::runtime_error("Failed to load file: " + std::string(result.description()));
     }
 
-    doc_flatten walker(xml_doc);
+    doc_flatten walker(xml_doc, input_file);
     xml_doc.traverse(walker);
     return xml_doc;
 }

@@ -129,7 +129,7 @@ class Box {
         // Copy constructor for deep copy
         Box(const Box& other)
             : x(other.x), y(other.y), width(other.width), height(other.height),
-            vertAlign(other.vertAlign), image_path(other.image_path), boxStyle(other.boxStyle), style(other.style), tabs(other.tabs) {
+            vertAlign(other.vertAlign), image_path(other.image_path), boxStyle(other.boxStyle), style(other.style), tabs(other.tabs), zIndex(other.zIndex) {
 
             // Deep copy of paragraphs
             for (const auto& paragraph : other.paragraphs) {
