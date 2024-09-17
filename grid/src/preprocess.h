@@ -15,6 +15,9 @@ struct doc_flatten: pugi::xml_tree_walker
             auto parent_path = std::filesystem::path(root_doc).parent_path();
             auto to_path = std::filesystem::path(file_path);
             auto full_path = parent_path / to_path;
+            if (!std::filesystem::exists(full_path)) {
+                std::cerr << "File does not exist: " << full_path << std::endl;
+            }
             pugi::xml_document import_doc;
             pugi::xml_parse_result result = import_doc.load_file(full_path.c_str());
 

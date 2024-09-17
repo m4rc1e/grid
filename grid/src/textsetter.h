@@ -107,13 +107,13 @@ public:
             auto currentLine = int(paragraph->lineNumber());
 
             // Handle collisions with other Boxes
-            auto collidedBox = boxCollision(nextCursor);
+            auto collidedBox = boxCollision(currentCursor, nextCursor);
             while (collidedBox) {
                 paragraph = builder.Build();
                 paragraph->layout(width);
                 currentCursor = getCursor(paragraph.get());
                 nextCursor = getNextCursor(token, paragraph_style, paragraph.get());
-                collidedBox = boxCollision(nextCursor);
+                collidedBox = boxCollision(currentCursor, nextCursor);
                 if (currentCursor.x >= nextCursor.x) {
                     std::cout << "col";
                     addPlaceholder(collidedBox->width);
@@ -192,13 +192,21 @@ public:
         return CursorPos{cursorX, cursorY};
     }
 
-    std::optional<laid::Box> boxCollision(CursorPos cursor) {
+    std::optional<laid::Box> boxCollision(CursorPos currentCursor, CursorPos nextCursor) {
         for (auto& box : boxes) {
             if (
-                cursor.x >= box.x && 
-                cursor.x <= box.x + box.width && 
-                cursor.y >= box.y && 
-                cursor.y <= box.y + box.height
+                nextCursor.x >= box.x && 
+                nextCursor.x <= box.x + box.width && 
+                nextCursor.y >= box.y && 
+                nextCursor.y <= box.y + box.height
+            ) {
+                return box;
+            }
+            // Fix edge case where next word is larger than box starting from new line
+            if (
+                nextCursor.x < currentCursor.x &&
+                nextCursor.y > currentCursor.y &&
+                nextCursor.x > box.x + box.width
             ) {
                 return box;
             }
