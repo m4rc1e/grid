@@ -440,6 +440,7 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
     auto xml_doc = preprocessXML(filename);
     auto xml_doc_start = xml_doc.child("document");
     auto doc = std::make_shared<laid::Document>();
+    doc->path = filename;
 
 
     // maps used to link boxes in the whole document

@@ -459,11 +459,12 @@ class Document {
         std::map<std::string, int> pageLinks;
         std::map<std::string, int> boxLinks;
         std::map<std::string, std::string> userVariables;
+        std::string path;
 
         Document() {}
         // Copy constructor
         Document(const Document& other) 
-            : page_count(other.page_count), paragraph_styles(other.paragraph_styles), strokeStyles(other.strokeStyles), masterPages(other.masterPages), printSettings(other.printSettings), userVariables(other.userVariables) {
+            : page_count(other.page_count), paragraph_styles(other.paragraph_styles), strokeStyles(other.strokeStyles), masterPages(other.masterPages), printSettings(other.printSettings), userVariables(other.userVariables), path(other.path) {
             
             // Deep copy the linked list of pages
             if (other.pages != nullptr) {

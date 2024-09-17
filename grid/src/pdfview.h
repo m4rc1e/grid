@@ -50,6 +50,7 @@
 #include <iostream>
 #include <sstream>
 #include <regex>
+#include <filesystem>
 
 using namespace skia::textlayout;
 
@@ -389,7 +390,14 @@ public:
         std::cout << "img:" << box << std::endl;
         if (box->image_path.size() > 0) {
             std::cout << "Rendering image canvas: " << canvas << std::endl;
-            auto data = SkData::MakeFromFileName(box->image_path.c_str());
+
+            auto parent_path = std::filesystem::path(laidDoc->path).parent_path();
+            auto to_path = std::filesystem::path(box->image_path.c_str());
+            auto full_path = parent_path / to_path;
+            if (!std::filesystem::exists(full_path)) {
+                throw std::invalid_argument("File '" + std::string(full_path) + "' does not exist!");
+            }
+            auto data = SkData::MakeFromFileName(full_path.c_str());
             auto img = SkImages::DeferredFromEncodedData(data);
             std::cout << "Image width: " << img << std::endl;
             canvas->drawImageRect(
