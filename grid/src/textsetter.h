@@ -16,6 +16,7 @@
 #include "include/core/SkStream.h"
 #include "include/core/SkString.h"
 #include "include/core/SkTypeface.h"
+#include "include/core/SkFont.h"
 #include "include/core/SkTypes.h"
 #include "include/core/SkPath.h"
 #include "include/encode/SkPngEncoder.h"
@@ -162,14 +163,20 @@ public:
 
         ParagraphBuilderImpl wordBuilder(style, fontCollection);
         auto text_style = style.getTextStyle();
+        auto strut_style = style.getStrutStyle();
         wordBuilder.pushStyle(text_style);
+
+        auto typeface = sk_sp<SkTypeface>(text_style.getTypeface());
+        SkFont font(typeface, text_style.getFontSize());
+        auto spaceWidth = font.measureText(" ", 1, SkTextEncoding::kUTF8);
 
         wordBuilder.addText(token.data());
         auto wordParagraph = wordBuilder.Build();
         wordParagraph->layout(width);
+        auto sd = strut_style.getFontSize();
         auto wordCursor = getCursor(wordParagraph.get());
-        if (cursor.x + wordCursor.x + 10 >= width) {
-            return CursorPos{wordCursor.x, cursor.y + 12};
+        if (cursor.x + wordCursor.x + spaceWidth >= width) {
+            return CursorPos{wordCursor.x, cursor.y + int(strut_style.getFontSize())};
         }
         return CursorPos{cursor.x + wordCursor.x, cursor.y};
     }
