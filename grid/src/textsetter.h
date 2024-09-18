@@ -61,6 +61,12 @@ class CursorPos {
     int y;
 };
 
+bool endsWith(const std::string& str, const std::string& suffix) {
+    if (suffix.size() > str.size()) return false;
+    return std::equal(suffix.rbegin(), suffix.rend(), str.rbegin());
+}
+
+
 class TextSetter {
 public:
     TextSetter(
@@ -141,7 +147,12 @@ public:
                     paragraph->layout(width);
                     currentCursor = getCursor(paragraph.get());
                     auto tabWidth = box->nextTab(currentCursor.x) - currentCursor.x;
-                    addPlaceholder(tabWidth);
+                    // Don't add a tab for the last word
+                    if (!endsWith(token, subToken)) {
+                        addPlaceholder(tabWidth);
+                    } else {
+                        builder.addText(" ");
+                    }
                 }
             } else {
                 builder.addText(token.data());
