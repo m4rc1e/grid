@@ -5,7 +5,7 @@
 #include "print.h"
 #include <algorithm>
 
-const char* VERSION = "0.0.1";
+const char* VERSION = "0.0.2";
 
 
 void splitAndInsert(const std::string& str, std::map<std::string, std::string>& userArgs) {
