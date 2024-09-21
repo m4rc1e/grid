@@ -416,7 +416,7 @@ public:
             for (auto& [paraIdx, children] : childBox->children) {
                 for (auto& child : children) {
                     if (child->zIndex > box->zIndex) {
-                        auto collideBox = laid::Box(child->x - box->x, child->y - box->y, child->width, child->height - offset);
+                        auto collideBox = laid::Box(child->x - box->x, child->y - box->y - offset, child->width, child->height);
                         collisionBoxes.push_back(collideBox);
                     }
                 }
@@ -425,7 +425,7 @@ public:
                 continue;
             }
             if (childBox->zIndex > box->zIndex) {
-                auto collideBox = laid::Box(childBox->x - box->x, childBox->y - box->y, childBox->width, childBox->height - offset);
+                auto collideBox = laid::Box(childBox->x - box->x, childBox->y - box->y - offset, childBox->width, childBox->height);
                 collisionBoxes.push_back(collideBox);
             }
 

@@ -120,6 +120,9 @@ public:
                 paragraph->layout(width);
                 currentCursor = getCursor(paragraph.get());
                 nextCursor = getNextCursor(token, paragraph_style, paragraph.get());
+                if (token == std::string("constantly")) {
+                    std::cout << "break";
+                }
                 collidedBox = boxCollision(currentCursor, nextCursor);
                 if (currentCursor.x >= nextCursor.x) {
                     std::cout << "col";

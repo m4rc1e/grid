@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${fileDirname}/${fileBasenameNoExtension}", // Specify the path to your compiled executable
             "args": [
-                "/Users/marcfoley/Documents/grid/docs/11_tables.gridml",
+                "/Users/marcfoley/Documents/grid/grid/promos/the_standard/a5-brochure.gridml",
                 "./bookie.pdf", 
                 "--debug"
             ], // Add your CLI arguments here

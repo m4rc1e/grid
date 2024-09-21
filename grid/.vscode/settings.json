@@ -83,7 +83,7 @@
             {
                 "match": "\\.gridml$",
                 "isAsync": true,
-                "cmd": "./grid ${file} ${file}.pdf"
+                "cmd": "./grid ${file} ${file}.pdf --debug"
             }
         ]
     }
