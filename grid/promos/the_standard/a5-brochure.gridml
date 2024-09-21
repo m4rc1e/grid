@@ -1,0 +1,92 @@
+<document>
+    <head>
+        <import file="styles.gridml"/>
+    </head>
+    <body>
+        <pages>
+            <page masterpage="A5-single">
+                <box name="title" gx="3" gy="4" rows="1" cols="2" style="8/10-bold">
+                    <p>A small brochure</p>
+                    <p style="8/10">John Doe</p>
+                </box>
+            </page>
+            <page masterpage="A5-single">
+                <box name="tribute" gx="1" gy="4" rows="1" cols="2" style="8/10">
+                    <p>Dedicated to the hard working team</p>
+                    <p>We're nothing without you.</p>
+                </box>
+
+            </page>
+            <page masterpage="A5-single">
+                <box name="toc" gx="3" gy="4" rows="1" cols="2" style="8/10-bold">
+                    <p>TODO</p>
+                </box>
+            </page>
+            <page masterpage="A5-single">
+                <box name="quote1" gx="1" gy="4" rows="4" cols="4" style="32/40-i">
+                    <p style="">We can include a memorable quote in this section</p>
+                </box>
+            </page>
+            <!-- Section: What is an a5 brochure layout -->
+            <page masterpage="A5-single">
+                <box name="text1" gx="1" gy="4" rows="6" cols="2" style="8/10" next="text2">
+                    <box name="title1" gx="1" gy="1" rows="1" cols="4" style="16/20">
+                        <p>WHAT IS AN A5 BROCHURE LAYOUT?</p>
+                    </box>
+                    <p>An A5 brochure layout is a compact and versatile format ideal for a variety of marketing and informational purposes. The layout typically includes several key elements:</p>
+                    <p>The cover page often features a striking image or graphic along with the brochure's title and a tagline. This page is designed to grab attention and entice the reader to open the brochure.</p>
+                    <p>A table of contents (TOC) is usually placed on the inside front cover or the first page. It provides an overview of the brochure's contents, making it easy for readers to navigate.</p>
+                    <p>The first few pages typically include an introduction to the brochure's subject matter. This section sets the tone and provides context for the information that follows.</p>
+                    <p>The bulk of the brochure is dedicated to the main content, which can be divided into sections or chapters. Each section should be clearly labeled and may include headings, subheadings, images, and graphics to break up the text and make it more engaging.</p>
+                    <p>Including memorable quotes or key points in larger, stylized text can help to emphasize important information and make the brochure more visually appealing.</p>
+                    <p>The final pages often include a call to action, encouraging readers to take the next step, whether it's contacting the company, visiting a website, or making a purchase.</p>
+                    <p>The back cover usually contains contact information, social media links, and any additional branding elements. It may also include a brief summary or teaser of the brochure's content.</p>
+                    <p>An A5 brochure layout is designed to be both informative and visually appealing, making it an effective tool for communication and marketing.</p>
+                    <p>An A5 brochure layout is a compact and versatile format ideal for a variety of marketing and informational purposes. The layout typically includes several key elements:</p>
+                    <p>The cover page often features a striking image or graphic along with the brochure's title and a tagline. This page is designed to grab attention and entice the reader to open the brochure.</p>
+                    <p>A table of contents (TOC) is usually placed on the inside front cover or the first page. It provides an overview of the brochure's contents, making it easy for readers to navigate.</p>
+                    <p>The first few pages typically include an introduction to the brochure's subject matter. This section sets the tone and provides context for the information that follows.</p>
+                    <p>The bulk of the brochure is dedicated to the main content, which can be divided into sections or chapters. Each section should be clearly labeled and may include headings, subheadings, images, and graphics to break up the text and make it more engaging.</p>
+                    <p>Including memorable quotes or key points in larger, stylized text can help to emphasize important information and make the brochure more visually appealing.</p>
+                    <p>The final pages often include a call to action, encouraging readers to take the next step, whether it's contacting the company, visiting a website, or making a purchase.</p>
+                    <p>The back cover usually contains contact information, social media links, and any additional branding elements. It may also include a brief summary or teaser of the brochure's content.</p>
+                    <p>An A5 brochure layout is designed to be both informative and visually appealing, making it an effective tool for communication and marketing.</p>
+                    <p>An A5 brochure is an excellent choice for businesses looking to create a concise yet impactful marketing tool. Its compact size makes it easy to distribute and convenient for readers to carry.</p>
+                    <p>The design of an A5 brochure should be clean and well-organized, ensuring that the information is easy to read and visually appealing. High-quality images and graphics can enhance the overall look and feel of the brochure.</p>
+                    <p>When creating an A5 brochure, it's important to consider the target audience. The content should be tailored to their interests and needs, providing valuable information that encourages them to take action.</p>
+                    <p>Effective use of color and typography can make an A5 brochure stand out. Bold headlines and clear, readable fonts help to draw attention to key points and make the brochure more engaging.</p>
+                    <p>Incorporating interactive elements, such as QR codes or links to online resources, can add an extra layer of engagement to an A5 brochure. This allows readers to easily access additional information or take the next step in the customer journey.</p>
+                    <p>An A5 brochure can be used for a variety of purposes, from product catalogs and event programs to informational guides and promotional materials. Its versatility makes it a valuable tool for any marketing strategy.</p>
+                    <p>To maximize the effectiveness of an A5 brochure, it's important to include a clear call to action. Whether it's encouraging readers to visit a website, contact the business, or make a purchase, a strong call to action can drive results.</p>
+                    <p>Overall, an A5 brochure is a powerful and versatile marketing tool that can help businesses communicate their message effectively and reach their target audience. With careful planning and thoughtful design, an A5 brochure can make a lasting impression.</p>
+                </box>
+                <box name="text2" gx="3" gy="4" rows="6" cols="2" style="8/10" next="text3" />
+            </page>
+            
+            <page masterpage="A5-single">
+                <box name="img1" gx="1" gy="1" rows="6" cols="4" boxstyle="placeholder"/>
+                <box name="img2" gx="1" gy="7" rows="3" cols="2" boxstyle="placeholder"/>
+                <box name="img3" gx="3" gy="7" rows="3" cols="2" boxstyle="placeholder"/>
+            </page>
+            <page masterpage="A5-single">
+                <box name="text3" gx="1" gy="1" cols="2" rows="9" next="text4" style="8/10" />
+                <box name="text4" gx="3" gy="1" cols="2" rows="9" style="8/10" />
+            </page>
+            <!-- Section Annual summary-->
+            <page masterpage="A5-single"/>
+            <page masterpage="A5-single">
+                <box name="title10" gx="1" gy="1" rows="1" cols="4" style="16/20">
+                    <p>ANNUAL SUMMARY</p>
+                </box>
+                <box name="img5" gx="1" gy="7" rows="3" cols="4" zindex="10" style="8/10"><p>Chicken</p></box>
+                <box name="text10" gx="1" gy="4" rows="6" cols="2" style="8/10" next="text11">
+                    <p>Our company, XYZ Corp, is a leading innovator in the tech industry, dedicated to providing cutting-edge solutions that drive progress and efficiency. With a team of highly skilled professionals, we specialize in delivering top-notch products and services that meet the evolving needs of our clients. Our commitment to excellence and customer satisfaction has established us as a trusted partner in the market. Join us on our journey to shape the future of technology.</p>
+                    <p>At XYZ Corp, we believe in the power of innovation and continuous improvement. Our research and development team is constantly exploring new technologies and methodologies to stay ahead of the curve. This proactive approach ensures that we can offer our clients the most advanced and effective solutions available.</p>
+                    <p>We pride ourselves on our collaborative culture, where every team member's input is valued and encouraged. This inclusive environment fosters creativity and drives our collective success. By working together, we can tackle complex challenges and deliver exceptional results.</p>
+                    <p>Our global presence allows us to serve a diverse range of clients, from small startups to large enterprises. We understand the unique needs of different markets and tailor our solutions to meet those specific requirements. Our goal is to empower businesses worldwide to achieve their full potential through the strategic use of technology.</p>
+                </box>
+                <box name="text11" gx="3" gy="4" rows="6" cols="2" style="8/10"/>
+            </page>
+        </pages>
+    </body>
+</document>
