@@ -78,12 +78,23 @@
                 <box name="title10" gx="1" gy="1" rows="1" cols="4" style="16/20">
                     <p>ANNUAL SUMMARY</p>
                 </box>
-                <box name="img5" gx="1" gy="7" rows="3" cols="4" zindex="10" style="8/10"><p>Chicken</p></box>
+                <box name="char" gx="1" gy="7" rows="3" cols="4" zindex="10" style="8/10" tabs="50,80,120,170,220">
+                    <p style="8/10-bold">Person	Age	Gender	Earnings	Expenses	Company Car</p>
+                    <p>J Doe	54	Male	$124,000	$20,000	Yes</p>
+                    <p>S Farad	43	Female	$150,000	$30,000	No</p>
+                    <p>M Smith	60	Male	$180,000	$40,000	No</p>
+                    <p>K Patel	35	Female	$110,000	$15,000	Yes</p>
+                    <p>A Garcia	28	Male	$90,000	$10,000	No</p>
+                    <p>L Nguyen	47	Female	$145,000	$25,000	Yes</p>
+                    <p>C Lee	50	Male	$170,000	$35,000	Yes</p>
+                    <p>R Martinez	39	Female	$130,000	$22,000	No</p>
+                    <p>P Johnson	62	Male	$200,000	$50,000	Yes</p>
+                    <p>T Brown	45	Female	$155,000	$30,000	No</p>
+                    <p>D Kim	52	Male	$160,000	$28,000	Yes</p>
+                </box>
                 <box name="text10" gx="1" gy="4" rows="6" cols="2" style="8/10" next="text11">
                     <p>Our company, XYZ Corp, is a leading innovator in the tech industry, dedicated to providing cutting-edge solutions that drive progress and efficiency. With a team of highly skilled professionals, we specialize in delivering top-notch products and services that meet the evolving needs of our clients. Our commitment to excellence and customer satisfaction has established us as a trusted partner in the market. Join us on our journey to shape the future of technology.</p>
                     <p>At XYZ Corp, we believe in the power of innovation and continuous improvement. Our research and development team is constantly exploring new technologies and methodologies to stay ahead of the curve. This proactive approach ensures that we can offer our clients the most advanced and effective solutions available.</p>
-                    <p>We pride ourselves on our collaborative culture, where every team member's input is valued and encouraged. This inclusive environment fosters creativity and drives our collective success. By working together, we can tackle complex challenges and deliver exceptional results.</p>
-                    <p>Our global presence allows us to serve a diverse range of clients, from small startups to large enterprises. We understand the unique needs of different markets and tailor our solutions to meet those specific requirements. Our goal is to empower businesses worldwide to achieve their full potential through the strategic use of technology.</p>
                 </box>
                 <box name="text11" gx="3" gy="4" rows="6" cols="2" style="8/10"/>
             </page>
