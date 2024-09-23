@@ -653,6 +653,11 @@ std::shared_ptr<laid::Document> load_file(const char* filename) {
         std::shared_ptr<laid::Box> prev;
         for (pugi::xml_node box_node: node.children("box")) {
             auto box = parseBox(box_node, basePage, boxes, boxMap);
+            for (auto paragraph: box->paragraphs) {
+                if (doc->paragraph_styles.find(paragraph->style) == doc->paragraph_styles.end()) {
+                    throw std::invalid_argument("No paragraph style found with name '" + paragraph->style + "'");
+                }
+            }
             basePage->addBox(box);
             prev = box;
         }
