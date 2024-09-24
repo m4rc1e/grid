@@ -495,6 +495,7 @@ class Document {
             for (auto& [key, value] : boxMap) {
                 if (nextMap[key] != nullptr) {
                     value->next = boxMap[nextMap[key]];
+                    boxMap[nextMap[key]]->prev = value;
                 }
             }
         }
@@ -553,6 +554,8 @@ class Document {
             for (auto& box : page->boxes) {
                 auto newBox = std::make_shared<Box>(box->x, box->y, box->width, box->height);
                 boxMap[box] = newBox;
+                newBox->style = box->style;
+                newBox->boxStyle = box->boxStyle;
                 newPage->addBox(newBox);
             }
             // link boxes

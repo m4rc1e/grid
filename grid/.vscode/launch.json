@@ -10,6 +10,7 @@
             "request": "launch",
             "program": "${fileDirname}/${fileBasenameNoExtension}", // Specify the path to your compiled executable
             "args": [
+//                "/Users/marcfoley/Documents/grid/grid/promos/winnie_the_poo/book.xml",
                 "/Users/marcfoley/Documents/grid/grid/promos/the_standard/a5-brochure.gridml",
                 "./bookie.pdf", 
                 "--debug"

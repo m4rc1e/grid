@@ -59,6 +59,29 @@
                     <p>An A5 brochure can be used for a variety of purposes, from product catalogs and event programs to informational guides and promotional materials. Its versatility makes it a valuable tool for any marketing strategy.</p>
                     <p>To maximize the effectiveness of an A5 brochure, it's important to include a clear call to action. Whether it's encouraging readers to visit a website, contact the business, or make a purchase, a strong call to action can drive results.</p>
                     <p>Overall, an A5 brochure is a powerful and versatile marketing tool that can help businesses communicate their message effectively and reach their target audience. With careful planning and thoughtful design, an A5 brochure can make a lasting impression.</p>
+
+                    <p>The bulk of the brochure is dedicated to the main content, which can be divided into sections or chapters. Each section should be clearly labeled and may include headings, subheadings, images, and graphics to break up the text and make it more engaging.</p>
+                    <p>Including memorable quotes or key points in larger, stylized text can help to emphasize important information and make the brochure more visually appealing.</p>
+                    <p>The final pages often include a call to action, encouraging readers to take the next step, whether it's contacting the company, visiting a website, or making a purchase.</p>
+                    <p>The back cover usually contains contact information, social media links, and any additional branding elements. It may also include a brief summary or teaser of the brochure's content.</p>
+                    <p>An A5 brochure layout is designed to be both informative and visually appealing, making it an effective tool for communication and marketing.</p>
+                    <p>An A5 brochure layout is a compact and versatile format ideal for a variety of marketing and informational purposes. The layout typically includes several key elements:</p>
+                    <p>The cover page often features a striking image or graphic along with the brochure's title and a tagline. This page is designed to grab attention and entice the reader to open the brochure.</p>
+                    <p>A table of contents (TOC) is usually placed on the inside front cover or the first page. It provides an overview of the brochure's contents, making it easy for readers to navigate.</p>
+                    <p>The first few pages typically include an introduction to the brochure's subject matter. This section sets the tone and provides context for the information that follows.</p>
+                    <p>The bulk of the brochure is dedicated to the main content, which can be divided into sections or chapters. Each section should be clearly labeled and may include headings, subheadings, images, and graphics to break up the text and make it more engaging.</p>
+                    <p>Including memorable quotes or key points in larger, stylized text can help to emphasize important information and make the brochure more visually appealing.</p>
+                    <p>The final pages often include a call to action, encouraging readers to take the next step, whether it's contacting the company, visiting a website, or making a purchase.</p>
+                    <p>The back cover usually contains contact information, social media links, and any additional branding elements. It may also include a brief summary or teaser of the brochure's content.</p>
+                    <p>An A5 brochure layout is designed to be both informative and visually appealing, making it an effective tool for communication and marketing.</p>
+                    <p>An A5 brochure is an excellent choice for businesses looking to create a concise yet impactful marketing tool. Its compact size makes it easy to distribute and convenient for readers to carry.</p>
+                    <p>The design of an A5 brochure should be clean and well-organized, ensuring that the information is easy to read and visually appealing. High-quality images and graphics can enhance the overall look and feel of the brochure.</p>
+                    <p>When creating an A5 brochure, it's important to consider the target audience. The content should be tailored to their interests and needs, providing valuable information that encourages them to take action.</p>
+                    <p>Effective use of color and typography can make an A5 brochure stand out. Bold headlines and clear, readable fonts help to draw attention to key points and make the brochure more engaging.</p>
+                    <p>Incorporating interactive elements, such as QR codes or links to online resources, can add an extra layer of engagement to an A5 brochure. This allows readers to easily access additional information or take the next step in the customer journey.</p>
+                    <p>An A5 brochure can be used for a variety of purposes, from product catalogs and event programs to informational guides and promotional materials. Its versatility makes it a valuable tool for any marketing strategy.</p>
+                    <p>To maximize the effectiveness of an A5 brochure, it's important to include a clear call to action. Whether it's encouraging readers to visit a website, contact the business, or make a purchase, a strong call to action can drive results.</p>
+                    <p>Overall, an A5 brochure is a powerful and versatile marketing tool that can help businesses communicate their message effectively and reach their target audience. With careful planning and thoughtful design, an A5 brochure can make a lasting impression.</p>
                 </box>
                 <box name="text2" gx="3" gy="4" rows="6" cols="2" style="8/10" next="text3" />
             </page>
@@ -68,7 +91,7 @@
                 <box name="img2" gx="1" gy="7" rows="3" cols="2" boxstyle="placeholder"/>
                 <box name="img3" gx="3" gy="7" rows="3" cols="2" boxstyle="placeholder"/>
             </page>
-            <page masterpage="A5-single">
+            <page masterpage="A5-single" overflow="true">
                 <box name="text3" gx="1" gy="1" cols="2" rows="9" next="text4" style="8/10" />
                 <box name="text4" gx="3" gy="1" cols="2" rows="9" style="8/10" />
             </page>
@@ -78,7 +101,7 @@
                 <box name="title10" gx="1" gy="1" rows="1" cols="4" style="16/20">
                     <p>ANNUAL SUMMARY</p>
                 </box>
-                <box name="char" gx="1" gy="7" rows="3" cols="4" zindex="10" style="8/10" tabs="50,80,120,170,220">
+                <box name="char" gx="1" gy="7" rows="3" cols="4" zindex="10" style="8/10" tabs="60,100,150,210,240">
                     <p style="8/10-bold">Person	Age	Gender	Earnings	Expenses	Company Car</p>
                     <p>J Doe	54	Male	$124,000	$20,000	Yes</p>
                     <p>S Farad	43	Female	$150,000	$30,000	No</p>

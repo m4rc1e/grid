@@ -183,12 +183,12 @@ public:
         BuildStyles();
         BuildPages();
 
-        secondPass = true;
-        pdf = SkPDF::MakeDocument(&stream, metadata);
-        secondPassDoc->pageLinks = laidDoc->pageLinks;
-        laidDoc = secondPassDoc;
-        BuildPages();
-        std::cout << "EE" << std::endl;
+//        secondPass = true;
+//        pdf = SkPDF::MakeDocument(&stream, metadata);
+//        secondPassDoc->pageLinks = laidDoc->pageLinks;
+//        laidDoc = secondPassDoc;
+//        BuildPages();
+//        std::cout << "EE" << std::endl;
     }
 
     void offsetCanvas(SkCanvas* canvas, float width, float height) {
@@ -515,6 +515,9 @@ public:
                     // push content to next box
                     if (box->next != nullptr) {
                         auto nextBox = box->next;
+                        if (text_run.style == "") {
+                            text_run.style = styleName;
+                        }
                         auto overflow_run = laid::TextRun{
                             textSetter->overflowingText,
                             text_run.style
@@ -538,8 +541,6 @@ public:
                         std::cout << "overflowing text" << '\n';
                         std::cout << textSetter->overflowingText << '\n';
                     }
-                    // THIS IS ALL WRONG
-                    // Finally paint boxes based on box vert alignment
                     textSetter->paintCoords(box->x, box->y+offset);
                     textSetters.push_back(textSetter);
                     for (auto& setter : textSetters) {
