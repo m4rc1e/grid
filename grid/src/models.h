@@ -571,7 +571,11 @@ class Document {
                     if (box->getFirst() == nullptr) {
                         box->next = boxMap[box];
                     } else {
-                        box->next = boxMap[box->getFirst()];
+                        auto previousBox = box;
+                        while (std::find(page->boxes.begin(), page->boxes.end(), previousBox->prev) != page->boxes.end()) {
+                            previousBox = previousBox->prev;
+                        }
+                        box->next = boxMap[previousBox];
                     }
                 }
             }

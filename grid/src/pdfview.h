@@ -183,12 +183,12 @@ public:
         BuildStyles();
         BuildPages();
 
-//        secondPass = true;
-//        pdf = SkPDF::MakeDocument(&stream, metadata);
-//        secondPassDoc->pageLinks = laidDoc->pageLinks;
-//        laidDoc = secondPassDoc;
-//        BuildPages();
-//        std::cout << "EE" << std::endl;
+        secondPass = true;
+        pdf = SkPDF::MakeDocument(&stream, metadata);
+        secondPassDoc->pageLinks = laidDoc->pageLinks;
+        laidDoc = secondPassDoc;
+        BuildPages();
+        std::cout << "EE" << std::endl;
     }
 
     void offsetCanvas(SkCanvas* canvas, float width, float height) {
