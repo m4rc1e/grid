@@ -147,6 +147,13 @@
 
 namespace laid {
 
+std::unordered_set<std::string> printsettingsAttribs = {
+    "composition",
+    "paperheight",
+    "paperwidth",
+    "crops",
+};
+
 std::unordered_set<std::string> masterPageAttribs = {
     "name",
     "height",
@@ -416,6 +423,7 @@ std::shared_ptr<laid::Box> parseBox(pugi::xml_node box_node, std::shared_ptr<lai
 }
 
 laid::PrintSettings parsePrintSettings(pugi::xml_node print_node) {
+    unkownAttribs(print_node, printsettingsAttribs);
     auto printSettings = laid::PrintSettings{};
     auto composition = print_node.attribute("composition").as_string();
     if (strcmp(composition, "spreads") == 0) {
